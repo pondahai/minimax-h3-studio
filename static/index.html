@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiniMax H3 Colab Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eef2ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+            surface: { 800: '#18181b', 850: '#141416', 900: '#09090b', 950: '#040405' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #141416; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  </style>
+</head>
+<body class="bg-surface-950 text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- Top Navbar -->
+  <header class="border-b border-zinc-800/80 bg-surface-900/80 backdrop-blur sticky top-0 z-50 px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center space-x-3.5">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-brand-500/25">
+        <i data-lucide="video" class="w-5 h-5 text-white"></i>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="font-bold text-lg tracking-tight text-white">MiniMax H3 Colab Studio</h1>
+          <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">Ref2VA</span>
+        </div>
+        <p class="text-xs text-zinc-400">Google Colab CLI 雲端推論控制中心</p>
+      </div>
+    </div>
+
+    <!-- Colab Balance & Status Bar -->
+    <div class="flex items-center space-x-3">
+      <div id="balanceCard" class="flex items-center space-x-3 px-4 py-2 rounded-xl bg-surface-800/90 border border-zinc-700/60 shadow-sm">
+        <div class="flex items-center space-x-2">
+          <span class="relative flex h-2.5 w-2.5">
+            <span id="balancePulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span class="text-xs text-zinc-400 font-medium">Colab 算力餘額:</span>
+        </div>
+        <div class="flex items-baseline space-x-1">
+          <span id="balanceVal" class="text-base font-bold font-mono text-emerald-400">查詢中...</span>
+          <span class="text-[11px] text-zinc-400 font-medium">Units</span>
+        </div>
+        <div class="h-4 w-[1px] bg-zinc-700 mx-1"></div>
+        <div class="text-[11px] text-zinc-400">
+          費率: <span id="rateVal" class="font-mono text-zinc-200">--</span>/hr
+        </div>
+        <button id="refreshBalanceBtn" onclick="fetchBalance(true)" title="重新整理餘額" class="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-[1680px] w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT COLUMN: Inputs & Configuration (7 cols) -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- Section 1: Reference Images (1-9 images) -->
+      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
+        <div class="flex items-center justify-between mb-3.5">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="image" class="w-4 h-4 text-brand-400"></i>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">1. 參照圖片 (Reference Images)</h2>
+          </div>
+          <span class="text-xs text-zinc-400">支援 1～9 張圖片（對應 &lt;Picture 1&gt;～&lt;Picture 9&gt;）</span>
+        </div>
+
+        <!-- Drag & Drop Zone -->
+        <div id="dropZone" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-zinc-700/80 hover:border-brand-500 rounded-xl p-5 text-center cursor-pointer transition bg-surface-850/50 hover:bg-surface-800/40 group">
+          <input type="file" id="fileInput" multiple accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+          <i data-lucide="upload-cloud" class="w-8 h-8 text-zinc-500 group-hover:text-brand-400 mx-auto mb-2 transition"></i>
+          <p class="text-xs text-zinc-300 font-medium">點擊或拖放參照圖片至此處上傳</p>
+          <p class="text-[11px] text-zinc-500 mt-1">PNG, JPG, WEBP (自動依序指派 Picture 編號)</p>
+        </div>
+
+        <!-- Image Previews List -->
+        <div id="imageList" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-4">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Section 2: Prompt Configuration -->
+      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="sparkles" class="w-4 h-4 text-brand-400"></i>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">2. 影片提示詞 (Ref2VA Prompt)</h2>
+          </div>
+          <!-- Mode Tabs -->
+          <div class="inline-flex rounded-lg bg-surface-800 p-1 border border-zinc-700/60 text-xs font-medium">
+            <button id="tabBuilder" onclick="switchPromptMode('builder')" class="px-3 py-1 rounded-md bg-brand-600 text-white shadow">結構化產生器</button>
+            <button id="tabRaw" onclick="switchPromptMode('raw')" class="px-3 py-1 rounded-md text-zinc-400 hover:text-white">自由編輯</button>
+          </div>
+        </div>
+
+        <!-- Ref2VA Guided Builder -->
+        <div id="promptBuilderView" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-zinc-300 mb-1">主體定義 (subject_definitions)</label>
+              <textarea id="refSubject" rows="2" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 font-mono" placeholder="The subject (S1) is the character from &lt;Picture 1&gt;."></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-zinc-300 mb-1">留存特徵分析 (retention_analysis)</label>
+              <textarea id="refRetention" rows="2" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 font-mono" placeholder="Retain facial features, clothing, and color palette from &lt;Picture 1&gt;."></textarea>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">整體劇情概要 (summary)</label>
+            <input type="text" id="refSummary" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500" placeholder="Cinematic sequence showing S1 walking gracefully and turning towards the camera.">
+          </div>
+
+          <!-- Multi-shot List -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-semibold text-zinc-300">分鏡鏡頭 (Shots Description)</label>
+              <button onclick="addShotRow()" class="text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center space-x-1">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>新增分鏡鏡頭</span>
+              </button>
+            </div>
+            <div id="shotsContainer" class="space-y-2.5">
+              <!-- Default Shot 1 -->
+              <div class="shot-row p-3 rounded-xl bg-surface-850 border border-zinc-800 space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-brand-400">Shot 1 (起始於 0.0s)</span>
+                  <input type="hidden" class="shot-start" value="0.0">
+                </div>
+                <input type="text" class="shot-desc w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200" placeholder="鏡頭動作與場景描述 (e.g. S1 walks into view under cinematic warm lighting)">
+                <div class="flex items-center space-x-2">
+                  <span class="text-[11px] text-zinc-400 shrink-0">角色台詞 (選填):</span>
+                  <input type="text" class="shot-dialogue w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="例如：你好，歡迎來到未來的世界。 (自動封裝為 &lt;d&gt;[Chinese] ...&lt;/d&gt;)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-zinc-300 mb-1">整體音景 (overall_soundscape)</label>
+              <input type="text" id="refSoundscape" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500" value="Gentle wind breeze and ambient city atmosphere with subtle footsteps.">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-zinc-300 mb-1">非劇情配樂 (non_diegetic_music)</label>
+              <input type="text" id="refMusic" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500" value="Uplifting cinematic strings with subtle synth pads.">
+            </div>
+          </div>
+
+          <button onclick="composeRef2VAPrompt()" class="w-full py-2 bg-surface-800 hover:bg-surface-700 border border-zinc-700 rounded-xl text-xs font-semibold text-zinc-200 flex items-center justify-center space-x-2 transition">
+            <i data-lucide="wand-2" class="w-3.5 h-3.5 text-brand-400"></i>
+            <span>合成標準 Ref2VA 提示詞</span>
+          </button>
+        </div>
+
+        <!-- Raw Prompt View -->
+        <div id="promptRawView" class="space-y-2 hidden">
+          <textarea id="rawPrompt" rows="9" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 font-mono leading-relaxed" placeholder="輸入完整的 MiniMax H3 Ref2VA 提示詞..."></textarea>
+          <div class="flex items-center justify-between text-[11px] text-zinc-500">
+            <span>支援標籤: &lt;Picture 1&gt; ~ &lt;Picture 9&gt;, &lt;d&gt;[Chinese] 台詞&lt;/d&gt;</span>
+            <button onclick="loadTemplatePrompt()" class="text-brand-400 hover:underline">載入範例模板</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Generation Parameters & Trigger -->
+      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200 mb-4 flex items-center space-x-2">
+          <i data-lucide="sliders" class="w-4 h-4 text-brand-400"></i>
+          <span>3. 算力與生成設定 (Colab Runtime)</span>
+        </h2>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
+          <!-- Duration -->
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">影片長度 (秒)</label>
+            <div class="flex items-center space-x-2">
+              <input type="range" id="durationRange" min="4" max="15" value="12" class="w-full accent-brand-500 cursor-pointer" oninput="document.getElementById('durationVal').innerText = this.value">
+              <span id="durationVal" class="font-mono text-sm font-bold text-brand-400 w-6">12</span>s
+            </div>
+          </div>
+
+          <!-- GPU -->
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">GPU 規格</label>
+            <select id="gpuSelect" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none">
+              <option value="A100" selected>A100 (推薦極速)</option>
+              <option value="V100">V100</option>
+              <option value="T4">T4 (經濟型)</option>
+              <option value="L4">L4</option>
+            </select>
+          </div>
+
+          <!-- High-Memory -->
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">高記憶體 (High-Mem)</label>
+            <label class="flex items-center space-x-2 cursor-pointer mt-1">
+              <input type="checkbox" id="highMemCheck" checked class="rounded border-zinc-700 text-brand-600 focus:ring-brand-500 h-4 w-4 bg-surface-850">
+              <span class="text-xs text-zinc-300">啟用高記憶體</span>
+            </label>
+          </div>
+
+          <!-- Seed -->
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">隨機種子 (Seed)</label>
+            <input type="number" id="seedInput" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-2.5 py-1.5 text-xs text-zinc-200 font-mono" placeholder="隨機">
+          </div>
+        </div>
+
+        <!-- Big Launch Button -->
+        <button id="generateBtn" onclick="startGeneration()" class="w-full py-3.5 bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 flex items-center justify-center space-x-2.5 transition transform active:scale-[0.99]">
+          <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+          <span class="text-sm tracking-wide">啟動 Google Colab MiniMax H3 影片生成</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Real-Time Status, Logs & Output (5 cols) -->
+    <div class="lg:col-span-5 space-y-6">
+
+      <!-- Current Job Progress Card -->
+      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">即時推論進度</h2>
+          </div>
+          <span id="jobStatusBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">閒置中 (Idle)</span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-surface-850 rounded-full h-2 overflow-hidden mb-3 border border-zinc-800">
+          <div id="progressBar" class="bg-gradient-to-r from-brand-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
+        </div>
+
+        <!-- Live Terminal Log -->
+        <div class="rounded-xl bg-surface-950 border border-zinc-800/90 p-3 font-mono text-[11px] h-48 overflow-y-auto space-y-1 text-zinc-400" id="logConsole">
+          <div class="text-zinc-600">&gt; 系統已就緒，等待開始任務...</div>
+        </div>
+      </div>
+
+      <!-- Video Player Card -->
+      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="film" class="w-4 h-4 text-purple-400"></i>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">生成影片預覽</h2>
+          </div>
+          <a id="downloadVideoBtn" href="#" download class="hidden text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center space-x-1">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>下載 MP4</span>
+          </a>
+        </div>
+
+        <div class="rounded-xl bg-surface-950 border border-zinc-800 overflow-hidden aspect-video flex items-center justify-center relative">
+          <video id="videoPlayer" controls class="w-full h-full object-contain hidden"></video>
+          <div id="videoPlaceholder" class="text-center p-6 text-zinc-500">
+            <i data-lucide="clapperboard" class="w-10 h-10 mx-auto mb-2 stroke-1"></i>
+            <p class="text-xs">尚無生成完成的影片</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Video Gallery -->
+      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="history" class="w-4 h-4 text-zinc-400"></i>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">歷史生成紀錄</h2>
+          </div>
+          <button onclick="fetchHistory()" class="text-xs text-zinc-400 hover:text-white">
+            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+        <div id="historyList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Global state
+    let uploadedImages = [];
+    let promptMode = 'builder';
+    let pollInterval = null;
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      fetchBalance();
+      fetchHistory();
+      setInterval(fetchBalance, 30000);
+      setupDropZone();
+    });
+
+    // Colab Balance Fetcher
+    async function fetchBalance(force = false) {
+      const btn = document.getElementById('refreshBalanceBtn');
+      btn.classList.add('animate-spin');
+      try {
+        const res = await fetch(`/api/balance?force_refresh=${force}`);
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('balanceVal').innerText = Number(data.balance).toFixed(2);
+          document.getElementById('rateVal').innerText = Number(data.rate_per_hour).toFixed(2);
+        } else {
+          document.getElementById('balanceVal').innerText = '未授權';
+        }
+      } catch (err) {
+        document.getElementById('balanceVal').innerText = '連線失敗';
+      } finally {
+        setTimeout(() => btn.classList.remove('animate-spin'), 600);
+      }
+    }
+
+    // Drag and Drop
+    function setupDropZone() {
+      const zone = document.getElementById('dropZone');
+      ['dragenter', 'dragover'].forEach(e => {
+        zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.classList.add('border-brand-500'); });
+      });
+      ['dragleave', 'drop'].forEach(e => {
+        zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.classList.remove('border-brand-500'); });
+      });
+      zone.addEventListener('drop', (ev) => {
+        if (ev.dataTransfer.files) {
+          uploadFiles(ev.dataTransfer.files);
+        }
+      });
+    }
+
+    function handleFileSelect(e) {
+      if (e.target.files) {
+        uploadFiles(e.target.files);
+      }
+    }
+
+    async function uploadFiles(files) {
+      if (uploadedImages.length + files.length > 9) {
+        alert('最多只能上傳 9 張參照圖片！');
+        return;
+      }
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.ok) {
+          uploadedImages.push(...data.files);
+          renderImages();
+        }
+      } catch (e) {
+        alert('上傳失敗: ' + e);
+      }
+    }
+
+    function removeImage(index) {
+      uploadedImages.splice(index, 1);
+      renderImages();
+    }
+
+    function renderImages() {
+      const container = document.getElementById('imageList');
+      container.innerHTML = '';
+      uploadedImages.forEach((img, idx) => {
+        const div = document.createElement('div');
+        div.className = 'relative group rounded-xl overflow-hidden border border-zinc-700 bg-surface-800 aspect-square';
+        div.innerHTML = `
+          <img src="${img.url}" class="w-full h-full object-cover">
+          <div class="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/75 text-[10px] font-mono font-bold text-brand-300">
+            &lt;Picture ${idx + 1}&gt;
+          </div>
+          <button onclick="removeImage(${idx})" class="absolute top-1 right-1 p-1 rounded-full bg-red-600/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition">
+            <i data-lucide="x" class="w-3 h-3"></i>
+          </button>
+        `;
+        container.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    // Prompt Switching & Construction
+    function switchPromptMode(mode) {
+      promptMode = mode;
+      const builder = document.getElementById('promptBuilderView');
+      const raw = document.getElementById('promptRawView');
+      const bTab = document.getElementById('tabBuilder');
+      const rTab = document.getElementById('tabRaw');
+
+      if (mode === 'builder') {
+        builder.classList.remove('hidden');
+        raw.classList.add('hidden');
+        bTab.className = 'px-3 py-1 rounded-md bg-brand-600 text-white shadow';
+        rTab.className = 'px-3 py-1 rounded-md text-zinc-400 hover:text-white';
+      } else {
+        builder.classList.add('hidden');
+        raw.classList.remove('hidden');
+        rTab.className = 'px-3 py-1 rounded-md bg-brand-600 text-white shadow';
+        bTab.className = 'px-3 py-1 rounded-md text-zinc-400 hover:text-white';
+      }
+    }
+
+    function addShotRow() {
+      const container = document.getElementById('shotsContainer');
+      const count = container.querySelectorAll('.shot-row').length + 1;
+      const startSec = (count - 1) * 3.0;
+      const div = document.createElement('div');
+      div.className = 'shot-row p-3 rounded-xl bg-surface-850 border border-zinc-800 space-y-2 relative group';
+      div.innerHTML = `
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-brand-400">Shot ${count}</span>
+          <div class="flex items-center space-x-1">
+            <span class="text-zinc-500 text-[11px]">開始時間 (秒):</span>
+            <input type="number" step="0.5" class="shot-start w-16 bg-surface-900 border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-zinc-200" value="${startSec.toFixed(1)}">
+            <button onclick="this.closest('.shot-row').remove()" class="text-zinc-500 hover:text-red-400 p-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+        <input type="text" class="shot-desc w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200" placeholder="鏡頭動作與場景描述">
+        <div class="flex items-center space-x-2">
+          <span class="text-[11px] text-zinc-400 shrink-0">角色台詞 (選填):</span>
+          <input type="text" class="shot-dialogue w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="角色台詞">
+        </div>
+      `;
+      container.appendChild(div);
+      lucide.createIcons();
+    }
+
+    async function composeRef2VAPrompt() {
+      if (uploadedImages.length === 0) {
+        alert('請先上傳至少 1 張參照圖片！');
+        return;
+      }
+      const shots = [];
+      document.querySelectorAll('.shot-row').forEach(row => {
+        shots.push({
+          start_seconds: parseFloat(row.querySelector('.shot-start').value || 0),
+          description: row.querySelector('.shot-desc').value || 'The camera frames the subject.',
+          dialogue: row.querySelector('.shot-dialogue').value || '',
+          speaker: 'The subject (S1)'
+        });
+      });
+
+      const payload = {
+        subject_definitions: document.getElementById('refSubject').value || 'The subject (S1) is the character in <Picture 1>.',
+        summary: document.getElementById('refSummary').value || 'Cinematic sequence of S1.',
+        retention_analysis: document.getElementById('refRetention').value || 'Retain facial and clothing details.',
+        shots: shots,
+        overall_soundscape: document.getElementById('refSoundscape').value,
+        non_diegetic_music: document.getElementById('refMusic').value,
+        image_count: uploadedImages.length,
+        duration_seconds: parseFloat(document.getElementById('durationRange').value)
+      };
+
+      try {
+        const res = await fetch('/api/compose_prompt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('rawPrompt').value = data.prompt;
+          switchPromptMode('raw');
+        } else {
+          alert('合成失敗: ' + data.error);
+        }
+      } catch (e) {
+        alert('請求錯誤: ' + e);
+      }
+    }
+
+    function loadTemplatePrompt() {
+      document.getElementById('rawPrompt').value = 
+`subject_definitions:
+The subject (S1) is the character shown in <Picture 1>.
+
+summary:
+A cinematic character presentation highlighting S1 turning to face the camera.
+
+retention_analysis:
+Retain key facial features, outfit texture, and ambient mood from <Picture 1>.
+
+detailed_description:
+[Shot 1] S1 stands in warm cinematic lighting and smiles gently. The subject (S1) says, <d>[Chinese] 很高興遇見你，讓我們一起探索世界吧。</d>
+
+[Shot 2] At 00:06.000, the camera cuts to a close-up shot capturing S1's expressive eyes and subtle head turn.
+
+overall_soundscape:
+Subtle studio ambience with gentle breeze acoustics.
+
+non_diegetic_music:
+Soft melodic piano with warm strings.`;
+    }
+
+    // Generation Execution
+    async function startGeneration() {
+      if (uploadedImages.length === 0) {
+        alert('請先上傳至少 1 張參照圖片！');
+        return;
+      }
+
+      let prompt = '';
+      if (promptMode === 'raw') {
+        prompt = document.getElementById('rawPrompt').value.trim();
+      }
+      if (!prompt) {
+        await composeRef2VAPrompt();
+        prompt = document.getElementById('rawPrompt').value.trim();
+      }
+
+      if (!prompt) {
+        alert('請填寫或合成提示詞！');
+        return;
+      }
+
+      const payload = {
+        title: "MiniMax H3 Generation",
+        reference_images: uploadedImages.map(img => img.path),
+        prompt: prompt,
+        duration_seconds: parseInt(document.getElementById('durationRange').value),
+        gpu: document.getElementById('gpuSelect').value,
+        high_mem: document.getElementById('highMemCheck').checked,
+        seed: document.getElementById('seedInput').value ? parseInt(document.getElementById('seedInput').value) : null
+      };
+
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.ok) {
+          startPolling();
+        } else {
+          alert('啟動失敗: ' + (data.detail || data.error));
+          btn.disabled = false;
+          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+      } catch (err) {
+        alert('呼叫錯誤: ' + err);
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    // Polling Status
+    function startPolling() {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(checkStatus, 3000);
+      checkStatus();
+    }
+
+    async function checkStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        const badge = document.getElementById('jobStatusBadge');
+        const bar = document.getElementById('progressBar');
+        const consoleEl = document.getElementById('logConsole');
+        const btn = document.getElementById('generateBtn');
+
+        badge.innerText = data.status.toUpperCase();
+        if (data.status === 'starting' || data.status === 'uploading') {
+          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30';
+          bar.style.width = '30%';
+        } else if (data.status === 'running' || data.status === 'generating') {
+          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 animate-pulse';
+          bar.style.width = '70%';
+        } else if (data.status === 'downloading') {
+          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30';
+          bar.style.width = '90%';
+        } else if (data.status === 'completed') {
+          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+          bar.style.width = '100%';
+          btn.disabled = false;
+          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+          clearInterval(pollInterval);
+          fetchHistory();
+          fetchBalance();
+        } else if (data.status === 'failed') {
+          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30';
+          bar.style.width = '100%';
+          btn.disabled = false;
+          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+          clearInterval(pollInterval);
+        }
+
+        // Render logs
+        if (data.log_tail && data.log_tail.length > 0) {
+          consoleEl.innerHTML = data.log_tail.map(l => `<div>&gt; ${escapeHtml(l)}</div>`).join('');
+          consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Check completed job outputs
+        if (data.jobs && data.jobs.length > 0) {
+          const finished = data.jobs.find(j => j.status === 'completed');
+          if (finished && finished.output) {
+            const filename = finished.output.split(/[\\/]/).pop();
+            showVideo(`/outputs/${filename}`);
+          }
+        }
+      } catch (e) {
+        console.error('Status check error:', e);
+      }
+    }
+
+    function showVideo(url) {
+      const player = document.getElementById('videoPlayer');
+      const placeholder = document.getElementById('videoPlaceholder');
+      const dl = document.getElementById('downloadVideoBtn');
+      player.src = url;
+      player.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+      dl.href = url;
+      dl.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    async function fetchHistory() {
+      try {
+        const res = await fetch('/api/history');
+        const data = await res.json();
+        const list = document.getElementById('historyList');
+        if (data.videos && data.videos.length > 0) {
+          list.innerHTML = data.videos.map(v => `
+            <div onclick="showVideo('${v.url}')" class="p-2.5 rounded-xl bg-surface-850 hover:bg-surface-800 border border-zinc-800 cursor-pointer flex items-center justify-between text-xs transition">
+              <div class="flex items-center space-x-2.5 overflow-hidden">
+                <i data-lucide="play-circle" class="w-4 h-4 text-brand-400 shrink-0"></i>
+                <div class="truncate">
+                  <div class="font-medium text-zinc-200 truncate">${escapeHtml(v.filename)}</div>
+                  <div class="text-[10px] text-zinc-500">${v.created_at} · ${v.size_mb} MB</div>
+                </div>
+              </div>
+              <a href="${v.url}" download onclick="event.stopPropagation()" class="p-1 text-zinc-400 hover:text-white">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          `).join('');
+          lucide.createIcons();
+        } else {
+          list.innerHTML = '<div class="text-xs text-zinc-500 text-center py-4">無歷史紀錄</div>';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
+    }
+  </script>
+</body>
+</html>
