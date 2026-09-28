@@ -399,11 +399,13 @@ def start_generation(req: GenerateRequest):
         if not output_name.endswith(".mp4"):
             output_name += ".mp4"
 
+        mode_val = "first_frame" if str(req.mode or "").lower() in ("fl2va", "first_frame") else "reference"
         manifest_data = {
             "jobs": [
                 {
                     "id": job_id,
                     "title": req.title or "MiniMax H3 Video",
+                    "mode": mode_val,
                     "reference_images": resolved_images,
                     "reference_audios": resolved_audios,
                     "prompt": req.prompt,

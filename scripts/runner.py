@@ -417,9 +417,11 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
         if not prompt.strip():
             raise ValueError(f"Job {index} needs a non-empty UTF-8 prompt.")
         image_count = len(image_paths)
-        invalid = sorted({int(n) for n in PICTURE_RE.findall(prompt) if int(n) < 1 or int(n) > image_count})
-        if invalid:
-            raise ValueError(f"Job {index} prompt references Picture {invalid}; it has {image_count} images.")
+        mode = "first_frame" if str(raw.get("mode", "reference")).lower() in ("first_frame", "fl2va") else "reference"
+        if mode == "reference":
+            invalid = sorted({int(n) for n in PICTURE_RE.findall(prompt) if int(n) < 1 or int(n) > image_count})
+            if invalid:
+                raise ValueError(f"Job {index} prompt references Picture {invalid}; it has {image_count} images.")
         duration = float(raw.get("duration_seconds", raw.get("duration", 12)))
         if not math.isfinite(duration) or not 4 <= duration <= 15:
             raise ValueError(f"Job {index} duration must be between 4 and 15 seconds.")
@@ -447,6 +449,7 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
         resolved.append({
             "id": job_id,
             "title": str(raw.get("title") or f"Video {index}")[:120],
+            "mode": mode,
             "prompt": prompt,
             "reference_images": image_paths,
             "reference_audios": audio_paths,
@@ -537,15 +540,32 @@ def run_batch(
             write_progress(progress_path, progress)
             remote_refs: list[str] = []
             remote_prefix = f"/content/h3_{job['id']}"
-            for image_index, image_path in enumerate(job["reference_images"], start=1):
-                remote = f"{remote_prefix}_reference_{image_index}.img"
+            is_first_frame = (job.get("mode") == "first_frame")
+            remote_first_frame = f"{remote_prefix}_first_frame.png"
+
+            if is_first_frame:
+                first_img = job["reference_images"][0]
                 call_colab(
-                    ["upload", "--session", session, str(image_path), remote],
-                    label=f"upload reference {image_index} for {job['title']}",
+                    ["upload", "--session", session, str(first_img), remote_first_frame],
+                    label=f"upload first frame for {job['title']}",
                     timeout=600,
                     on_line=log_line,
+                    session_to_stop=session,
+                    stall_timeout=120,
                 )
-                remote_refs.append(remote)
+                remote_refs.append(remote_first_frame)
+            else:
+                for image_index, image_path in enumerate(job["reference_images"], start=1):
+                    remote = f"{remote_prefix}_reference_{image_index}.img"
+                    call_colab(
+                        ["upload", "--session", session, str(image_path), remote],
+                        label=f"upload reference {image_index} for {job['title']}",
+                        timeout=600,
+                        on_line=log_line,
+                        session_to_stop=session,
+                        stall_timeout=120,
+                    )
+                    remote_refs.append(remote)
 
             remote_audios: list[str] = []
             for audio_index, audio_path in enumerate(job.get("reference_audios", []), start=1):
@@ -576,7 +596,7 @@ def run_batch(
             shutil.copy2(NOTEBOOK, notebook_copy)
             effective_exec_timeout = int(min(exec_timeout, DEFAULT_MAX_EXEC_TIMEOUT_SECONDS))
             env_values = [
-                "H3_INFERENCE_MODE=reference",
+                f"H3_INFERENCE_MODE={'first_frame' if is_first_frame else 'reference'}",
                 "H3_REFERENCE_IMAGES=" + json.dumps(remote_refs, separators=(",", ":")),
                 "H3_REFERENCE_AUDIOS=" + json.dumps(remote_audios, separators=(",", ":")),
                 "H3_PROMPT_FILE=" + remote_prompt,
@@ -586,6 +606,8 @@ def run_batch(
                 "H3_OUTPUT_PATH=" + remote_output,
                 "H3_JOB_TIMEOUT_SECONDS=" + str(effective_exec_timeout),
             ]
+            if is_first_frame:
+                env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")
             exec_args = ["exec", "--session", session, "--timeout", str(effective_exec_timeout)]
             for value in env_values:
                 exec_args.extend(["--env", value])

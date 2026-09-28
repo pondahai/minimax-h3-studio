@@ -470,6 +470,7 @@
       } else {
         document.getElementById('ref2vaCanvas').classList.remove('hidden');
       }
+      renderAssetLists();
     }
 
     // Colab Balance Fetcher
@@ -572,10 +573,15 @@
       uploadedImages.forEach((img, idx) => {
         const card = document.createElement('div');
         card.className = 'relative group rounded-xl overflow-hidden border border-zinc-700 bg-surface-800 aspect-square';
+        const isFLFirst = (workflowMode === 'fl2va' && idx === 0);
+        const badgeClass = isFLFirst 
+          ? 'bg-purple-950/90 text-purple-200 border border-purple-500 shadow-sm' 
+          : 'bg-black/75 text-brand-300';
+        const badgeLabel = isFLFirst ? '&lt;首幀 Frame 0&gt;' : `&lt;Picture ${idx + 1}&gt;`;
         card.innerHTML = `
           <img src="${img.url}" class="w-full h-full object-cover">
-          <div class="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-mono font-bold text-brand-300">
-            &lt;Picture ${idx + 1}&gt;
+          <div class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${badgeClass}">
+            ${badgeLabel}
           </div>
           <button onclick="removeImage(${idx})" class="absolute top-1 right-1 p-1 rounded-full bg-red-600/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition">
             <i data-lucide="x" class="w-3 h-3"></i>
@@ -1002,7 +1008,7 @@ ${concept}
       lucide.createIcons();
     }
 
-    // Extend From Last Frame Feature
+    // Extend From Last Frame Feature (Continuous Storytelling via FL2VA)
     async function extendFromLastFrame() {
       if (!currentVideoFile) return;
       try {
@@ -1013,7 +1019,7 @@ ${concept}
         });
         const data = await res.json();
         if (data.ok) {
-          // Replace Picture 1 with the extracted frame
+          // Set extracted frame as the sole initial frame
           uploadedImages = [{
             filename: data.filename,
             original_name: 'LastFrame_' + currentVideoFile,
@@ -1021,8 +1027,9 @@ ${concept}
             url: data.url,
             type: 'image'
           }];
+          setWorkflowMode('fl2va');
           renderAssetLists();
-          alert('✅ 已擷取上一鏡最後一幀，並自動設為新的 Picture 1！您可以直接編寫下一鏡劇本接續生成！');
+          alert('🎬 已成功擷取上一鏡最後一幀！\n\n系統已自動切換為【🎬 FL2VA 首尾過渡】首幀延續模式。\n新影片第 0 秒將精確鎖定在此畫面，並以此為起點開展連續動作，確保前後鏡頭無縫銜接！');
         } else {
           alert('擷取失敗: ' + data.detail);
         }
