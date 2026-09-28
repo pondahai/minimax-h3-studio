@@ -110,8 +110,12 @@
         <div id="imageDropZone" onclick="document.getElementById('imageFileInput').click()" class="border border-dashed border-zinc-700/80 hover:border-brand-500 rounded-xl p-3.5 text-center cursor-pointer transition bg-surface-850/60 hover:bg-surface-800/40 group">
           <input type="file" id="imageFileInput" multiple accept="image/*" class="hidden" onchange="handleImageSelect(event)">
           <i data-lucide="upload" class="w-5 h-5 text-zinc-500 group-hover:text-brand-400 mx-auto mb-1 transition"></i>
-          <p class="text-xs text-zinc-300 font-medium">拖放或點擊上傳參照圖</p>
-          <p class="text-[10px] text-zinc-500 mt-0.5">自動對應 &lt;Picture 1&gt; ~ &lt;Picture 9&gt;</p>
+          <p class="text-xs text-zinc-300 font-medium flex items-center justify-center gap-1.5 flex-wrap">
+            <span>拖放、點擊或</span>
+            <kbd class="px-1.5 py-0.5 rounded bg-surface-750 border border-zinc-600 text-[10px] font-mono text-brand-300 shadow-sm font-bold">Ctrl + V</kbd>
+            <span>貼上圖片</span>
+          </p>
+          <p class="text-[10px] text-zinc-500 mt-0.5">截圖直接貼上，自動對應 &lt;Picture 1&gt; ~ &lt;Picture 9&gt;</p>
         </div>
 
         <!-- Image Preview Grid -->
@@ -454,7 +458,7 @@
       }
     }
 
-    // Dropzone setup
+    // Dropzone & Paste setup
     function setupDropZones() {
       const imgZone = document.getElementById('imageDropZone');
       const audZone = document.getElementById('audioDropZone');
@@ -466,6 +470,48 @@
 
       imgZone.addEventListener('drop', ev => { if (ev.dataTransfer.files) uploadFiles(ev.dataTransfer.files); });
       audZone.addEventListener('drop', ev => { if (ev.dataTransfer.files) uploadFiles(ev.dataTransfer.files); });
+
+      // Support CTRL-V pasting of images globally
+      window.addEventListener('paste', handleGlobalPaste);
+    }
+
+    function handleGlobalPaste(e) {
+      const clipboardData = e.clipboardData || window.clipboardData;
+      if (!clipboardData) return;
+
+      const items = clipboardData.items;
+      const imageFiles = [];
+
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type && items[i].type.startsWith('image/')) {
+            const file = items[i].getAsFile();
+            if (file) {
+              const ext = file.type.split('/')[1] || 'png';
+              const namedFile = new File([file], `paste_${Date.now()}_${i + 1}.${ext}`, { type: file.type });
+              imageFiles.push(namedFile);
+            }
+          }
+        }
+      }
+
+      if (imageFiles.length === 0 && clipboardData.files && clipboardData.files.length > 0) {
+        for (let i = 0; i < clipboardData.files.length; i++) {
+          if (clipboardData.files[i].type && clipboardData.files[i].type.startsWith('image/')) {
+            imageFiles.push(clipboardData.files[i]);
+          }
+        }
+      }
+
+      if (imageFiles.length > 0) {
+        e.preventDefault();
+        const imgZone = document.getElementById('imageDropZone');
+        if (imgZone) {
+          imgZone.classList.add('border-brand-400', 'bg-brand-950/40');
+          setTimeout(() => imgZone.classList.remove('border-brand-400', 'bg-brand-950/40'), 800);
+        }
+        uploadFiles(imageFiles);
+      }
     }
 
     function handleImageSelect(e) { if (e.target.files) uploadFiles(e.target.files); }
