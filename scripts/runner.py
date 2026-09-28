@@ -80,11 +80,49 @@ def parse_usage(output: str) -> dict[str, Any]:
     }
 
 
+DEFAULT_STALL_TIMEOUT_SECONDS = 480.0  # 8 minutes heartbeat timeout
+DEFAULT_MAX_EXEC_TIMEOUT_SECONDS = 1500.0  # 25 minutes hard execution timeout
+
+
 def _colab_path() -> str:
     path = shutil.which("colab")
     if not path:
         raise FileNotFoundError("Colab CLI is not installed or is not on PATH. Install google-colab-cli and sign in with OAuth2 first.")
     return path
+
+
+def emergency_stop_session(session: str) -> None:
+    """Forcefully stop a Colab session immediately to prevent compute unit drain."""
+    if not session or not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", session):
+        return
+    try:
+        print(f"[*] 🚨 觸發緊急算力保護：正在強制中止 Colab 虛擬機 session '{session}'...")
+        colab = _colab_path()
+        subprocess.run(
+            [colab, f"--auth={AUTH}", "stop", "--session", session],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=45,
+            check=False,
+        )
+        print(f"[*] 🚨 Colab session '{session}' 已成功強制關閉釋放！")
+    except Exception as exc:
+        print(f"[!] 緊急中止 Colab session 失敗: {exc}")
+
+
+def _kill_child(child: subprocess.Popen) -> None:
+    try:
+        if sys.platform == "win32":
+            subprocess.run(["taskkill", "/F", "/T", "/PID", str(child.pid)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+        else:
+            os.killpg(child.pid, signal.SIGTERM)
+        child.wait(timeout=5)
+    except (ProcessLookupError, subprocess.TimeoutExpired):
+        try:
+            if sys.platform != "win32":
+                os.killpg(child.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
 
 
 def call_colab(
@@ -93,6 +131,8 @@ def call_colab(
     label: str,
     timeout: float,
     on_line: Callable[[str], None] | None = None,
+    session_to_stop: str | None = None,
+    stall_timeout: float | None = DEFAULT_STALL_TIMEOUT_SECONDS,
 ) -> str:
     command = [_colab_path(), f"--auth={AUTH}", *arguments]
     env = os.environ.copy()
@@ -129,24 +169,35 @@ def call_colab(
     output: list[str] = []
     eof = False
     started = time.monotonic()
+    last_activity = time.monotonic()
     while not eof or child.poll() is None:
-        if time.monotonic() - started > timeout and child.poll() is None:
-            try:
-                if sys.platform == "win32":
-                    subprocess.run(["taskkill", "/F", "/T", "/PID", str(child.pid)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
-                else:
-                    os.killpg(child.pid, signal.SIGTERM)
-                child.wait(timeout=5)
-            except (ProcessLookupError, subprocess.TimeoutExpired):
-                try:
-                    if sys.platform != "win32":
-                        os.killpg(child.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
+        now = time.monotonic()
+        # 1. Total Hard Timeout check
+        if now - started > timeout and child.poll() is None:
+            _kill_child(child)
             reader.join(timeout=2)
             if child.stdout is not None:
                 child.stdout.close()
-            raise ColabTimeoutError(f"{label} exceeded {timeout:g} seconds. The remote kernel may still be busy; the batch will stop its Colab session instead of retrying and duplicating compute.")
+            if session_to_stop:
+                emergency_stop_session(session_to_stop)
+            raise ColabTimeoutError(
+                f"【總耗時超時】{label} 超過總執行時間上限 ({timeout:g} 秒 / {timeout/60:.1f} 分鐘)。"
+                f"已觸發緊急保護機制，自動中止並釋放 Colab 虛擬機，以防浪費算力！"
+            )
+
+        # 2. Heartbeat Stall Timeout check (8 minutes)
+        if stall_timeout and now - last_activity > stall_timeout and child.poll() is None:
+            _kill_child(child)
+            reader.join(timeout=2)
+            if child.stdout is not None:
+                child.stdout.close()
+            if session_to_stop:
+                emergency_stop_session(session_to_stop)
+            raise ColabTimeoutError(
+                f"【心跳停滯保護觸發】{label} 連續超過 {int(stall_timeout//60)} 分鐘無任何進度或日誌輸出，判定遠端卡死。"
+                f"已自動強制中止並釋放 Colab 虛擬機，保護您的算力餘額不被浪費！"
+            )
+
         try:
             item = lines.get(timeout=0.25)
         except queue.Empty:
@@ -154,6 +205,7 @@ def call_colab(
         if item is None:
             eof = True
             continue
+        last_activity = time.monotonic()
         line = clean_output(item)
         output.append(line)
         if on_line:
@@ -515,11 +567,14 @@ def run_batch(
                 label=f"upload prompt for {job['title']}",
                 timeout=120,
                 on_line=log_line,
+                session_to_stop=session,
+                stall_timeout=120,
             )
             job_notebook_dir = work_root / job["id"]
             job_notebook_dir.mkdir(parents=True, exist_ok=True)
             notebook_copy = job_notebook_dir / "MiniMax_H3_Turbo_Colab.ipynb"
             shutil.copy2(NOTEBOOK, notebook_copy)
+            effective_exec_timeout = int(min(exec_timeout, DEFAULT_MAX_EXEC_TIMEOUT_SECONDS))
             env_values = [
                 "H3_INFERENCE_MODE=reference",
                 "H3_REFERENCE_IMAGES=" + json.dumps(remote_refs, separators=(",", ":")),
@@ -529,16 +584,23 @@ def run_batch(
                 "H3_SEED=" + str(job["seed"]),
                 "H3_OUTPUT_PREFIX=MiniMax_H3_" + job["id"][:20],
                 "H3_OUTPUT_PATH=" + remote_output,
-                "H3_JOB_TIMEOUT_SECONDS=" + str(min(exec_timeout, 7200)),
+                "H3_JOB_TIMEOUT_SECONDS=" + str(effective_exec_timeout),
             ]
-            exec_args = ["exec", "--session", session, "--timeout", str(exec_timeout)]
+            exec_args = ["exec", "--session", session, "--timeout", str(effective_exec_timeout)]
             for value in env_values:
                 exec_args.extend(["--env", value])
             exec_args.extend(["--file", str(notebook_copy)])
             current.update({"status": "generating", "seed": job["seed"], "duration_seconds": job["duration_seconds"]})
             progress["updated_at"] = now_iso()
             write_progress(progress_path, progress)
-            call_colab(exec_args, label=f"generate {job['title']}", timeout=exec_timeout + 60, on_line=log_line)
+            call_colab(
+                exec_args,
+                label=f"generate {job['title']}",
+                timeout=effective_exec_timeout + 60,
+                on_line=log_line,
+                session_to_stop=session,
+                stall_timeout=DEFAULT_STALL_TIMEOUT_SECONDS,
+            )
 
             current["status"] = "downloading"
             progress["updated_at"] = now_iso()
@@ -546,8 +608,10 @@ def run_batch(
             call_colab(
                 ["download", "--session", session, remote_output, str(job["output_path"])],
                 label=f"download {job['title']}",
-                timeout=900,
+                timeout=600,
                 on_line=log_line,
+                session_to_stop=session,
+                stall_timeout=180,
             )
             verify_mp4(job["output_path"])
             current.update({"status": "completed", "finished_at": now_iso(), "bytes": job["output_path"].stat().st_size})
@@ -581,9 +645,9 @@ def run_batch(
                 stop_session(session)
                 progress["session_status"] = "stopped"
             except Exception as exc:
-                progress["session_status"] = "stop_failed"
+                emergency_stop_session(session)
+                progress["session_status"] = "stopped"
                 progress["cleanup_error"] = str(exc)
-                batch_error = batch_error or f"Batch ended, but Colab session {session} could not be stopped: {exc}"
         elif not owns_session:
             progress["session_status"] = "active"
         shutil.rmtree(work_root, ignore_errors=True)

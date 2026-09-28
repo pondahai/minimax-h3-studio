@@ -311,7 +311,7 @@ class GenerateRequest(BaseModel):
     duration_seconds: int = 12
     gpu: str = "A100"
     high_mem: bool = True
-    timeout: int = 3600
+    timeout: int = 1500
     seed: Optional[int] = None
     output_name: Optional[str] = None
 
@@ -423,6 +423,30 @@ def start_generation(req: GenerateRequest):
         return {"ok": True, "job_id": job_id, "message": "任務已排入 Google Colab 佇列"}
 
 
+@app.post("/api/cancel")
+def cancel_generation():
+    """Immediately abort current task and terminate remote Colab VM."""
+    global current_state
+    session = current_state.get("session")
+    if not session and PROGRESS_FILE.is_file():
+        try:
+            p = json.loads(PROGRESS_FILE.read_text(encoding="utf-8"))
+            session = p.get("session")
+        except Exception:
+            pass
+
+    current_state["is_running"] = False
+    current_state["status"] = "cancelled"
+    current_state["stage"] = 0
+    current_state["stage_label"] = "任務已手動取消，Colab 虛擬機已安全釋放"
+    current_state["log_tail"].append("[*] 🛑 手動取消任務，正在強制釋放遠端 Colab...")
+
+    if session:
+        runner.emergency_stop_session(session)
+
+    return {"ok": True, "message": "任務已中止並釋放 Colab 運算資源。"}
+
+
 @app.get("/api/status")
 def get_status():
     """Poll live progress, stage, logs and outputs."""
@@ -497,7 +521,7 @@ def stop_generation():
         try:
             runner.stop_session(session)
         except Exception as e:
-            pass
+            runner.emergency_stop_session(session)
 
     current_state["is_running"] = False
     current_state["status"] = "stopped"
