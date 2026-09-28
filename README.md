@@ -7,8 +7,8 @@
 ## 目錄
 - [1. 貢獻者致謝](#1-貢獻者致謝)
 - [2. 專案目錄結構](#2-專案目錄結構)
-- [3. 前端功能與特色](#3-前端功能與特色)
-  - [3.1 提示詞生成工作流：搭配外部 LLM（如 Qwen 3.8 27B）](#31-提示詞生成工作流搭配外部-llm如-qwen-38-27b)
+- [3. 前端功能與特色 (Studio 2.0)](#3-前端功能與特色-studio-20)
+  - [3.1 外部 LLM 導演工作流（搭配 Qwen 3.8 / 2.5 27B 等）](#31-外部-llm-導演工作流搭配-qwen-38--25-27b-等)
 - [4. 技術挑戰與相容性修復過程](#4-技術挑戰與相容性修復過程)
   - [4.1 Colab CLI Windows 原生相容性修復（termios / tty）](#41-colab-cli-windows-原生相容性修復termios--tty)
   - [4.2 Windows 控制台 CP950 編碼問題](#42-windows-控制台-cp950-編碼問題)
@@ -16,6 +16,10 @@
   - [4.4 Notebook JSON 結構毀損修復（NotJSONError）](#44-notebook-json-結構毀損修復notjsonerror)
 - [5. 實測成果與算力消耗報告](#5-實測成果與算力消耗報告)
 - [6. 快速上手指南](#6-快速上手指南)
+- [7. AI Agent 輔助部署與自動運行指南](#7-ai-agent-輔助部署與自動運行指南)
+  - [7.1 給使用者的 AI Agent 一鍵調度 Prompt](#71-給使用者的-ai-agent-一鍵調度-prompt)
+  - [7.2 AI Agent 部署 SOP 與自檢清單](#72-ai-agent-部署-sop-與自檢清單)
+  - [7.3 AI Agent 無頭批次自動化（Headless Mode）](#73-ai-agent-無頭批次自動化headless-mode)
 
 ---
 
@@ -156,3 +160,64 @@ python app.py
 👉 **http://localhost:7860**
 
 上傳 1～9 張照片，調整影片長度與提示詞，即可享受流暢穩定的 MiniMax H3 影片生成體驗！
+
+---
+
+## 7. AI Agent 輔助部署與自動運行指南 🤖
+
+本專案完全適配現代 AI Coding Agent（如 **Google Antigravity**、**Claude Code**、**Cursor**、**Codex**、**Windsurf** 等）。第三方使用者可以直接指派其專屬 AI Agent 自動拉取本儲存庫並在本地環境中完成部署與驅動。
+
+### 7.1 給使用者的 AI Agent 一鍵調度 Prompt
+
+若您在自己的電腦中使用 AI Agent，只需將以下指令複製貼給您的 Agent：
+
+> **「請閱讀 https://github.com/pondahai/minimax-h3-studio 儲存庫，在我的本機環境中完成依賴套件安裝，檢查 Google Colab CLI 的登入授權狀態與算力餘額，並啟動 Studio 2.0 Web 控制台服務（http://localhost:7860）。」**
+
+---
+
+### 7.2 AI Agent 部署 SOP 與自檢清單（Agent Execution Checklist）
+
+AI Agent 在接獲指令後，應依照下列標準檢查步驟執行：
+
+1. **儲存庫複製與環境安裝**：
+   ```bash
+   git clone https://github.com/pondahai/minimax-h3-studio.git
+   cd minimax-h3-studio
+   pip install -r requirements.txt
+   ```
+2. **Google Colab 算力與憑證檢查**：
+   - 執行 `colab usage` 檢查傳回之 `Current balance`。
+   - 若回報尚未登入或 Token 過期，Agent 應提示使用者手動執行 `colab login` 完成 Google OAuth2 授權（憑證保存在本機 `~/.colab-cli-oauth-token.json`）。
+3. **Windows 平台原生適配檢查**：
+   - 若使用者為 Windows 系統，官方 `google-colab-cli 0.7.4` 預設因引用 Unix 的 `termios` 模組會發生例外。
+   - Agent 可參考本專案 [4.1 節](#41-colab-cli-windows-原生相容性修復termios--tty) 的修復指引，安全保護 `colab_cli/console.py` 中的 Unix 專用模組匯入。
+4. **服務啟動與健康檢查**：
+   - 執行 `python app.py` 啟動 FastAPI 伺服器。
+   - 向 `http://localhost:7860/api/status` 發送 GET 請求，確認返回 `{"ok": true}`。
+   - 提供使用者 Web 存取連結：`http://localhost:7860`。
+
+---
+
+### 7.3 AI Agent 無頭批次自動化（Headless Script Mode）
+
+AI Agent 不僅能啟動 Web 介面供人類操作，還能直接作為**「自主電影導演」**在背景批次調用：
+
+1. **直接調用 API 發動推論**：
+   AI Agent 可直接對本機後端發送 HTTP POST 請求啟動影片生成：
+   ```python
+   import requests
+
+   payload = {
+       "prompt": "...",  # Ref2VA 結構化提示詞
+       "reference_images": ["uploads/char1.png"],
+       "reference_audios": ["uploads/voice1.wav"],
+       "duration_seconds": 12.0,
+       "gpu": "A100"
+   }
+   res = requests.post("http://localhost:7860/api/generate", json=payload)
+   print(res.json())
+   ```
+2. **多鏡頭連續生成與自動拼接**：
+   - Agent 可在第一段影片生成完成後，調用 `POST /api/extract_last_frame` 自動擷取最後一幀。
+   - 將該幀做為第二鏡頭的 `<Picture 1>` 進行無縫接續生成。
+   - 任務完成後由 Agent 自動確認 `colab stop` 釋放雲端虛擬機，完全無需人工介入守候。
