@@ -163,30 +163,60 @@
     <!-- COL 2: Storyboard & Script Canvas (5 cols) -->
     <div class="lg:col-span-5 space-y-4">
 
-      <!-- AI Co-Pilot Assistant -->
-      <div class="rounded-2xl border border-indigo-900/40 bg-gradient-to-br from-surface-900 via-surface-900 to-indigo-950/30 p-4 shadow-xl">
-        <div class="flex items-center justify-between mb-2">
+      <!-- External LLM Prompt Workshop & Smart Import -->
+      <div class="rounded-2xl border border-indigo-900/40 bg-gradient-to-br from-surface-900 via-surface-900 to-indigo-950/30 p-4 shadow-xl space-y-3">
+        <div class="flex items-center justify-between">
           <div class="flex items-center space-x-1.5">
-            <i data-lucide="wand-2" class="w-4 h-4 text-purple-400"></i>
-            <h2 class="text-xs font-bold uppercase tracking-wider text-purple-200">AI 靈感劇本協同 (Co-Pilot)</h2>
+            <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-purple-200">LLM 導演提示詞工坊 (Qwen / GPT / Claude)</h2>
           </div>
-          <span class="text-[10px] text-purple-300/80">一鍵智能構建 Ref2VA 分鏡規格</span>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <input type="text" id="aiConceptInput" class="flex-1 bg-surface-850 border border-zinc-700/80 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 placeholder-zinc-500" placeholder="輸入一句話構想：例如 雨夜霓虹街頭，女主角轉身微笑問候...">
-          <button onclick="triggerAICoPilot()" class="px-3 py-2 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white rounded-xl text-xs font-semibold flex items-center space-x-1 shrink-0 shadow">
-            <span>✨ 智慧拆解</span>
+          <button onclick="toggleLLMGuide()" class="text-[11px] text-purple-300 hover:text-purple-100 flex items-center space-x-1">
+            <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+            <span>使用說明</span>
           </button>
         </div>
 
-        <!-- Quick Style Chips -->
-        <div class="flex items-center space-x-1.5 mt-2.5 overflow-x-auto text-[11px]">
-          <span class="text-zinc-500 shrink-0">快捷風格:</span>
-          <button onclick="applyStylePreset('cinematic')" class="px-2 py-0.5 rounded-md bg-surface-800 hover:bg-surface-700 text-zinc-300 shrink-0">🎬 電影感</button>
-          <button onclick="applyStylePreset('scifi')" class="px-2 py-0.5 rounded-md bg-surface-800 hover:bg-surface-700 text-zinc-300 shrink-0">🌆 賽博朋克</button>
-          <button onclick="applyStylePreset('dialogue')" class="px-2 py-0.5 rounded-md bg-surface-800 hover:bg-surface-700 text-zinc-300 shrink-0">🎙️ 情感獨白</button>
-          <button onclick="applyStylePreset('commercial')" class="px-2 py-0.5 rounded-md bg-surface-800 hover:bg-surface-700 text-zinc-300 shrink-0">🛍️ 商業展示</button>
+        <div class="flex items-center space-x-2">
+          <input type="text" id="aiConceptInput" class="flex-1 bg-surface-850 border border-zinc-700/80 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-purple-500 placeholder-zinc-500" placeholder="輸入短片創意構想：例如 雨夜霓虹街頭，女主角轉身微笑問候，帶著微醺的磁性嗓音...">
+          <button onclick="copyLLMMetaPrompt()" class="px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center space-x-1.5 shrink-0 shadow transition active:scale-95" title="組裝並複製結構化指令，直接貼給 Qwen 或 ChatGPT">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span id="copyPromptBtnText">複製 LLM 提示詞</span>
+          </button>
+          <button onclick="toggleSmartImportModal()" class="px-3 py-2 bg-surface-800 hover:bg-surface-700 border border-zinc-700 text-zinc-200 rounded-xl text-xs font-semibold flex items-center space-x-1 shrink-0 transition" title="貼回外部 LLM 生成的 JSON 或文字">
+            <i data-lucide="file-input" class="w-3.5 h-3.5 text-brand-400"></i>
+            <span>貼回解析</span>
+          </button>
+        </div>
+
+        <!-- Collapsible Usage Guide -->
+        <div id="llmGuideBox" class="hidden p-3 rounded-xl bg-purple-950/20 border border-purple-800/40 text-[11px] text-purple-200/90 space-y-1.5">
+          <p class="font-semibold text-purple-300">📖 外部 LLM 三步驟工作流：</p>
+          <ol class="list-decimal list-inside space-y-1 text-zinc-300">
+            <li>在上方輸入您的故事想法，點擊 <strong class="text-white">「複製 LLM 提示詞」</strong>（系統會自動綁定您已上傳的圖片與音色標籤）。</li>
+            <li>開啟 <strong class="text-purple-300">Qwen 2.5/3.8</strong>、<strong class="text-purple-300">ChatGPT</strong> 或 <strong class="text-purple-300">Claude</strong> 直接貼上（Ctrl+V），LLM 將為您撰寫專業分鏡與對白 JSON。</li>
+            <li>複製 LLM 回覆，點擊 <strong class="text-brand-300">「貼回解析」</strong> 貼上，分鏡、時序、台詞、音景與配樂將<strong>瞬間自動填妥</strong>！</li>
+          </ol>
+        </div>
+
+        <!-- Collapsible Smart Import Drawer -->
+        <div id="smartImportBox" class="hidden p-3 rounded-xl bg-surface-850 border border-brand-500/50 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-brand-300 flex items-center space-x-1">
+              <i data-lucide="sparkle" class="w-3.5 h-3.5 text-brand-400"></i>
+              <span>貼入外部 LLM 回覆內容（支援 JSON 或結構文字）</span>
+            </span>
+            <button onclick="toggleSmartImportModal()" class="text-zinc-400 hover:text-white">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <textarea id="smartImportText" rows="4" class="w-full bg-surface-900 border border-zinc-700/80 rounded-lg p-2.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-brand-500" placeholder="在此處貼上 (Ctrl+V) 外部 LLM 輸出的內容..."></textarea>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-zinc-500">支援標準 JSON 或 Ref2VA 標籤文本</span>
+            <button onclick="executeSmartImport()" class="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow active:scale-95 transition">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              <span>⚡ 自動解析並填入所有欄位</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -584,43 +614,176 @@
     function removeImage(idx) { uploadedImages.splice(idx, 1); renderAssetLists(); }
     function removeAudio(idx) { uploadedAudios.splice(idx, 1); renderAssetLists(); }
 
-    // AI Co-Pilot
-    async function triggerAICoPilot(genre = 'cinematic') {
-      const concept = document.getElementById('aiConceptInput').value.trim();
-      try {
-        const res = await fetch('/api/ai_copilot', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            concept: concept,
-            genre: genre,
-            has_audio: uploadedAudios.length > 0,
-            has_image: uploadedImages.length > 0,
-            image_count: Math.max(1, uploadedImages.length)
-          })
-        });
-        const data = await res.json();
-        if (data.ok) {
-          document.getElementById('subjectInput').value = data.subject_definitions;
-          document.getElementById('retentionInput').value = data.retention_analysis;
-          document.getElementById('soundscapeInput').value = data.overall_soundscape;
-          document.getElementById('musicInput').value = data.non_diegetic_music;
+    // LLM Workshop & Smart Import
+    function toggleLLMGuide() {
+      const box = document.getElementById('llmGuideBox');
+      if (box) box.classList.toggle('hidden');
+    }
 
-          // Populate shots
-          const list = document.getElementById('shotsList');
-          list.innerHTML = '';
-          data.shots.forEach((s, idx) => {
-            appendShotBlock(idx + 1, s.start_seconds, s.description);
-          });
-          lucide.createIcons();
+    function toggleSmartImportModal() {
+      const box = document.getElementById('smartImportBox');
+      if (box) {
+        box.classList.toggle('hidden');
+        if (!box.classList.contains('hidden')) {
+          document.getElementById('smartImportText').focus();
         }
-      } catch (e) {
-        alert('AI 輔助生成錯誤: ' + e);
       }
     }
 
-    function applyStylePreset(genre) {
-      triggerAICoPilot(genre);
+    function copyLLMMetaPrompt() {
+      const concept = document.getElementById('aiConceptInput').value.trim() || '高質感電影級角色短片，生動的微表情與氛圍光影。';
+      const imgCount = Math.max(1, uploadedImages.length);
+      const hasAudio = uploadedAudios.length > 0;
+
+      const imgRefDesc = imgCount > 1 
+        ? `目前已上傳 ${imgCount} 張圖片，依序映射為 <Picture 1> 至 <Picture ${imgCount}>。`
+        : `目前已上傳 1 張圖片，映射為 <Picture 1>。`;
+      
+      const audioRefDesc = hasAudio
+        ? `目前已上傳 1 份音訊，映射為 <Audio 1>。請在主體定義與分鏡中指定角色以 <Audio 1> 的音色發聲。`
+        : `未上傳音訊（使用預設自然環境聲音與角色微表情演出）。`;
+
+      const promptText = `你是一位精通視聽電影語言與 AI 影片提示詞工程的高級導演。
+請為 MiniMax H3 (Ref2VA) 多模態影片生成模型設計一份嚴格符合語法結構的分鏡腳本。
+
+【導演創作核心理念/構想】：
+${concept}
+
+【已就緒之多模態資產狀態】：
+- 視覺參照：${imgRefDesc}
+- 音訊參照：${audioRefDesc}
+
+【MiniMax H3 (Ref2VA) 規範要求】：
+1. subject_definitions：明確定義主體代號（例如 S1 是來自 <Picture 1> 的角色${hasAudio ? '，說話時帶有 <Audio 1> 的音色與口音' : ''}）。
+2. retention_analysis：說明保留特徵（例如臉部輪廓、五官比例、服裝材質、髮型細節）。
+3. summary：整體劇情精要（1~2 句話，富含鏡頭張力）。
+4. shots：分鏡時序（總長約 12 秒，請切分成 2~3 個分鏡，起始秒數建議為 0.0s、5.0s/6.0s 等）：
+   - 運鏡與動作：請使用專業電影語彙（如 Dolly In、Tracking Shot、Close-up、Low Angle 等）。
+   - 角色對白：若角色有台詞，請在 description 中使用標準封裝語法：<d>[Chinese] 台詞內容 </d>，並單獨列出 dialogue 純台詞。
+5. overall_soundscape：客觀環境音場（例如：雨滴落地、街頭車流、風聲吹拂、沉重腳步等）。
+6. non_diegetic_music：非劇情配樂風格（例如：cinematic strings, low pulsing synthwave, ambient piano 等）。
+
+請直接輸出以下標準 JSON 格式（包含在 \`\`\`json 區塊中，不要額外寒暄，以利程式自動解析）：
+
+\`\`\`json
+{
+  "subject_definitions": "The subject (S1) is the character from <Picture 1>.${hasAudio ? ' S1 speaks with the exact vocal timbre and pitch of <Audio 1>.' : ''}",
+  "retention_analysis": "Retain key facial features, hairstyle, outfit texture, and lighting mood from <Picture 1>.",
+  "summary": "Cinematic sequence of S1 ...",
+  "shots": [
+    {
+      "start_seconds": 0.0,
+      "description": "The camera slowly dollies in on S1 in warm atmospheric lighting as S1 looks into the lens. S1 says, <d>[Chinese] 很高興與你相遇。</d>",
+      "dialogue": "很高興與你相遇。",
+      "voice": "${hasAudio ? 'Audio 1' : ''}"
+    },
+    {
+      "start_seconds": 6.0,
+      "description": "The camera cuts to a tight tracking close-up capturing S1's expressive eyes under soft bokeh.",
+      "dialogue": "",
+      "voice": ""
+    }
+  ],
+  "overall_soundscape": "Gentle outdoor breeze with subtle ambient footsteps.",
+  "non_diegetic_music": "Warm cinematic strings with emotive piano notes."
+}
+\`\`\``;
+
+      navigator.clipboard.writeText(promptText).then(() => {
+        const btnText = document.getElementById('copyPromptBtnText');
+        const orig = btnText.innerText;
+        btnText.innerText = '✅ 已複製指令！';
+        setTimeout(() => { btnText.innerText = orig; }, 2500);
+
+        const guide = document.getElementById('llmGuideBox');
+        if (guide && guide.classList.contains('hidden')) {
+          guide.classList.remove('hidden');
+        }
+      }).catch(err => {
+        alert('複製失敗，請手動複製: ' + err);
+      });
+    }
+
+    function executeSmartImport() {
+      const raw = document.getElementById('smartImportText').value.trim();
+      if (!raw) {
+        alert('請先貼入外部 LLM 的回覆內容！');
+        return;
+      }
+
+      let parsed = null;
+
+      // 1. Try JSON extraction
+      let jsonStr = raw;
+      const jsonMatch = raw.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) jsonStr = jsonMatch[1];
+
+      try {
+        parsed = JSON.parse(jsonStr);
+      } catch (e) {
+        // Try cleaning loose JSON if any
+        const firstBrace = jsonStr.indexOf('{');
+        const lastBrace = jsonStr.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+          try {
+            parsed = JSON.parse(jsonStr.substring(firstBrace, lastBrace + 1));
+          } catch (e2) {}
+        }
+      }
+
+      // 2. If JSON parse succeeded
+      if (parsed && typeof parsed === 'object') {
+        if (parsed.subject_definitions) document.getElementById('subjectInput').value = parsed.subject_definitions;
+        if (parsed.retention_analysis) document.getElementById('retentionInput').value = parsed.retention_analysis;
+        if (parsed.overall_soundscape) document.getElementById('soundscapeInput').value = parsed.overall_soundscape;
+        if (parsed.non_diegetic_music) document.getElementById('musicInput').value = parsed.non_diegetic_music;
+
+        if (Array.isArray(parsed.shots) && parsed.shots.length > 0) {
+          const list = document.getElementById('shotsList');
+          list.innerHTML = '';
+          parsed.shots.forEach((s, idx) => {
+            appendShotBlock(idx + 1, s.start_seconds || (idx * 5.0), s.description || '', s.dialogue || '', s.voice || '');
+          });
+        }
+      } else {
+        // 3. Fallback: Key-Value / Line-by-Line Regex Parser
+        const subMatch = raw.match(/subject_definitions[:：]\s*([^\n]+)/i);
+        if (subMatch) document.getElementById('subjectInput').value = subMatch[1].trim();
+
+        const retMatch = raw.match(/retention_analysis[:：]\s*([^\n]+)/i);
+        if (retMatch) document.getElementById('retentionInput').value = retMatch[1].trim();
+
+        const soundMatch = raw.match(/overall_soundscape[:：]\s*([^\n]+)/i);
+        if (soundMatch) document.getElementById('soundscapeInput').value = soundMatch[1].trim();
+
+        const musicMatch = raw.match(/non_diegetic_music[:：]\s*([^\n]+)/i);
+        if (musicMatch) document.getElementById('musicInput').value = musicMatch[1].trim();
+
+        // Check for shots
+        const shotMatches = [...raw.matchAll(/\[Shot\s*(\d+)\]\s*([^\n]+)/gi)];
+        if (shotMatches.length > 0) {
+          const list = document.getElementById('shotsList');
+          list.innerHTML = '';
+          shotMatches.forEach((m, idx) => {
+            const desc = m[2].trim();
+            const dMatch = desc.match(/<d>\[Chinese\]\s*([^<]+)<\/d>/);
+            const dia = dMatch ? dMatch[1].trim() : '';
+            appendShotBlock(idx + 1, idx * 5.0, desc, dia, '');
+          });
+        }
+      }
+
+      // Visual flash effect on storyboard canvas
+      const canvas = document.getElementById('ref2vaCanvas');
+      if (canvas) {
+        canvas.classList.add('ring-2', 'ring-purple-500');
+        setTimeout(() => canvas.classList.remove('ring-2', 'ring-purple-500'), 1000);
+      }
+
+      // Hide smart import box
+      toggleSmartImportModal();
+      document.getElementById('smartImportText').value = '';
+      lucide.createIcons();
     }
 
     // Shot Timeline Blocks
@@ -630,7 +793,7 @@
       appendShotBlock(count, start, 'The camera pans gracefully over the scene.');
     }
 
-    function appendShotBlock(number, startSec, defaultDesc) {
+    function appendShotBlock(number, startSec, defaultDesc, dialogue = '', voice = '') {
       const container = document.getElementById('shotsList');
       const div = document.createElement('div');
       div.className = 'shot-card p-3 rounded-xl bg-surface-850 border border-zinc-800 space-y-2';
@@ -652,10 +815,10 @@
         <input type="text" class="shot-desc-input w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200" value="${escapeHtml(defaultDesc)}">
         <div class="flex items-center space-x-2">
           <span class="text-[11px] text-zinc-400 shrink-0">角色台詞:</span>
-          <input type="text" class="shot-dialogue-input w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="角色台詞">
+          <input type="text" class="shot-dialogue-input w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="角色台詞" value="${escapeHtml(dialogue)}">
           <select class="shot-voice-select bg-surface-900 border border-zinc-700/70 rounded-lg px-2 py-1 text-[11px] text-zinc-300 shrink-0">
-            <option value="">預設音色</option>
-            <option value="Audio 1">🎙️ Audio 1 音色</option>
+            <option value="" ${!voice ? 'selected' : ''}>預設音色</option>
+            <option value="Audio 1" ${voice.includes('1') ? 'selected' : ''}>🎙️ Audio 1 音色</option>
           </select>
         </div>
       `;

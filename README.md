@@ -64,8 +64,9 @@ minimax-h3-studio/
 3. **分鏡時間軸與一鍵接續延伸（Last-Frame Continuation）**：
    - 內建故事板時間軸（Storyboard Timeline），將各次生成結果組織為連續鏡頭（Shot 1, Shot 2...）。
    - 提供「延伸此鏡頭（接續生成下一鏡）」按鈕：透過後端 OpenCV 即時無失真擷取當前影片最後一幀，自動將其設為下一段的 `<Picture 1>`，使鏡頭銜接流暢無縫。
-4. **AI 導演提示詞助手（AI Copilot Assistant）**：
-   - 支援輸入簡短靈感（例如：「賽博龐克雨夜偵探追逐」），Copilot 會自動結合目前上傳的圖片與音訊標籤，智能擴寫為結構化 Ref2VA 提示詞規範，大幅降低提示詞編寫門檻。
+4. **LLM 導演提示詞工坊與一鍵智慧解析（LLM Workshop & Smart Import）**：
+   - **一鍵組裝 Meta-Prompt**：自動感知目前上傳的圖片張數與音訊狀態，將您的簡要構想封裝為包含 MiniMax H3 嚴格語法規範（`<Picture 1-9>`、`<Audio 1>`、`<d>[Chinese]...</d>`）的高階指令，一鍵複製直接餵給 **Qwen 2.5/3.8**、**ChatGPT** 或 **Claude**。
+   - **一鍵貼回智慧解析（Smart Import）**：外部 LLM 生成完成後，只需複製回覆並在 Studio 點擊「貼回解析」，系統瞬間自動解析主體、留存特徵、分鏡時序、運鏡與台詞、環境音景與配樂，完全免去手動逐欄複製的痛點！
 5. **雲端運算參數控制**：
    - 影片長度（4～15 秒滑動條，預設 12 秒）。
    - GPU 規格選擇（A100 極速推薦、V100、T4 經濟型、L4）。
@@ -78,32 +79,13 @@ minimax-h3-studio/
    - 生成完成後即時於網頁播放預覽，提供一鍵下載 MP4。
    - 歷史清單自動讀取 `outputs/` 目錄，顯示歷史影片大小、時間並支援隨時回播或載入延伸。
 
-### 3.1 提示詞生成技巧：搭配外部 LLM（如 Qwen 3.8 27B）
+### 3.1 外部 LLM 導演工作流（搭配 Qwen 3.8 / 2.5 27B 等）
 
-本 Studio 前端定義的結構化欄位非常適合交由具備聯網能力的大語言模型（如 Qwen 3.8 27B 等）輔助撰寫：
+透過 Studio 2.0 的雙向閉環設計，您能充分發揮外部頂尖大語言模型的創意編劇實力：
 
-1. **欄位規格提供**：將 Studio 前端定義的六大欄位結構（主體定義、留存特徵、劇情概要、分鏡時序與台詞、音景、配樂）提供給 LLM。
-2. **規格檢索與生成**：讓 LLM 查詢網路上 MiniMax H3 (Ref2VA) 的規範標準，針對您上傳的圖片與音訊特徵自動生成符合格式的內容：
-   ```text
-   subject_definitions:
-   The subject (S1) is the character from <Picture 1>, speaking with voice timbre from <Audio 1>.
-
-   summary:
-   Cinematic sequence of S1 walking through the neon alley.
-
-   retention_analysis:
-   Retain facial identity from <Picture 1> and vocal pitch from <Audio 1>.
-
-   detailed_description:
-   [Shot 1] The camera slowly dollies in on S1. S1 looks into the rain and speaks: <d>[Chinese] 夜深了，這座城市還沒睡。</d>
-
-   overall_soundscape:
-   Heavy rain dripping, distant police sirens, and neon hum.
-
-   non_diegetic_music:
-   Dark synthwave with low pulsing bass.
-   ```
-3. **快速匯入執行**：將生成的內容貼回前端對應欄位，即可在 Colab A100 上順暢驅動模型生成完整影片。
+1. **構想輸入與一鍵複製**：輸入故事想法後點擊「📋 複製 LLM 提示詞」，Studio 自動帶入目前素材清單組裝出標準指令。
+2. **外部 LLM 智能生成**：將指令發送給 Qwen 或其他大模型，LLM 會自動輸出富含鏡頭張力、自然對白與立體音景的標準 JSON 分鏡。
+3. **一鍵貼回解析填入**：複製外部 LLM 回覆，在 Studio 點擊「📥 貼回解析」，六大欄位與時間軸分鏡瞬間自動填妥！
 
 ---
 
