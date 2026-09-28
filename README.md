@@ -50,55 +50,58 @@ minimax-h3-studio/
 
 ---
 
-## 3. 前端功能與特色
+## 3. 前端功能與特色 (Studio 2.0)
 
-前端介面採用現代暗色系玻璃擬態設計（Glassmorphism），整合以下核心功能：
+前端介面採用現代暗色系玻璃擬態設計（Glassmorphism），升級至 Studio 2.0 帶來全方位的工作流支援：
 
 1. **即時 Colab 算力儀表板**：
    - 頂部常駐顯示目前帳號的 Google Colab 算力餘額（Compute Units, CU）。
    - 即時監控每小時費率（`Rate/hr`）與活躍虛擬機配置數（`Active assignments`）。
    - 支援 30 秒自動輪詢與手動即時刷新按鈕。
-2. **參照圖片管理（1～9 張）**：
-   - 支援拖曳或多選上傳圖片，自動依序映射為 MiniMax H3 所需的 `<Picture 1>` 至 `<Picture 9>` 標籤，提供縮圖卡片與快速刪除。
-3. **Ref2VA 結構化提示詞產生器**：
-   - **結構化模式**：提供主體定義（`subject_definitions`）、留存分析（`retention_analysis`）、劇情概要（`summary`）、多分鏡時序（支援設定開始秒數、運鏡描述、自動將角色台詞封裝為 `<d>[Chinese] ...</d>`）、音景與非劇情配樂輸入框。
-   - **一鍵自動合成**：點擊按鈕直接調用 Skill 內建演算法合成並驗證標準 Ref2VA 提示詞。
-   - **自由編輯模式**：支援高階玩家直接貼入或編寫自訂 prompt。
-4. **雲端運算參數控制**：
+2. **多模態資產塢（Multi-Modal Dock）**：
+   - **視覺素材（`<Picture 1-9>`）**：支援拖曳或多選上傳 1～9 張人物與場景參考圖片，自動依序映射。
+   - **音訊素材（`<Audio 1-3>` 音色置換與語音克隆）**：支援上傳 MP3 / WAV 乾淨人聲音訊（建議 2～15 秒）。模型自動擷取目標音色、音調與口音，並在對話句 `<d>[Chinese] ...</d>` 中合成具有該音色的自然台詞語音與唇形同步。
+3. **分鏡時間軸與一鍵接續延伸（Last-Frame Continuation）**：
+   - 內建故事板時間軸（Storyboard Timeline），將各次生成結果組織為連續鏡頭（Shot 1, Shot 2...）。
+   - 提供「延伸此鏡頭（接續生成下一鏡）」按鈕：透過後端 OpenCV 即時無失真擷取當前影片最後一幀，自動將其設為下一段的 `<Picture 1>`，使鏡頭銜接流暢無縫。
+4. **AI 導演提示詞助手（AI Copilot Assistant）**：
+   - 支援輸入簡短靈感（例如：「賽博龐克雨夜偵探追逐」），Copilot 會自動結合目前上傳的圖片與音訊標籤，智能擴寫為結構化 Ref2VA 提示詞規範，大幅降低提示詞編寫門檻。
+5. **雲端運算參數控制**：
    - 影片長度（4～15 秒滑動條，預設 12 秒）。
    - GPU 規格選擇（A100 極速推薦、V100、T4 經濟型、L4）。
    - 高記憶體（High-Mem）切換開關、自訂隨機種子（Seed）。
-5. **即時進度與終端機日誌串流**：
-   - 階段狀態標籤（Session 建立 ➔ 上傳素材 ➔ A100 GPU 生成 ➔ 下載 MP4 ➔ 完成）。
+6. **5 階段視覺化步進條與即時日誌**：
+   - 即時步進器（雲端連線 ➔ 資產上傳 ➔ A100 模型推論 ➔ 成果下載 ➔ 完成）。
+   - 支援瀏覽器桌面通知（完成時彈出提醒，無需長時間盯盤）。
    - 終端機日誌視窗，即時串流遠端執行進度。
-6. **內建影片播放器與歷史紀錄庫**：
+7. **歷史鏡頭庫與分鏡下載**：
    - 生成完成後即時於網頁播放預覽，提供一鍵下載 MP4。
-   - 歷史清單自動讀取 `outputs/` 目錄，顯示歷史影片大小、時間並支援隨時回播。
+   - 歷史清單自動讀取 `outputs/` 目錄，顯示歷史影片大小、時間並支援隨時回播或載入延伸。
 
 ### 3.1 提示詞生成技巧：搭配外部 LLM（如 Qwen 3.8 27B）
 
 本 Studio 前端定義的結構化欄位非常適合交由具備聯網能力的大語言模型（如 Qwen 3.8 27B 等）輔助撰寫：
 
 1. **欄位規格提供**：將 Studio 前端定義的六大欄位結構（主體定義、留存特徵、劇情概要、分鏡時序與台詞、音景、配樂）提供給 LLM。
-2. **規格檢索與生成**：讓 LLM 查詢網路上 MiniMax H3 (Ref2VA) 的規範標準，針對您上傳的圖片特徵自動生成符合格式的內容：
+2. **規格檢索與生成**：讓 LLM 查詢網路上 MiniMax H3 (Ref2VA) 的規範標準，針對您上傳的圖片與音訊特徵自動生成符合格式的內容：
    ```text
    subject_definitions:
-   The subject (S1) is the character from <Picture 1>.
+   The subject (S1) is the character from <Picture 1>, speaking with voice timbre from <Audio 1>.
 
    summary:
-   Cinematic sequence of S1.
+   Cinematic sequence of S1 walking through the neon alley.
 
    retention_analysis:
-   Retain facial and clothing details.
+   Retain facial identity from <Picture 1> and vocal pitch from <Audio 1>.
 
    detailed_description:
-   [Shot 1] The camera frames the subject.
+   [Shot 1] The camera slowly dollies in on S1. S1 looks into the rain and speaks: <d>[Chinese] 夜深了，這座城市還沒睡。</d>
 
    overall_soundscape:
-   Gentle wind breeze and ambient city atmosphere with subtle footsteps.
+   Heavy rain dripping, distant police sirens, and neon hum.
 
    non_diegetic_music:
-   Uplifting cinematic strings with subtle synth pads.
+   Dark synthwave with low pulsing bass.
    ```
 3. **快速匯入執行**：將生成的內容貼回前端對應欄位，即可在 Colab A100 上順暢驅動模型生成完整影片。
 

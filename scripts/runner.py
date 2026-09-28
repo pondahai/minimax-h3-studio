@@ -385,11 +385,19 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
             raise ValueError(f"Multiple jobs target the same output path: {output}")
         seen_outputs.add(output)
         output.parent.mkdir(parents=True, exist_ok=True)
+        audios = raw.get("reference_audios", raw.get("audios", []))
+        audio_paths: list[Path] = []
+        if isinstance(audios, list):
+            for audio in audios:
+                a_path = Path(str(audio)).expanduser().resolve()
+                if a_path.is_file() and a_path.stat().st_size > 0:
+                    audio_paths.append(a_path)
         resolved.append({
             "id": job_id,
             "title": str(raw.get("title") or f"Video {index}")[:120],
             "prompt": prompt,
             "reference_images": image_paths,
+            "reference_audios": audio_paths,
             "duration_seconds": duration,
             "seed": seed,
             "output_path": output,
@@ -487,6 +495,17 @@ def run_batch(
                 )
                 remote_refs.append(remote)
 
+            remote_audios: list[str] = []
+            for audio_index, audio_path in enumerate(job.get("reference_audios", []), start=1):
+                remote = f"{remote_prefix}_audio_{audio_index}{audio_path.suffix}"
+                call_colab(
+                    ["upload", "--session", session, str(audio_path), remote],
+                    label=f"upload audio {audio_index} for {job['title']}",
+                    timeout=300,
+                    on_line=log_line,
+                )
+                remote_audios.append(remote)
+
             prompt_path = work_root / f"{job['id']}.txt"
             prompt_path.write_text(job["prompt"], encoding="utf-8")
             remote_prompt = f"{remote_prefix}_prompt.txt"
@@ -504,6 +523,7 @@ def run_batch(
             env_values = [
                 "H3_INFERENCE_MODE=reference",
                 "H3_REFERENCE_IMAGES=" + json.dumps(remote_refs, separators=(",", ":")),
+                "H3_REFERENCE_AUDIOS=" + json.dumps(remote_audios, separators=(",", ":")),
                 "H3_PROMPT_FILE=" + remote_prompt,
                 "H3_DURATION_SECONDS=" + str(job["duration_seconds"]),
                 "H3_SEED=" + str(job["seed"]),

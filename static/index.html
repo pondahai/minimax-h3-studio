@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MiniMax H3 Colab Studio</title>
+  <title>MiniMax H3 Colab Studio 2.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
@@ -12,8 +12,8 @@
       theme: {
         extend: {
           colors: {
-            brand: { 50: '#eef2ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
-            surface: { 800: '#18181b', 850: '#141416', 900: '#09090b', 950: '#040405' }
+            brand: { 50: '#eef2ff', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+            surface: { 800: '#18181b', 850: '#141416', 900: '#0c0c0e', 950: '#060608' }
           }
         }
       }
@@ -23,8 +23,8 @@
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #141416; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #0c0c0e; }
     ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
   </style>
@@ -32,269 +32,367 @@
 <body class="bg-surface-950 text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
   <!-- Top Navbar -->
-  <header class="border-b border-zinc-800/80 bg-surface-900/80 backdrop-blur sticky top-0 z-50 px-6 py-3.5 flex items-center justify-between">
-    <div class="flex items-center space-x-3.5">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-brand-500/25">
-        <i data-lucide="video" class="w-5 h-5 text-white"></i>
+  <header class="border-b border-zinc-800/80 bg-surface-900/90 backdrop-blur sticky top-0 z-50 px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/25">
+        <i data-lucide="clapperboard" class="w-5 h-5 text-white"></i>
       </div>
       <div>
         <div class="flex items-center space-x-2">
-          <h1 class="font-bold text-lg tracking-tight text-white">MiniMax H3 Colab Studio</h1>
-          <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">Ref2VA</span>
+          <h1 class="font-bold text-base tracking-tight text-white">MiniMax H3 Studio</h1>
+          <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-gradient-to-r from-brand-500/20 to-purple-500/20 text-brand-300 border border-brand-500/30">2.0 Omni-Modal</span>
         </div>
-        <p class="text-xs text-zinc-400">Google Colab CLI 雲端推論控制中心</p>
+        <p class="text-[11px] text-zinc-400">Google Colab A100 雲端推論導演工作站</p>
       </div>
     </div>
 
-    <!-- Colab Balance & Status Bar -->
+    <!-- Mode Selector Tabs -->
+    <div class="hidden md:inline-flex rounded-xl bg-surface-850 p-1 border border-zinc-800 text-xs font-semibold">
+      <button id="modeTabRef" onclick="setWorkflowMode('ref2va')" class="px-3.5 py-1.5 rounded-lg bg-brand-600 text-white shadow transition flex items-center space-x-1.5">
+        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+        <span>🎭 Ref2VA 全模態</span>
+      </button>
+      <button id="modeTabFL" onclick="setWorkflowMode('fl2va')" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
+        <i data-lucide="git-commit" class="w-3.5 h-3.5"></i>
+        <span>🎬 FL2VA 首尾過渡</span>
+      </button>
+      <button id="modeTabT2V" onclick="setWorkflowMode('t2va')" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
+        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+        <span>✍️ T2VA 純文字</span>
+      </button>
+    </div>
+
+    <!-- Colab Balance & Telemetry -->
     <div class="flex items-center space-x-3">
-      <div id="balanceCard" class="flex items-center space-x-3 px-4 py-2 rounded-xl bg-surface-800/90 border border-zinc-700/60 shadow-sm">
-        <div class="flex items-center space-x-2">
-          <span class="relative flex h-2.5 w-2.5">
-            <span id="balancePulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+      <div id="balanceCard" class="flex items-center space-x-3 px-3.5 py-1.5 rounded-xl bg-surface-850 border border-zinc-700/60 shadow-sm text-xs">
+        <div class="flex items-center space-x-1.5">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span class="text-xs text-zinc-400 font-medium">Colab 算力餘額:</span>
+          <span class="text-zinc-400 font-medium">Colab 算力:</span>
         </div>
-        <div class="flex items-baseline space-x-1">
-          <span id="balanceVal" class="text-base font-bold font-mono text-emerald-400">查詢中...</span>
-          <span class="text-[11px] text-zinc-400 font-medium">Units</span>
+        <div class="flex items-baseline space-x-0.5">
+          <span id="balanceVal" class="font-bold font-mono text-emerald-400 text-sm">--</span>
+          <span class="text-[10px] text-zinc-400">CU</span>
         </div>
-        <div class="h-4 w-[1px] bg-zinc-700 mx-1"></div>
-        <div class="text-[11px] text-zinc-400">
-          費率: <span id="rateVal" class="font-mono text-zinc-200">--</span>/hr
-        </div>
-        <button id="refreshBalanceBtn" onclick="fetchBalance(true)" title="重新整理餘額" class="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-700 transition">
+        <div class="h-3 w-[1px] bg-zinc-700 mx-0.5"></div>
+        <span class="text-zinc-400 text-[11px]"><span id="rateVal" class="font-mono text-zinc-200">0.00</span>/hr</span>
+        <button onclick="fetchBalance(true)" title="重新整理算力" class="text-zinc-400 hover:text-white p-0.5">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
         </button>
       </div>
+
+      <!-- Notification Toggle -->
+      <button id="notifyBtn" onclick="toggleNotification()" title="啟用完成桌面推播通知" class="p-2 rounded-xl bg-surface-850 border border-zinc-800 text-zinc-400 hover:text-white transition">
+        <i data-lucide="bell" class="w-4 h-4"></i>
+      </button>
     </div>
   </header>
 
-  <!-- Main Content Layout -->
-  <main class="flex-1 max-w-[1680px] w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <!-- Main 3-Column Studio Layout -->
+  <main class="flex-1 max-w-[1720px] w-full mx-auto p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-    <!-- LEFT COLUMN: Inputs & Configuration (7 cols) -->
-    <div class="lg:col-span-7 space-y-6">
+    <!-- COL 1: Multi-Modal Asset Dock (3 cols) -->
+    <div class="lg:col-span-3 space-y-4">
 
-      <!-- Section 1: Reference Images (1-9 images) -->
-      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
-        <div class="flex items-center justify-between mb-3.5">
-          <div class="flex items-center space-x-2">
+      <!-- Section: Reference Images (1-9) -->
+      <div class="rounded-2xl border border-zinc-800 bg-surface-900/80 p-4 backdrop-blur shadow-lg">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center space-x-1.5">
             <i data-lucide="image" class="w-4 h-4 text-brand-400"></i>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">1. 參照圖片 (Reference Images)</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-200">影像資產 (1～9 張)</h2>
           </div>
-          <span class="text-xs text-zinc-400">支援 1～9 張圖片（對應 &lt;Picture 1&gt;～&lt;Picture 9&gt;）</span>
+          <span id="imgCountBadge" class="text-[11px] font-mono text-zinc-400">0/9</span>
         </div>
 
-        <!-- Drag & Drop Zone -->
-        <div id="dropZone" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-zinc-700/80 hover:border-brand-500 rounded-xl p-5 text-center cursor-pointer transition bg-surface-850/50 hover:bg-surface-800/40 group">
-          <input type="file" id="fileInput" multiple accept="image/*" class="hidden" onchange="handleFileSelect(event)">
-          <i data-lucide="upload-cloud" class="w-8 h-8 text-zinc-500 group-hover:text-brand-400 mx-auto mb-2 transition"></i>
-          <p class="text-xs text-zinc-300 font-medium">點擊或拖放參照圖片至此處上傳</p>
-          <p class="text-[11px] text-zinc-500 mt-1">PNG, JPG, WEBP (自動依序指派 Picture 編號)</p>
+        <!-- Image Upload Drag Zone -->
+        <div id="imageDropZone" onclick="document.getElementById('imageFileInput').click()" class="border border-dashed border-zinc-700/80 hover:border-brand-500 rounded-xl p-3.5 text-center cursor-pointer transition bg-surface-850/60 hover:bg-surface-800/40 group">
+          <input type="file" id="imageFileInput" multiple accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+          <i data-lucide="upload" class="w-5 h-5 text-zinc-500 group-hover:text-brand-400 mx-auto mb-1 transition"></i>
+          <p class="text-xs text-zinc-300 font-medium">拖放或點擊上傳參照圖</p>
+          <p class="text-[10px] text-zinc-500 mt-0.5">自動對應 &lt;Picture 1&gt; ~ &lt;Picture 9&gt;</p>
         </div>
 
-        <!-- Image Previews List -->
-        <div id="imageList" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-4">
-          <!-- Dynamically populated -->
+        <!-- Image Preview Grid -->
+        <div id="imageList" class="grid grid-cols-3 gap-2 mt-3">
+          <!-- Populated dynamically -->
         </div>
       </div>
 
-      <!-- Section 2: Prompt Configuration -->
-      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center space-x-2">
-            <i data-lucide="sparkles" class="w-4 h-4 text-brand-400"></i>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">2. 影片提示詞 (Ref2VA Prompt)</h2>
+      <!-- Section: Reference Audio / Timbre Cloning (Audio 1-3) -->
+      <div id="audioSection" class="rounded-2xl border border-zinc-800 bg-surface-900/80 p-4 backdrop-blur shadow-lg">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center space-x-1.5">
+            <i data-lucide="mic" class="w-4 h-4 text-emerald-400"></i>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-200">音色克隆資產 (Audio 1～3)</h2>
           </div>
-          <!-- Mode Tabs -->
-          <div class="inline-flex rounded-lg bg-surface-800 p-1 border border-zinc-700/60 text-xs font-medium">
-            <button id="tabBuilder" onclick="switchPromptMode('builder')" class="px-3 py-1 rounded-md bg-brand-600 text-white shadow">結構化產生器</button>
-            <button id="tabRaw" onclick="switchPromptMode('raw')" class="px-3 py-1 rounded-md text-zinc-400 hover:text-white">自由編輯</button>
-          </div>
+          <span id="audioCountBadge" class="text-[11px] font-mono text-zinc-400">0/3</span>
         </div>
 
-        <!-- Ref2VA Guided Builder -->
-        <div id="promptBuilderView" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-zinc-300 mb-1">主體定義 (subject_definitions)</label>
-              <textarea id="refSubject" rows="2" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 font-mono" placeholder="The subject (S1) is the character from &lt;Picture 1&gt;."></textarea>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-zinc-300 mb-1">留存特徵分析 (retention_analysis)</label>
-              <textarea id="refRetention" rows="2" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 font-mono" placeholder="Retain facial features, clothing, and color palette from &lt;Picture 1&gt;."></textarea>
-            </div>
-          </div>
+        <div id="audioDropZone" onclick="document.getElementById('audioFileInput').click()" class="border border-dashed border-zinc-700/80 hover:border-emerald-500 rounded-xl p-3.5 text-center cursor-pointer transition bg-surface-850/60 hover:bg-surface-800/40 group">
+          <input type="file" id="audioFileInput" multiple accept="audio/*" class="hidden" onchange="handleAudioSelect(event)">
+          <i data-lucide="music" class="w-5 h-5 text-zinc-500 group-hover:text-emerald-400 mx-auto mb-1 transition"></i>
+          <p class="text-xs text-zinc-300 font-medium">上傳 2～15 秒人聲音檔</p>
+          <p class="text-[10px] text-zinc-500 mt-0.5">MP3/WAV，自動對應 &lt;Audio 1&gt;</p>
+        </div>
 
-          <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">整體劇情概要 (summary)</label>
-            <input type="text" id="refSummary" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500" placeholder="Cinematic sequence showing S1 walking gracefully and turning towards the camera.">
-          </div>
+        <!-- Audio List -->
+        <div id="audioList" class="space-y-2 mt-3">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
 
-          <!-- Multi-shot List -->
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <label class="block text-xs font-semibold text-zinc-300">分鏡鏡頭 (Shots Description)</label>
-              <button onclick="addShotRow()" class="text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center space-x-1">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span>新增分鏡鏡頭</span>
-              </button>
-            </div>
-            <div id="shotsContainer" class="space-y-2.5">
-              <!-- Default Shot 1 -->
-              <div class="shot-row p-3 rounded-xl bg-surface-850 border border-zinc-800 space-y-2">
-                <div class="flex items-center justify-between text-xs">
-                  <span class="font-bold text-brand-400">Shot 1 (起始於 0.0s)</span>
-                  <input type="hidden" class="shot-start" value="0.0">
-                </div>
-                <input type="text" class="shot-desc w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200" placeholder="鏡頭動作與場景描述 (e.g. S1 walks into view under cinematic warm lighting)">
-                <div class="flex items-center space-x-2">
-                  <span class="text-[11px] text-zinc-400 shrink-0">角色台詞 (選填):</span>
-                  <input type="text" class="shot-dialogue w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="例如：你好，歡迎來到未來的世界。 (自動封裝為 &lt;d&gt;[Chinese] ...&lt;/d&gt;)">
-                </div>
-              </div>
-            </div>
-          </div>
+      <!-- Quick Tips Box -->
+      <div class="rounded-xl border border-zinc-800/60 bg-surface-850/40 p-3 text-[11px] text-zinc-400 space-y-1">
+        <div class="flex items-center space-x-1 text-zinc-300 font-semibold">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-brand-400"></i>
+          <span>多模態標籤調度提示</span>
+        </div>
+        <p>• 圖片於提示詞中使用 <code class="text-brand-300">&lt;Picture 1&gt;</code> 標註</p>
+        <p>• 音色於提示詞中使用 <code class="text-emerald-300">&lt;Audio 1&gt;</code> 標註</p>
+        <p>• 對話台詞自動封裝為 <code class="text-purple-300">&lt;d&gt;[Chinese] ...&lt;/d&gt;</code></p>
+      </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-zinc-300 mb-1">整體音景 (overall_soundscape)</label>
-              <input type="text" id="refSoundscape" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500" value="Gentle wind breeze and ambient city atmosphere with subtle footsteps.">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-zinc-300 mb-1">非劇情配樂 (non_diegetic_music)</label>
-              <input type="text" id="refMusic" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500" value="Uplifting cinematic strings with subtle synth pads.">
-            </div>
-          </div>
+    </div>
 
-          <button onclick="composeRef2VAPrompt()" class="w-full py-2 bg-surface-800 hover:bg-surface-700 border border-zinc-700 rounded-xl text-xs font-semibold text-zinc-200 flex items-center justify-center space-x-2 transition">
-            <i data-lucide="wand-2" class="w-3.5 h-3.5 text-brand-400"></i>
-            <span>合成標準 Ref2VA 提示詞</span>
+    <!-- COL 2: Storyboard & Script Canvas (5 cols) -->
+    <div class="lg:col-span-5 space-y-4">
+
+      <!-- AI Co-Pilot Assistant -->
+      <div class="rounded-2xl border border-indigo-900/40 bg-gradient-to-br from-surface-900 via-surface-900 to-indigo-950/30 p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center space-x-1.5">
+            <i data-lucide="wand-2" class="w-4 h-4 text-purple-400"></i>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-purple-200">AI 靈感劇本協同 (Co-Pilot)</h2>
+          </div>
+          <span class="text-[10px] text-purple-300/80">一鍵智能構建 Ref2VA 分鏡規格</span>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <input type="text" id="aiConceptInput" class="flex-1 bg-surface-850 border border-zinc-700/80 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 placeholder-zinc-500" placeholder="輸入一句話構想：例如 雨夜霓虹街頭，女主角轉身微笑問候...">
+          <button onclick="triggerAICoPilot()" class="px-3 py-2 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white rounded-xl text-xs font-semibold flex items-center space-x-1 shrink-0 shadow">
+            <span>✨ 智慧拆解</span>
           </button>
         </div>
 
-        <!-- Raw Prompt View -->
-        <div id="promptRawView" class="space-y-2 hidden">
-          <textarea id="rawPrompt" rows="9" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 font-mono leading-relaxed" placeholder="輸入完整的 MiniMax H3 Ref2VA 提示詞..."></textarea>
-          <div class="flex items-center justify-between text-[11px] text-zinc-500">
-            <span>支援標籤: &lt;Picture 1&gt; ~ &lt;Picture 9&gt;, &lt;d&gt;[Chinese] 台詞&lt;/d&gt;</span>
-            <button onclick="loadTemplatePrompt()" class="text-brand-400 hover:underline">載入範例模板</button>
+        <!-- Quick Style Chips -->
+        <div class="flex items-center space-x-1.5 mt-2.5 overflow-x-auto text-[11px]">
+          <span class="text-zinc-500 shrink-0">快捷風格:</span>
+          <button onclick="applyStylePreset('cinematic')" class="px-2 py-0.5 rounded-md bg-surface-800 hover:bg-surface-700 text-zinc-300 shrink-0">🎬 電影感</button>
+          <button onclick="applyStylePreset('scifi')" class="px-2 py-0.5 rounded-md bg-surface-800 hover:bg-surface-700 text-zinc-300 shrink-0">🌆 賽博朋克</button>
+          <button onclick="applyStylePreset('dialogue')" class="px-2 py-0.5 rounded-md bg-surface-800 hover:bg-surface-700 text-zinc-300 shrink-0">🎙️ 情感獨白</button>
+          <button onclick="applyStylePreset('commercial')" class="px-2 py-0.5 rounded-md bg-surface-800 hover:bg-surface-700 text-zinc-300 shrink-0">🛍️ 商業展示</button>
+        </div>
+      </div>
+
+      <!-- Storyboard Canvas (Ref2VA View) -->
+      <div id="ref2vaCanvas" class="rounded-2xl border border-zinc-800 bg-surface-900/80 p-4 backdrop-blur shadow-lg space-y-3.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="film" class="w-4 h-4 text-brand-400"></i>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-200">導演分鏡時間軸 (Storyboard Timeline)</h2>
+          </div>
+          <button onclick="addShotBlock()" class="text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center space-x-1">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>新增分鏡</span>
+          </button>
+        </div>
+
+        <!-- Subject Definition & Retention Analysis -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">主體定義 (subject_definitions)</label>
+            <input type="text" id="subjectInput" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 font-mono" value="The subject (S1) is the character from <Picture 1>.">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">留存特徵 (retention_analysis)</label>
+            <input type="text" id="retentionInput" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-brand-500 font-mono" value="Retain facial features, clothing, and color palette from <Picture 1>.">
+          </div>
+        </div>
+
+        <!-- Timeline Shot Blocks Container -->
+        <div id="shotsList" class="space-y-2.5">
+          <!-- Shot 1 Default -->
+          <div class="shot-card p-3 rounded-xl bg-surface-850 border border-zinc-800 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-brand-400 flex items-center space-x-1">
+                <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+                <span>Shot 1 (0.0s 起始)</span>
+              </span>
+              <input type="hidden" class="shot-start-val" value="0.0">
+              <!-- Camera Quick Badges -->
+              <div class="flex items-center space-x-1">
+                <button onclick="insertCamera(this, 'The camera dollies in on S1. ')" class="text-[10px] px-1.5 py-0.5 rounded bg-surface-800 hover:bg-surface-700 text-zinc-300">推進 Dolly In</button>
+                <button onclick="insertCamera(this, 'The camera pans across the scene. ')" class="text-[10px] px-1.5 py-0.5 rounded bg-surface-800 hover:bg-surface-700 text-zinc-300">橫搖 Pan</button>
+                <button onclick="insertCamera(this, 'A tracking shot follows S1. ')" class="text-[10px] px-1.5 py-0.5 rounded bg-surface-800 hover:bg-surface-700 text-zinc-300">跟隨 Track</button>
+              </div>
+            </div>
+            <input type="text" class="shot-desc-input w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200" placeholder="鏡頭運鏡與主體動作敘述" value="The camera slowly dollies in on S1 under warm atmospheric lighting as S1 smiles.">
+            <!-- Dialogue & Timbre Link -->
+            <div class="flex items-center space-x-2">
+              <span class="text-[11px] text-zinc-400 shrink-0">角色台詞:</span>
+              <input type="text" class="shot-dialogue-input w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="角色台詞（例如：你好，很高興認識你。）" value="你好，歡迎來到未來的世界。">
+              <select class="shot-voice-select bg-surface-900 border border-zinc-700/70 rounded-lg px-2 py-1 text-[11px] text-zinc-300 shrink-0">
+                <option value="">預設音色</option>
+                <option value="Audio 1">🎙️ Audio 1 音色</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overall Audio Environment -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">整體音景 (overall_soundscape)</label>
+            <input type="text" id="soundscapeInput" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2.5 py-1.5 text-xs text-zinc-200 font-mono" value="Gentle outdoor breeze, soft urban ambience, and subtle footsteps.">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">非劇情配樂 (non_diegetic_music)</label>
+            <input type="text" id="musicInput" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2.5 py-1.5 text-xs text-zinc-200 font-mono" value="Uplifting cinematic strings with subtle piano chords.">
           </div>
         </div>
       </div>
 
-      <!-- Section 3: Generation Parameters & Trigger -->
-      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200 mb-4 flex items-center space-x-2">
-          <i data-lucide="sliders" class="w-4 h-4 text-brand-400"></i>
-          <span>3. 算力與生成設定 (Colab Runtime)</span>
-        </h2>
+      <!-- Raw Prompt Drawer (Toggleable) -->
+      <div class="rounded-xl border border-zinc-800 bg-surface-900/60 p-3">
+        <div class="flex items-center justify-between cursor-pointer" onclick="toggleRawPrompt()">
+          <span class="text-xs font-semibold text-zinc-400 flex items-center space-x-1.5">
+            <i data-lucide="code" class="w-3.5 h-3.5"></i>
+            <span>檢視 / 自由編輯完整 Prompt</span>
+          </span>
+          <i id="rawPromptChevron" data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 transition"></i>
+        </div>
+        <textarea id="rawPromptArea" rows="5" class="w-full bg-surface-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 font-mono mt-2 hidden focus:outline-none focus:border-brand-500"></textarea>
+      </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
-          <!-- Duration -->
+    </div>
+
+    <!-- COL 3: Telemetry, Colab Dispatch & Player (4 cols) -->
+    <div class="lg:col-span-4 space-y-4">
+
+      <!-- Runtime Controls & Big Launch -->
+      <div class="rounded-2xl border border-zinc-800 bg-surface-900/80 p-4 backdrop-blur shadow-lg space-y-3.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-zinc-200 flex items-center space-x-1.5">
+            <i data-lucide="sliders" class="w-4 h-4 text-brand-400"></i>
+            <span>雲端調度設定</span>
+          </span>
+          <span class="text-[11px] text-emerald-400 font-semibold">⚡ 預估耗時約 4.5 分鐘 | ~1.1 CU</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">影片長度 (秒)</label>
-            <div class="flex items-center space-x-2">
-              <input type="range" id="durationRange" min="4" max="15" value="12" class="w-full accent-brand-500 cursor-pointer" oninput="document.getElementById('durationVal').innerText = this.value">
-              <span id="durationVal" class="font-mono text-sm font-bold text-brand-400 w-6">12</span>s
-            </div>
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">秒數: <span id="durVal" class="text-brand-400 font-bold font-mono">12</span>s</label>
+            <input type="range" id="durRange" min="4" max="15" value="12" class="w-full accent-brand-500 cursor-pointer" oninput="document.getElementById('durVal').innerText = this.value">
           </div>
-
-          <!-- GPU -->
           <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">GPU 規格</label>
-            <select id="gpuSelect" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none">
-              <option value="A100" selected>A100 (推薦極速)</option>
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">GPU 規格</label>
+            <select id="gpuSelect" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2 py-1 text-xs text-zinc-200">
+              <option value="A100" selected>A100 (極速推薦)</option>
               <option value="V100">V100</option>
               <option value="T4">T4 (經濟型)</option>
               <option value="L4">L4</option>
             </select>
           </div>
-
-          <!-- High-Memory -->
-          <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">高記憶體 (High-Mem)</label>
-            <label class="flex items-center space-x-2 cursor-pointer mt-1">
-              <input type="checkbox" id="highMemCheck" checked class="rounded border-zinc-700 text-brand-600 focus:ring-brand-500 h-4 w-4 bg-surface-850">
-              <span class="text-xs text-zinc-300">啟用高記憶體</span>
-            </label>
-          </div>
-
-          <!-- Seed -->
-          <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">隨機種子 (Seed)</label>
-            <input type="number" id="seedInput" class="w-full bg-surface-850 border border-zinc-700/70 rounded-xl px-2.5 py-1.5 text-xs text-zinc-200 font-mono" placeholder="隨機">
-          </div>
         </div>
 
-        <!-- Big Launch Button -->
-        <button id="generateBtn" onclick="startGeneration()" class="w-full py-3.5 bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 flex items-center justify-center space-x-2.5 transition transform active:scale-[0.99]">
-          <i data-lucide="play" class="w-5 h-5 fill-current"></i>
-          <span class="text-sm tracking-wide">啟動 Google Colab MiniMax H3 影片生成</span>
+        <!-- Big Launch CTA -->
+        <button id="dispatchBtn" onclick="launchGeneration()" class="w-full py-3.5 bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-brand-500/25 flex items-center justify-center space-x-2 transition transform active:scale-[0.99]">
+          <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+          <span class="text-xs tracking-wider uppercase font-extrabold">啟動 Google Colab 雲端生成</span>
+        </button>
+
+        <button id="stopSessionBtn" onclick="stopActiveSession()" class="hidden w-full py-2 bg-red-950/40 hover:bg-red-900/60 border border-red-800 text-red-300 text-xs font-semibold rounded-xl flex items-center justify-center space-x-1 transition">
+          <i data-lucide="power" class="w-3.5 h-3.5"></i>
+          <span>緊急中斷並關閉 Colab 虛擬機</span>
         </button>
       </div>
-    </div>
 
-    <!-- RIGHT COLUMN: Real-Time Status, Logs & Output (5 cols) -->
-    <div class="lg:col-span-5 space-y-6">
-
-      <!-- Current Job Progress Card -->
-      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center space-x-2">
+      <!-- 5-Stage Visual Progress Stepper -->
+      <div class="rounded-2xl border border-zinc-800 bg-surface-900/80 p-4 backdrop-blur shadow-lg space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-1.5">
             <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">即時推論進度</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-200">推論執行階段</h2>
           </div>
-          <span id="jobStatusBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">閒置中 (Idle)</span>
+          <span id="stageLabel" class="text-[11px] font-semibold text-zinc-400">系統就緒</span>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="w-full bg-surface-850 rounded-full h-2 overflow-hidden mb-3 border border-zinc-800">
-          <div id="progressBar" class="bg-gradient-to-r from-brand-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
+        <!-- 5 Stepper Dots -->
+        <div class="flex items-center justify-between relative px-2">
+          <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-zinc-800 -translate-y-1/2 -z-0"></div>
+          <div id="stepLine" class="absolute top-1/2 left-4 h-0.5 bg-brand-500 -translate-y-1/2 -z-0 transition-all duration-500" style="width: 0%"></div>
+
+          <div class="flex flex-col items-center space-y-1 z-10" id="stepDot1">
+            <div class="w-5 h-5 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-mono text-zinc-400">1</div>
+            <span class="text-[9px] text-zinc-500">申請 GPU</span>
+          </div>
+          <div class="flex flex-col items-center space-y-1 z-10" id="stepDot2">
+            <div class="w-5 h-5 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-mono text-zinc-400">2</div>
+            <span class="text-[9px] text-zinc-500">上傳素材</span>
+          </div>
+          <div class="flex flex-col items-center space-y-1 z-10" id="stepDot3">
+            <div class="w-5 h-5 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-mono text-zinc-400">3</div>
+            <span class="text-[9px] text-zinc-500">H3 取樣</span>
+          </div>
+          <div class="flex flex-col items-center space-y-1 z-10" id="stepDot4">
+            <div class="w-5 h-5 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-mono text-zinc-400">4</div>
+            <span class="text-[9px] text-zinc-500">下載成果</span>
+          </div>
+          <div class="flex flex-col items-center space-y-1 z-10" id="stepDot5">
+            <div class="w-5 h-5 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-mono text-zinc-400">5</div>
+            <span class="text-[9px] text-zinc-500">安全關機</span>
+          </div>
         </div>
 
-        <!-- Live Terminal Log -->
-        <div class="rounded-xl bg-surface-950 border border-zinc-800/90 p-3 font-mono text-[11px] h-48 overflow-y-auto space-y-1 text-zinc-400" id="logConsole">
-          <div class="text-zinc-600">&gt; 系統已就緒，等待開始任務...</div>
+        <!-- Terminal Log Box -->
+        <div id="logBox" class="rounded-xl bg-surface-950 border border-zinc-800/80 p-2.5 font-mono text-[10px] h-32 overflow-y-auto space-y-1 text-zinc-400">
+          <div class="text-zinc-600">&gt; 系統已就緒，等待派發任務...</div>
         </div>
       </div>
 
-      <!-- Video Player Card -->
-      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center space-x-2">
+      <!-- Video Player & Continuation (Extend Shot) -->
+      <div class="rounded-2xl border border-zinc-800 bg-surface-900/80 p-4 backdrop-blur shadow-lg space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-1.5">
             <i data-lucide="film" class="w-4 h-4 text-purple-400"></i>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">生成影片預覽</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-200">生成影片成果</h2>
           </div>
-          <a id="downloadVideoBtn" href="#" download class="hidden text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center space-x-1">
+          <a id="downloadBtn" href="#" download class="hidden text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center space-x-1">
             <i data-lucide="download" class="w-3.5 h-3.5"></i>
             <span>下載 MP4</span>
           </a>
         </div>
 
+        <!-- Video Player Frame -->
         <div class="rounded-xl bg-surface-950 border border-zinc-800 overflow-hidden aspect-video flex items-center justify-center relative">
-          <video id="videoPlayer" controls class="w-full h-full object-contain hidden"></video>
-          <div id="videoPlaceholder" class="text-center p-6 text-zinc-500">
-            <i data-lucide="clapperboard" class="w-10 h-10 mx-auto mb-2 stroke-1"></i>
+          <video id="player" controls class="w-full h-full object-contain hidden"></video>
+          <div id="playerPlaceholder" class="text-center p-6 text-zinc-500">
+            <i data-lucide="clapperboard" class="w-8 h-8 mx-auto mb-2 stroke-1"></i>
             <p class="text-xs">尚無生成完成的影片</p>
           </div>
         </div>
+
+        <!-- Continuous Storytelling Action: Extend to Next Shot -->
+        <button id="extendBtn" onclick="extendFromLastFrame()" class="hidden w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs shadow flex items-center justify-center space-x-1.5 transition">
+          <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
+          <span>🔄 以此影片結尾接續下一鏡 (Extend to Next Shot)</span>
+        </button>
       </div>
 
-      <!-- History Video Gallery -->
-      <div class="rounded-2xl border border-zinc-800/80 bg-surface-900/60 p-5 shadow-xl backdrop-blur">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center space-x-2">
+      <!-- History Gallery -->
+      <div class="rounded-2xl border border-zinc-800 bg-surface-900/80 p-4 backdrop-blur shadow-lg">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-zinc-200 flex items-center space-x-1.5">
             <i data-lucide="history" class="w-4 h-4 text-zinc-400"></i>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-200">歷史生成紀錄</h2>
-          </div>
-          <button onclick="fetchHistory()" class="text-xs text-zinc-400 hover:text-white">
+            <span>歷史生成庫</span>
+          </span>
+          <button onclick="fetchHistory()" class="text-zinc-400 hover:text-white">
             <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
           </button>
         </div>
-        <div id="historyList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+        <div id="historyList" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
           <!-- Populated dynamically -->
         </div>
       </div>
@@ -303,24 +401,45 @@
   </main>
 
   <script>
-    // Global state
+    // Global State
+    let workflowMode = 'ref2va';
     let uploadedImages = [];
-    let promptMode = 'builder';
-    let pollInterval = null;
+    let uploadedAudios = [];
+    let pollTimer = null;
+    let currentVideoFile = '';
+    let notificationEnabled = false;
 
-    // Initialize
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       fetchBalance();
       fetchHistory();
       setInterval(fetchBalance, 30000);
-      setupDropZone();
+      setupDropZones();
     });
+
+    // Workflow Mode Switching
+    function setWorkflowMode(mode) {
+      workflowMode = mode;
+      const tRef = document.getElementById('modeTabRef');
+      const tFL = document.getElementById('modeTabFL');
+      const tT2V = document.getElementById('modeTabT2V');
+      const activeClass = 'px-3.5 py-1.5 rounded-lg bg-brand-600 text-white shadow transition flex items-center space-x-1.5';
+      const inactiveClass = 'px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5';
+
+      tRef.className = mode === 'ref2va' ? activeClass : inactiveClass;
+      tFL.className = mode === 'fl2va' ? activeClass : inactiveClass;
+      tT2V.className = mode === 't2va' ? activeClass : inactiveClass;
+
+      if (mode === 't2va') {
+        document.getElementById('rawPromptArea').classList.remove('hidden');
+        document.getElementById('ref2vaCanvas').classList.add('hidden');
+      } else {
+        document.getElementById('ref2vaCanvas').classList.remove('hidden');
+      }
+    }
 
     // Colab Balance Fetcher
     async function fetchBalance(force = false) {
-      const btn = document.getElementById('refreshBalanceBtn');
-      btn.classList.add('animate-spin');
       try {
         const res = await fetch(`/api/balance?force_refresh=${force}`);
         const data = await res.json();
@@ -330,247 +449,264 @@
         } else {
           document.getElementById('balanceVal').innerText = '未授權';
         }
-      } catch (err) {
-        document.getElementById('balanceVal').innerText = '連線失敗';
-      } finally {
-        setTimeout(() => btn.classList.remove('animate-spin'), 600);
+      } catch (e) {
+        document.getElementById('balanceVal').innerText = '連線中斷';
       }
     }
 
-    // Drag and Drop
-    function setupDropZone() {
-      const zone = document.getElementById('dropZone');
-      ['dragenter', 'dragover'].forEach(e => {
-        zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.classList.add('border-brand-500'); });
+    // Dropzone setup
+    function setupDropZones() {
+      const imgZone = document.getElementById('imageDropZone');
+      const audZone = document.getElementById('audioDropZone');
+
+      [imgZone, audZone].forEach(z => {
+        ['dragenter', 'dragover'].forEach(e => z.addEventListener(e, ev => { ev.preventDefault(); z.classList.add('border-brand-500'); }));
+        ['dragleave', 'drop'].forEach(e => z.addEventListener(e, ev => { ev.preventDefault(); z.classList.remove('border-brand-500'); }));
       });
-      ['dragleave', 'drop'].forEach(e => {
-        zone.addEventListener(e, (ev) => { ev.preventDefault(); zone.classList.remove('border-brand-500'); });
-      });
-      zone.addEventListener('drop', (ev) => {
-        if (ev.dataTransfer.files) {
-          uploadFiles(ev.dataTransfer.files);
-        }
-      });
+
+      imgZone.addEventListener('drop', ev => { if (ev.dataTransfer.files) uploadFiles(ev.dataTransfer.files); });
+      audZone.addEventListener('drop', ev => { if (ev.dataTransfer.files) uploadFiles(ev.dataTransfer.files); });
     }
 
-    function handleFileSelect(e) {
-      if (e.target.files) {
-        uploadFiles(e.target.files);
-      }
-    }
+    function handleImageSelect(e) { if (e.target.files) uploadFiles(e.target.files); }
+    function handleAudioSelect(e) { if (e.target.files) uploadFiles(e.target.files); }
 
     async function uploadFiles(files) {
-      if (uploadedImages.length + files.length > 9) {
-        alert('最多只能上傳 9 張參照圖片！');
-        return;
-      }
       const formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        formData.append('files', files[i]);
-      }
+      for (let i = 0; i < files.length; i++) formData.append('files', files[i]);
       try {
         const res = await fetch('/api/upload', { method: 'POST', body: formData });
         const data = await res.json();
         if (data.ok) {
-          uploadedImages.push(...data.files);
-          renderImages();
+          data.files.forEach(f => {
+            if (f.type === 'image' && uploadedImages.length < 9) uploadedImages.push(f);
+            if (f.type === 'audio' && uploadedAudios.length < 3) uploadedAudios.push(f);
+          });
+          renderAssetLists();
         }
-      } catch (e) {
-        alert('上傳失敗: ' + e);
+      } catch (err) {
+        alert('上傳失敗: ' + err);
       }
     }
 
-    function removeImage(index) {
-      uploadedImages.splice(index, 1);
-      renderImages();
-    }
-
-    function renderImages() {
-      const container = document.getElementById('imageList');
-      container.innerHTML = '';
+    function renderAssetLists() {
+      // Images
+      const imgContainer = document.getElementById('imageList');
+      imgContainer.innerHTML = '';
       uploadedImages.forEach((img, idx) => {
-        const div = document.createElement('div');
-        div.className = 'relative group rounded-xl overflow-hidden border border-zinc-700 bg-surface-800 aspect-square';
-        div.innerHTML = `
+        const card = document.createElement('div');
+        card.className = 'relative group rounded-xl overflow-hidden border border-zinc-700 bg-surface-800 aspect-square';
+        card.innerHTML = `
           <img src="${img.url}" class="w-full h-full object-cover">
-          <div class="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/75 text-[10px] font-mono font-bold text-brand-300">
+          <div class="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/75 text-[9px] font-mono font-bold text-brand-300">
             &lt;Picture ${idx + 1}&gt;
           </div>
           <button onclick="removeImage(${idx})" class="absolute top-1 right-1 p-1 rounded-full bg-red-600/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition">
             <i data-lucide="x" class="w-3 h-3"></i>
           </button>
         `;
-        container.appendChild(div);
+        imgContainer.appendChild(card);
       });
+      document.getElementById('imgCountBadge').innerText = `${uploadedImages.length}/9`;
+
+      // Audios
+      const audContainer = document.getElementById('audioList');
+      audContainer.innerHTML = '';
+      uploadedAudios.forEach((aud, idx) => {
+        const card = document.createElement('div');
+        card.className = 'p-2 rounded-xl bg-surface-850 border border-zinc-800 flex items-center justify-between text-xs';
+        card.innerHTML = `
+          <div class="flex items-center space-x-2 overflow-hidden">
+            <span class="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-[9px] font-mono font-bold text-emerald-400 shrink-0">
+              &lt;Audio ${idx + 1}&gt;
+            </span>
+            <span class="truncate text-zinc-300 font-medium text-[11px]">${escapeHtml(aud.original_name)}</span>
+          </div>
+          <div class="flex items-center space-x-1">
+            <audio src="${aud.url}" controls class="h-6 w-28"></audio>
+            <button onclick="removeAudio(${idx})" class="text-zinc-500 hover:text-red-400 p-1">
+              <i data-lucide="x" class="w-3 h-3"></i>
+            </button>
+          </div>
+        `;
+        audContainer.appendChild(card);
+      });
+      document.getElementById('audioCountBadge').innerText = `${uploadedAudios.length}/3`;
       lucide.createIcons();
     }
 
-    // Prompt Switching & Construction
-    function switchPromptMode(mode) {
-      promptMode = mode;
-      const builder = document.getElementById('promptBuilderView');
-      const raw = document.getElementById('promptRawView');
-      const bTab = document.getElementById('tabBuilder');
-      const rTab = document.getElementById('tabRaw');
+    function removeImage(idx) { uploadedImages.splice(idx, 1); renderAssetLists(); }
+    function removeAudio(idx) { uploadedAudios.splice(idx, 1); renderAssetLists(); }
 
-      if (mode === 'builder') {
-        builder.classList.remove('hidden');
-        raw.classList.add('hidden');
-        bTab.className = 'px-3 py-1 rounded-md bg-brand-600 text-white shadow';
-        rTab.className = 'px-3 py-1 rounded-md text-zinc-400 hover:text-white';
-      } else {
-        builder.classList.add('hidden');
-        raw.classList.remove('hidden');
-        rTab.className = 'px-3 py-1 rounded-md bg-brand-600 text-white shadow';
-        bTab.className = 'px-3 py-1 rounded-md text-zinc-400 hover:text-white';
+    // AI Co-Pilot
+    async function triggerAICoPilot(genre = 'cinematic') {
+      const concept = document.getElementById('aiConceptInput').value.trim();
+      try {
+        const res = await fetch('/api/ai_copilot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            concept: concept,
+            genre: genre,
+            has_audio: uploadedAudios.length > 0,
+            has_image: uploadedImages.length > 0,
+            image_count: Math.max(1, uploadedImages.length)
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('subjectInput').value = data.subject_definitions;
+          document.getElementById('retentionInput').value = data.retention_analysis;
+          document.getElementById('soundscapeInput').value = data.overall_soundscape;
+          document.getElementById('musicInput').value = data.non_diegetic_music;
+
+          // Populate shots
+          const list = document.getElementById('shotsList');
+          list.innerHTML = '';
+          data.shots.forEach((s, idx) => {
+            appendShotBlock(idx + 1, s.start_seconds, s.description);
+          });
+          lucide.createIcons();
+        }
+      } catch (e) {
+        alert('AI 輔助生成錯誤: ' + e);
       }
     }
 
-    function addShotRow() {
-      const container = document.getElementById('shotsContainer');
-      const count = container.querySelectorAll('.shot-row').length + 1;
-      const startSec = (count - 1) * 3.0;
+    function applyStylePreset(genre) {
+      triggerAICoPilot(genre);
+    }
+
+    // Shot Timeline Blocks
+    function addShotBlock() {
+      const count = document.querySelectorAll('.shot-card').length + 1;
+      const start = (count - 1) * 4.0;
+      appendShotBlock(count, start, 'The camera pans gracefully over the scene.');
+    }
+
+    function appendShotBlock(number, startSec, defaultDesc) {
+      const container = document.getElementById('shotsList');
       const div = document.createElement('div');
-      div.className = 'shot-row p-3 rounded-xl bg-surface-850 border border-zinc-800 space-y-2 relative group';
+      div.className = 'shot-card p-3 rounded-xl bg-surface-850 border border-zinc-800 space-y-2';
       div.innerHTML = `
         <div class="flex items-center justify-between text-xs">
-          <span class="font-bold text-brand-400">Shot ${count}</span>
+          <span class="font-bold text-brand-400 flex items-center space-x-1">
+            <i data-lucide="video" class="w-3 h-3"></i>
+            <span>Shot ${number} (${Number(startSec).toFixed(1)}s 起始)</span>
+          </span>
+          <input type="hidden" class="shot-start-val" value="${Number(startSec).toFixed(1)}">
           <div class="flex items-center space-x-1">
-            <span class="text-zinc-500 text-[11px]">開始時間 (秒):</span>
-            <input type="number" step="0.5" class="shot-start w-16 bg-surface-900 border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-zinc-200" value="${startSec.toFixed(1)}">
-            <button onclick="this.closest('.shot-row').remove()" class="text-zinc-500 hover:text-red-400 p-1">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <button onclick="insertCamera(this, 'The camera dollies in on S1. ')" class="text-[10px] px-1.5 py-0.5 rounded bg-surface-800 hover:bg-surface-700 text-zinc-300">推進</button>
+            <button onclick="insertCamera(this, 'The camera pans across the scene. ')" class="text-[10px] px-1.5 py-0.5 rounded bg-surface-800 hover:bg-surface-700 text-zinc-300">橫搖</button>
+            <button onclick="this.closest('.shot-card').remove()" class="text-zinc-500 hover:text-red-400 p-1">
+              <i data-lucide="trash-2" class="w-3 h-3"></i>
             </button>
           </div>
         </div>
-        <input type="text" class="shot-desc w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200" placeholder="鏡頭動作與場景描述">
+        <input type="text" class="shot-desc-input w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200" value="${escapeHtml(defaultDesc)}">
         <div class="flex items-center space-x-2">
-          <span class="text-[11px] text-zinc-400 shrink-0">角色台詞 (選填):</span>
-          <input type="text" class="shot-dialogue w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="角色台詞">
+          <span class="text-[11px] text-zinc-400 shrink-0">角色台詞:</span>
+          <input type="text" class="shot-dialogue-input w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="角色台詞">
+          <select class="shot-voice-select bg-surface-900 border border-zinc-700/70 rounded-lg px-2 py-1 text-[11px] text-zinc-300 shrink-0">
+            <option value="">預設音色</option>
+            <option value="Audio 1">🎙️ Audio 1 音色</option>
+          </select>
         </div>
       `;
       container.appendChild(div);
       lucide.createIcons();
     }
 
-    async function composeRef2VAPrompt() {
+    function insertCamera(btn, text) {
+      const input = btn.closest('.shot-card').querySelector('.shot-desc-input');
+      input.value = text + input.value;
+    }
+
+    function toggleRawPrompt() {
+      const area = document.getElementById('rawPromptArea');
+      const chev = document.getElementById('rawPromptChevron');
+      area.classList.toggle('hidden');
+      chev.classList.toggle('rotate-180');
+    }
+
+    // Launch Generation
+    async function launchGeneration() {
       if (uploadedImages.length === 0) {
         alert('請先上傳至少 1 張參照圖片！');
         return;
       }
-      const shots = [];
-      document.querySelectorAll('.shot-row').forEach(row => {
-        shots.push({
-          start_seconds: parseFloat(row.querySelector('.shot-start').value || 0),
-          description: row.querySelector('.shot-desc').value || 'The camera frames the subject.',
-          dialogue: row.querySelector('.shot-dialogue').value || '',
-          speaker: 'The subject (S1)'
+
+      // Compose Prompt
+      let prompt = document.getElementById('rawPromptArea').value.trim();
+      if (!prompt) {
+        const shots = [];
+        document.querySelectorAll('.shot-card').forEach(card => {
+          shots.push({
+            start_seconds: parseFloat(card.querySelector('.shot-start-val').value || 0),
+            description: card.querySelector('.shot-desc-input').value || 'The camera frames the scene.',
+            dialogue: card.querySelector('.shot-dialogue-input').value || '',
+            speaker: 'The subject (S1)'
+          });
         });
-      });
 
-      const payload = {
-        subject_definitions: document.getElementById('refSubject').value || 'The subject (S1) is the character in <Picture 1>.',
-        summary: document.getElementById('refSummary').value || 'Cinematic sequence of S1.',
-        retention_analysis: document.getElementById('refRetention').value || 'Retain facial and clothing details.',
-        shots: shots,
-        overall_soundscape: document.getElementById('refSoundscape').value,
-        non_diegetic_music: document.getElementById('refMusic').value,
-        image_count: uploadedImages.length,
-        duration_seconds: parseFloat(document.getElementById('durationRange').value)
-      };
+        const payload = {
+          subject_definitions: document.getElementById('subjectInput').value,
+          summary: 'Cinematic sequence of S1.',
+          retention_analysis: document.getElementById('retentionInput').value,
+          shots: shots,
+          overall_soundscape: document.getElementById('soundscapeInput').value,
+          non_diegetic_music: document.getElementById('musicInput').value,
+          image_count: uploadedImages.length,
+          duration_seconds: parseFloat(document.getElementById('durRange').value)
+        };
 
-      try {
         const res = await fetch('/api/compose_prompt', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        const data = await res.json();
-        if (data.ok) {
-          document.getElementById('rawPrompt').value = data.prompt;
-          switchPromptMode('raw');
+        const pData = await res.json();
+        if (pData.ok) {
+          prompt = pData.prompt;
+          document.getElementById('rawPromptArea').value = prompt;
         } else {
-          alert('合成失敗: ' + data.error);
+          alert('合成提示詞失敗: ' + pData.error);
+          return;
         }
-      } catch (e) {
-        alert('請求錯誤: ' + e);
-      }
-    }
-
-    function loadTemplatePrompt() {
-      document.getElementById('rawPrompt').value = 
-`subject_definitions:
-The subject (S1) is the character shown in <Picture 1>.
-
-summary:
-A cinematic character presentation highlighting S1 turning to face the camera.
-
-retention_analysis:
-Retain key facial features, outfit texture, and ambient mood from <Picture 1>.
-
-detailed_description:
-[Shot 1] S1 stands in warm cinematic lighting and smiles gently. The subject (S1) says, <d>[Chinese] 很高興遇見你，讓我們一起探索世界吧。</d>
-
-[Shot 2] At 00:06.000, the camera cuts to a close-up shot capturing S1's expressive eyes and subtle head turn.
-
-overall_soundscape:
-Subtle studio ambience with gentle breeze acoustics.
-
-non_diegetic_music:
-Soft melodic piano with warm strings.`;
-    }
-
-    // Generation Execution
-    async function startGeneration() {
-      if (uploadedImages.length === 0) {
-        alert('請先上傳至少 1 張參照圖片！');
-        return;
       }
 
-      let prompt = '';
-      if (promptMode === 'raw') {
-        prompt = document.getElementById('rawPrompt').value.trim();
-      }
-      if (!prompt) {
-        await composeRef2VAPrompt();
-        prompt = document.getElementById('rawPrompt').value.trim();
-      }
-
-      if (!prompt) {
-        alert('請填寫或合成提示詞！');
-        return;
-      }
-
-      const payload = {
-        title: "MiniMax H3 Generation",
+      const reqBody = {
+        title: "MiniMax Studio Generation",
+        mode: workflowMode,
         reference_images: uploadedImages.map(img => img.path),
+        reference_audios: uploadedAudios.map(aud => aud.path),
         prompt: prompt,
-        duration_seconds: parseInt(document.getElementById('durationRange').value),
+        duration_seconds: parseInt(document.getElementById('durRange').value),
         gpu: document.getElementById('gpuSelect').value,
-        high_mem: document.getElementById('highMemCheck').checked,
-        seed: document.getElementById('seedInput').value ? parseInt(document.getElementById('seedInput').value) : null
+        high_mem: true
       };
 
-      const btn = document.getElementById('generateBtn');
+      const btn = document.getElementById('dispatchBtn');
       btn.disabled = true;
       btn.classList.add('opacity-50', 'cursor-not-allowed');
+      document.getElementById('stopSessionBtn').classList.remove('hidden');
 
       try {
         const res = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(reqBody)
         });
-        const data = await res.json();
-        if (data.ok) {
+        const d = await res.json();
+        if (d.ok) {
           startPolling();
         } else {
-          alert('啟動失敗: ' + (data.detail || data.error));
+          alert('派發失敗: ' + (d.detail || d.error));
           btn.disabled = false;
           btn.classList.remove('opacity-50', 'cursor-not-allowed');
         }
-      } catch (err) {
-        alert('呼叫錯誤: ' + err);
+      } catch (e) {
+        alert('請求錯誤: ' + e);
         btn.disabled = false;
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
       }
@@ -578,8 +714,8 @@ Soft melodic piano with warm strings.`;
 
     // Polling Status
     function startPolling() {
-      if (pollInterval) clearInterval(pollInterval);
-      pollInterval = setInterval(checkStatus, 3000);
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(checkStatus, 3000);
       checkStatus();
     }
 
@@ -587,66 +723,110 @@ Soft melodic piano with warm strings.`;
       try {
         const res = await fetch('/api/status');
         const data = await res.json();
-        const badge = document.getElementById('jobStatusBadge');
-        const bar = document.getElementById('progressBar');
-        const consoleEl = document.getElementById('logConsole');
-        const btn = document.getElementById('generateBtn');
-
-        badge.innerText = data.status.toUpperCase();
-        if (data.status === 'starting' || data.status === 'uploading') {
-          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30';
-          bar.style.width = '30%';
-        } else if (data.status === 'running' || data.status === 'generating') {
-          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 animate-pulse';
-          bar.style.width = '70%';
-        } else if (data.status === 'downloading') {
-          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30';
-          bar.style.width = '90%';
-        } else if (data.status === 'completed') {
-          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-          bar.style.width = '100%';
-          btn.disabled = false;
-          btn.classList.remove('opacity-50', 'cursor-not-allowed');
-          clearInterval(pollInterval);
-          fetchHistory();
-          fetchBalance();
-        } else if (data.status === 'failed') {
-          badge.className = 'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30';
-          bar.style.width = '100%';
-          btn.disabled = false;
-          btn.classList.remove('opacity-50', 'cursor-not-allowed');
-          clearInterval(pollInterval);
-        }
+        updateStepper(data.stage, data.stage_label);
 
         // Render logs
         if (data.log_tail && data.log_tail.length > 0) {
-          consoleEl.innerHTML = data.log_tail.map(l => `<div>&gt; ${escapeHtml(l)}</div>`).join('');
-          consoleEl.scrollTop = consoleEl.scrollHeight;
+          const box = document.getElementById('logBox');
+          box.innerHTML = data.log_tail.map(l => `<div>&gt; ${escapeHtml(l)}</div>`).join('');
+          box.scrollTop = box.scrollHeight;
         }
 
-        // Check completed job outputs
-        if (data.jobs && data.jobs.length > 0) {
-          const finished = data.jobs.find(j => j.status === 'completed');
-          if (finished && finished.output) {
-            const filename = finished.output.split(/[\\/]/).pop();
-            showVideo(`/outputs/${filename}`);
+        // Completion
+        if (data.status === 'completed') {
+          clearInterval(pollTimer);
+          document.getElementById('dispatchBtn').disabled = false;
+          document.getElementById('dispatchBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+          document.getElementById('stopSessionBtn').classList.add('hidden');
+          fetchHistory();
+          fetchBalance();
+
+          if (data.jobs && data.jobs.length > 0) {
+            const finished = data.jobs.find(j => j.status === 'completed');
+            if (finished && finished.output) {
+              const filename = finished.output.split(/[\\/]/).pop();
+              playVideo(`/outputs/${filename}`, filename);
+              triggerCompletionNotification();
+            }
           }
+        } else if (data.status === 'failed') {
+          clearInterval(pollTimer);
+          document.getElementById('dispatchBtn').disabled = false;
+          document.getElementById('dispatchBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+          document.getElementById('stopSessionBtn').classList.add('hidden');
         }
       } catch (e) {
-        console.error('Status check error:', e);
+        console.error(e);
       }
     }
 
-    function showVideo(url) {
-      const player = document.getElementById('videoPlayer');
-      const placeholder = document.getElementById('videoPlaceholder');
-      const dl = document.getElementById('downloadVideoBtn');
-      player.src = url;
-      player.classList.remove('hidden');
+    function updateStepper(stage, label) {
+      document.getElementById('stageLabel').innerText = label;
+      const stepLine = document.getElementById('stepLine');
+      const percents = [0, 15, 38, 62, 85, 100];
+      stepLine.style.width = (percents[stage] || 0) + '%';
+
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.getElementById('stepDot' + i).firstElementChild;
+        if (i <= stage) {
+          dot.className = 'w-5 h-5 rounded-full bg-brand-500 border border-brand-400 flex items-center justify-center text-[10px] font-mono text-white shadow';
+        } else {
+          dot.className = 'w-5 h-5 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-mono text-zinc-400';
+        }
+      }
+    }
+
+    // Video Player & Continuation
+    function playVideo(url, filename) {
+      currentVideoFile = filename;
+      const p = document.getElementById('player');
+      const placeholder = document.getElementById('playerPlaceholder');
+      const dl = document.getElementById('downloadBtn');
+      const ext = document.getElementById('extendBtn');
+
+      p.src = url;
+      p.classList.remove('hidden');
       placeholder.classList.add('hidden');
       dl.href = url;
       dl.classList.remove('hidden');
+      ext.classList.remove('hidden');
       lucide.createIcons();
+    }
+
+    // Extend From Last Frame Feature
+    async function extendFromLastFrame() {
+      if (!currentVideoFile) return;
+      try {
+        const res = await fetch('/api/extract_last_frame', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ video_filename: currentVideoFile })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          // Replace Picture 1 with the extracted frame
+          uploadedImages = [{
+            filename: data.filename,
+            original_name: 'LastFrame_' + currentVideoFile,
+            path: data.path,
+            url: data.url,
+            type: 'image'
+          }];
+          renderAssetLists();
+          alert('✅ 已擷取上一鏡最後一幀，並自動設為新的 Picture 1！您可以直接編寫下一鏡劇本接續生成！');
+        } else {
+          alert('擷取失敗: ' + data.detail);
+        }
+      } catch (err) {
+        alert('擷取錯誤: ' + err);
+      }
+    }
+
+    async function stopActiveSession() {
+      if (confirm('確定要立即關閉遠端 Colab Session 嗎？')) {
+        await fetch('/api/stop', { method: 'POST' });
+        checkStatus();
+      }
     }
 
     async function fetchHistory() {
@@ -656,30 +836,49 @@ Soft melodic piano with warm strings.`;
         const list = document.getElementById('historyList');
         if (data.videos && data.videos.length > 0) {
           list.innerHTML = data.videos.map(v => `
-            <div onclick="showVideo('${v.url}')" class="p-2.5 rounded-xl bg-surface-850 hover:bg-surface-800 border border-zinc-800 cursor-pointer flex items-center justify-between text-xs transition">
-              <div class="flex items-center space-x-2.5 overflow-hidden">
-                <i data-lucide="play-circle" class="w-4 h-4 text-brand-400 shrink-0"></i>
-                <div class="truncate">
-                  <div class="font-medium text-zinc-200 truncate">${escapeHtml(v.filename)}</div>
-                  <div class="text-[10px] text-zinc-500">${v.created_at} · ${v.size_mb} MB</div>
-                </div>
+            <div onclick="playVideo('${v.url}', '${v.filename}')" class="p-2 rounded-xl bg-surface-850 hover:bg-surface-800 border border-zinc-800 cursor-pointer flex items-center justify-between text-xs transition">
+              <div class="flex items-center space-x-2 overflow-hidden">
+                <i data-lucide="play-circle" class="w-3.5 h-3.5 text-brand-400 shrink-0"></i>
+                <div class="truncate text-[11px] text-zinc-300">${escapeHtml(v.filename)}</div>
               </div>
-              <a href="${v.url}" download onclick="event.stopPropagation()" class="p-1 text-zinc-400 hover:text-white">
-                <i data-lucide="download" class="w-3.5 h-3.5"></i>
-              </a>
+              <span class="text-[10px] text-zinc-500 font-mono shrink-0">${v.size_mb} MB</span>
             </div>
           `).join('');
           lucide.createIcons();
         } else {
-          list.innerHTML = '<div class="text-xs text-zinc-500 text-center py-4">無歷史紀錄</div>';
+          list.innerHTML = '<div class="text-[11px] text-zinc-500 text-center py-2">無歷史紀錄</div>';
         }
       } catch (e) {
         console.error(e);
       }
     }
 
+    // HTML5 Background Desktop Notification
+    function toggleNotification() {
+      if (!("Notification" in window)) {
+        alert("此瀏覽器不支援桌面通知。");
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          notificationEnabled = true;
+          document.getElementById('notifyBtn').classList.add('text-brand-400', 'border-brand-500');
+          new Notification("MiniMax H3 Studio", { body: "通知已啟用！影片生成完畢時將通知您。" });
+        }
+      });
+    }
+
+    function triggerCompletionNotification() {
+      if (notificationEnabled && Notification.permission === "granted") {
+        new Notification("🎬 MiniMax H3 影片生成完畢！", {
+          body: "您的 12 秒高畫質影片已成功由 Google Colab A100 生成並下載完成，點擊返回預覽。",
+          icon: "/static/favicon.ico"
+        });
+      }
+    }
+
     function escapeHtml(text) {
-      return text.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
+      return (text || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
     }
   </script>
 </body>
