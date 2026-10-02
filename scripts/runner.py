@@ -446,8 +446,21 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
                 a_path = Path(str(audio)).expanduser().resolve()
                 if a_path.is_file() and a_path.stat().st_size > 0:
                     audio_paths.append(a_path)
+        guides: list[dict[str, Any]] = []
+        for g_index, g in enumerate(raw.get("guides") or [], start=1):
+            item: dict[str, Any] = {"frame": int(g.get("frame", 0))}
+            for kind in ("image", "audio"):
+                if g.get(kind):
+                    g_path = Path(str(g[kind])).expanduser().resolve()
+                    if not g_path.is_file() or g_path.stat().st_size == 0:
+                        raise ValueError(f"Job {index} guide {g_index} {kind} is missing or empty: {g_path}")
+                    item[kind] = g_path
+            if "image" not in item and "audio" not in item:
+                raise ValueError(f"Job {index} guide {g_index} needs an image or an audio.")
+            guides.append(item)
         resolved.append({
             "id": job_id,
+            "guides": guides,
             "title": str(raw.get("title") or f"Video {index}")[:120],
             "mode": mode,
             "prompt": prompt,
@@ -578,6 +591,24 @@ def run_batch(
                 )
                 remote_audios.append(remote)
 
+            # 時間軸錨點（MiniMaxH3AddGuide）：圖／音訊固定在指定幀
+            remote_guides: list[dict[str, Any]] = []
+            for guide_index, guide in enumerate(job.get("guides", []), start=1):
+                remote_guide: dict[str, Any] = {"frame": guide["frame"]}
+                for kind in ("image", "audio"):
+                    if kind in guide:
+                        remote = f"{remote_prefix}_guide_{guide_index}_{kind}{guide[kind].suffix}"
+                        call_colab(
+                            ["upload", "--session", session, str(guide[kind]), remote],
+                            label=f"upload guide {guide_index} {kind} for {job['title']}",
+                            timeout=300,
+                            on_line=log_line,
+                            session_to_stop=session,
+                            stall_timeout=120,
+                        )
+                        remote_guide[kind] = remote
+                remote_guides.append(remote_guide)
+
             prompt_path = work_root / f"{job['id']}.txt"
             prompt_path.write_text(job["prompt"], encoding="utf-8")
             remote_prompt = f"{remote_prefix}_prompt.txt"
@@ -605,6 +636,7 @@ def run_batch(
                 "H3_OUTPUT_PREFIX=MiniMax_H3_" + job["id"][:20],
                 "H3_OUTPUT_PATH=" + remote_output,
                 "H3_JOB_TIMEOUT_SECONDS=" + str(effective_exec_timeout),
+                "H3_GUIDES=" + json.dumps(remote_guides, separators=(",", ":")),
             ]
             if is_first_frame:
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")
