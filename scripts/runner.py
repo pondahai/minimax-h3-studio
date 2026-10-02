@@ -530,6 +530,14 @@ def run_batch(
         # Avoid copying full prompt text into logs/state files.
         if not line or len(line) > 320 or "<Picture" in line or "<Subject" in line or "[Chinese]" in line:
             return
+        # Notebook stage timings ("[h3-stage] name seconds") are kept per job; heartbeats only keep the
+        # stall watchdog alive (call_colab already counted them as activity) and stay out of log_tail.
+        if line.startswith("[h3-stage]"):
+            job = next((item for item in progress["jobs"] if item["id"] == progress.get("current_job")), None)
+            if job is not None:
+                job.setdefault("stages", []).append(line[len("[h3-stage]"):].strip())
+        if line.startswith("[h3-heartbeat]"):
+            return
         progress["log_tail"] = (progress["log_tail"] + [line])[-30:]
         progress["updated_at"] = now_iso()
         write_progress(progress_path, progress)
