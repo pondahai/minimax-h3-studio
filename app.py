@@ -307,6 +307,8 @@ class GenerateRequest(BaseModel):
     mode: Optional[str] = "ref2va"
     reference_images: List[str]
     reference_audios: Optional[List[str]] = []
+    reference_videos: Optional[List[str]] = []
+    character_swap: bool = False
     prompt: str
     duration_seconds: int = 12
     gpu: str = "A100"
@@ -394,6 +396,20 @@ def start_generation(req: GenerateRequest):
             if ap.is_file():
                 resolved_audios.append(str(ap))
 
+        # Resolve video paths (<Video 1>–<Video 3>)
+        resolved_videos = []
+        for vid in (req.reference_videos or []):
+            vp = Path(vid)
+            if not vp.is_absolute():
+                vp = UPLOADS_DIR / vp.name
+            if not vp.is_file():
+                raise HTTPException(status_code=400, detail=f"找不到參照影片：{vid}")
+            resolved_videos.append(str(vp))
+        if len(resolved_videos) > 3:
+            raise HTTPException(status_code=400, detail="最多 3 支參照影片。")
+        if req.character_swap and not resolved_videos:
+            raise HTTPException(status_code=400, detail="換人模式需要上傳一支原片。")
+
         job_id = f"job_{int(time.time())}_{uuid.uuid4().hex[:4]}"
         output_name = req.output_name or f"h3_{job_id}"
         if not output_name.endswith(".mp4"):
@@ -408,6 +424,8 @@ def start_generation(req: GenerateRequest):
                     "mode": mode_val,
                     "reference_images": resolved_images,
                     "reference_audios": resolved_audios,
+                    "reference_videos": resolved_videos,
+                    "character_swap": req.character_swap,
                     "prompt": req.prompt,
                     "duration_seconds": req.duration_seconds,
                     "seed": req.seed if req.seed is not None else int(time.time()) % 1000000,

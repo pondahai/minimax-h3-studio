@@ -25,6 +25,7 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 NOTEBOOK = SKILL_DIR / "assets" / "MiniMax_H3_Turbo_Colab.ipynb"
 ANSI_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 PICTURE_RE = re.compile(r"<Picture\s+(\d+)>")
+VIDEO_RE = re.compile(r"<Video\s+(\d+)>")
 NAME_RE = re.compile(r"[^A-Za-z0-9_-]+")
 AUTH = os.environ.get("COLAB_AUTH", "oauth2")
 
@@ -446,6 +447,23 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
                 a_path = Path(str(audio)).expanduser().resolve()
                 if a_path.is_file() and a_path.stat().st_size > 0:
                     audio_paths.append(a_path)
+        # 影片參照（<Video 1>–<Video 3>），換人模式以 <Video 1> 為原片
+        videos = raw.get("reference_videos", raw.get("videos", []))
+        if not isinstance(videos, list) or len(videos) > 3:
+            raise ValueError(f"Job {index} may have at most 3 reference videos.")
+        video_paths: list[Path] = []
+        for video in videos:
+            v_path = Path(str(video)).expanduser().resolve()
+            if not v_path.is_file() or v_path.stat().st_size == 0:
+                raise ValueError(f"Reference video is missing or empty: {v_path}")
+            video_paths.append(v_path)
+        character_swap = bool(raw.get("character_swap"))
+        if character_swap and (mode != "reference" or not video_paths):
+            raise ValueError(f"Job {index} character swap needs Ref2VA mode and a source video.")
+        if mode == "reference":
+            invalid = sorted({int(n) for n in VIDEO_RE.findall(prompt) if int(n) < 1 or int(n) > len(video_paths)})
+            if invalid:
+                raise ValueError(f"Job {index} prompt references Video {invalid}; it has {len(video_paths)} videos.")
         guides: list[dict[str, Any]] = []
         for g_index, g in enumerate(raw.get("guides") or [], start=1):
             item: dict[str, Any] = {"frame": int(g.get("frame", 0))}
@@ -466,6 +484,9 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
             "prompt": prompt,
             "reference_images": image_paths,
             "reference_audios": audio_paths,
+            "reference_videos": video_paths,
+            "character_swap": character_swap,
+            "aspect": "portrait" if str(raw.get("aspect", "")).lower() == "portrait" else "landscape",
             "duration_seconds": duration,
             "seed": seed,
             "output_path": output,
@@ -599,6 +620,19 @@ def run_batch(
                 )
                 remote_audios.append(remote)
 
+            remote_videos: list[str] = []
+            for video_index, video_path in enumerate(job.get("reference_videos", []), start=1):
+                remote = f"{remote_prefix}_video_{video_index}{video_path.suffix}"
+                call_colab(
+                    ["upload", "--session", session, str(video_path), remote],
+                    label=f"upload video {video_index} for {job['title']}",
+                    timeout=900,
+                    on_line=log_line,
+                    session_to_stop=session,
+                    stall_timeout=180,
+                )
+                remote_videos.append(remote)
+
             # 時間軸錨點（MiniMaxH3AddGuide）：圖／音訊固定在指定幀
             remote_guides: list[dict[str, Any]] = []
             for guide_index, guide in enumerate(job.get("guides", []), start=1):
@@ -645,6 +679,9 @@ def run_batch(
                 "H3_OUTPUT_PATH=" + remote_output,
                 "H3_JOB_TIMEOUT_SECONDS=" + str(effective_exec_timeout),
                 "H3_GUIDES=" + json.dumps(remote_guides, separators=(",", ":")),
+                "H3_REFERENCE_VIDEOS=" + json.dumps(remote_videos, separators=(",", ":")),
+                "H3_CHARACTER_SWAP=" + ("1" if job.get("character_swap") else "0"),
+                "H3_ASPECT=" + job.get("aspect", "landscape"),
             ]
             if is_first_frame:
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")
