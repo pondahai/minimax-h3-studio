@@ -309,6 +309,7 @@ class GenerateRequest(BaseModel):
     reference_audios: Optional[List[str]] = []
     reference_videos: Optional[List[str]] = []
     character_swap: bool = False
+    aspect: Optional[str] = "landscape"
     prompt: str
     duration_seconds: int = 12
     gpu: str = "A100"
@@ -426,6 +427,7 @@ def start_generation(req: GenerateRequest):
                     "reference_audios": resolved_audios,
                     "reference_videos": resolved_videos,
                     "character_swap": req.character_swap,
+                    "aspect": "portrait" if req.aspect == "portrait" else "landscape",
                     "prompt": req.prompt,
                     "duration_seconds": req.duration_seconds,
                     "seed": req.seed if req.seed is not None else int(time.time()) % 1000000,

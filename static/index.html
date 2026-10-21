@@ -182,6 +182,7 @@
         </div>
         <p>• 圖片於提示詞中使用 <code class="text-brand-300">&lt;Picture 1&gt;</code> 標註</p>
         <p>• 音色於提示詞中使用 <code class="text-emerald-300">&lt;Audio 1&gt;</code> 標註</p>
+        <p>• 影片於提示詞中使用 <code class="text-amber-300">&lt;Video 1&gt;</code> 標註（換人模式以它為原片）</p>
         <p>• 對話台詞自動封裝為 <code class="text-purple-300">&lt;d&gt;[Chinese] ...&lt;/d&gt;</code></p>
       </div>
 
@@ -356,6 +357,13 @@
               <option value="L4">L4</option>
             </select>
           </div>
+          <div class="col-span-2">
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">畫面比例</label>
+            <select id="aspectSelect" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2 py-1 text-xs text-zinc-200">
+              <option value="landscape" selected>橫式 1376×768</option>
+              <option value="portrait">直式 768×1376（手機／短影音原片）</option>
+            </select>
+          </div>
         </div>
 
         <!-- Big Launch CTA -->
@@ -521,14 +529,16 @@
     function setupDropZones() {
       const imgZone = document.getElementById('imageDropZone');
       const audZone = document.getElementById('audioDropZone');
+      const vidZone = document.getElementById('videoDropZone');
 
-      [imgZone, audZone].forEach(z => {
+      [imgZone, audZone, vidZone].forEach(z => {
         ['dragenter', 'dragover'].forEach(e => z.addEventListener(e, ev => { ev.preventDefault(); z.classList.add('border-brand-500'); }));
         ['dragleave', 'drop'].forEach(e => z.addEventListener(e, ev => { ev.preventDefault(); z.classList.remove('border-brand-500'); }));
       });
 
       imgZone.addEventListener('drop', ev => { if (ev.dataTransfer.files) uploadFiles(ev.dataTransfer.files); });
       audZone.addEventListener('drop', ev => { if (ev.dataTransfer.files) uploadFiles(ev.dataTransfer.files); });
+      vidZone.addEventListener('drop', ev => { if (ev.dataTransfer.files) uploadFiles(ev.dataTransfer.files); });
 
       // Support CTRL-V pasting of images globally
       window.addEventListener('paste', handleGlobalPaste);
@@ -590,6 +600,7 @@
             if (f.type === 'video' && uploadedVideos.length < 3) uploadedVideos.push(f);
           });
           renderAssetLists();
+          data.files.filter(f => f.type === 'video').forEach(checkVideoMeta);
         }
       } catch (err) {
         alert('上傳失敗: ' + err);
@@ -675,6 +686,29 @@
     function removeAudio(idx) { uploadedAudios.splice(idx, 1); renderAssetLists(); }
     function removeVideo(idx) { uploadedVideos.splice(idx, 1); renderAssetLists(); }
 
+    // 檢查參照影片長度（官方 2～15 秒，換人建議 4～5 秒），直式原片自動切換直式輸出
+    function checkVideoMeta(vid) {
+      const probe = document.createElement('video');
+      probe.preload = 'metadata';
+      probe.onloadedmetadata = () => {
+        const sec = probe.duration;
+        vid.duration = sec;
+        if (sec < 2 || sec > 15) {
+          alert(`「${vid.original_name}」長 ${sec.toFixed(1)} 秒，超出 H3 參照影片 2～15 秒限制，已移除；請先裁剪後再上傳。`);
+          const idx = uploadedVideos.indexOf(vid);
+          if (idx >= 0) removeVideo(idx);
+          return;
+        }
+        if (sec > 6) {
+          alert(`「${vid.original_name}」長 ${sec.toFixed(1)} 秒。換人模式建議 4～5 秒的連續鏡頭，較長的片段容易漂移。`);
+        }
+        if (uploadedVideos.indexOf(vid) === 0 && probe.videoHeight > probe.videoWidth) {
+          document.getElementById('aspectSelect').value = 'portrait';
+        }
+      };
+      probe.src = vid.url;
+    }
+
     // LLM Workshop & Smart Import
     function toggleLLMGuide() {
       const box = document.getElementById('llmGuideBox');
@@ -704,6 +738,13 @@
         ? `目前已上傳 1 份音訊，映射為 <Audio 1>。請在主體定義與分鏡中指定角色以 <Audio 1> 的音色發聲。`
         : `未上傳音訊（使用預設自然環境聲音與角色微表情演出）。`;
 
+      const vidCount = uploadedVideos.length;
+      const isSwap = document.getElementById('characterSwapToggle').checked && vidCount > 0;
+      const videoRefDesc = vidCount === 0
+        ? `未上傳參照影片。`
+        : `目前已上傳 ${vidCount} 支影片，依序映射為 <Video 1>${vidCount > 1 ? ` 至 <Video ${vidCount}>` : ''}，原聲一併帶入。` +
+          (isSwap ? `已開啟換人模式：要把 <Video 1> 裡的人換成 <Picture 1> 的角色，其餘鏡頭、背景、其他人、動作與節奏保持原片。` : '');
+
       const promptText = `你是一位精通視聽電影語言與 AI 影片提示詞工程的高級導演。
 請為 MiniMax H3 (Ref2VA) 多模態影片生成模型設計一份嚴格符合語法結構的分鏡腳本。
 
@@ -713,6 +754,7 @@ ${concept}
 【已就緒之多模態資產狀態】：
 - 視覺參照：${imgRefDesc}
 - 音訊參照：${audioRefDesc}
+- 影片參照：${videoRefDesc}
 
 【MiniMax H3 (Ref2VA) 規範要求】：
 1. subject_definitions：明確定義主體代號（例如 S1 是來自 <Picture 1> 的角色${hasAudio ? '，說話時帶有 <Audio 1> 的音色與口音' : ''}）。
@@ -723,7 +765,8 @@ ${concept}
    - 角色對白：若角色有台詞，請在 description 中使用標準封裝語法：<d>[Chinese] 台詞內容 </d>，並單獨列出 dialogue 純台詞。
 5. overall_soundscape：客觀環境音場（例如：雨滴落地、街頭車流、風聲吹拂、沉重腳步等）。
 6. non_diegetic_music：非劇情配樂風格（例如：cinematic strings, low pulsing synthwave, ambient piano 等）。
-
+${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 description 中具體描述 <Video 1> 原片人物的動作、姿勢與表情（模型不會自動照抄動作）；retention_analysis 要列出保留 <Video 1> 的鏡頭、背景、服裝與節奏；overall_soundscape 寫明沿用 <Video 1> 的原聲。
+` : ''}
 請直接輸出以下標準 JSON 格式（包含在 \`\`\`json 區塊中，不要額外寒暄，以利程式自動解析）：
 
 \`\`\`json
@@ -964,6 +1007,7 @@ ${concept}
         prompt: prompt,
         duration_seconds: parseInt(document.getElementById('durRange').value),
         gpu: document.getElementById('gpuSelect').value,
+        aspect: document.getElementById('aspectSelect').value,
         high_mem: true
       };
 

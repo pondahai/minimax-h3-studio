@@ -65,21 +65,27 @@ minimax-h3-studio/
 2. **多模態資產塢（Multi-Modal Dock）**：
    - **視覺素材（`<Picture 1-9>`）**：支援拖曳、點擊或直接剪貼簿 **Ctrl+V** 貼上（支援螢幕截圖 / 圖片複製）1～9 張人物與場景參考圖片，自動依序映射。
    - **音訊素材（`<Audio 1-3>` 音色置換與語音克隆）**：支援上傳 MP3 / WAV 乾淨人聲音訊（建議 2～15 秒）。模型自動擷取目標音色、音調與口音，並在對話句 `<d>[Chinese] ...</d>` 中合成具有該音色的自然台詞語音與唇形同步。
-3. **分鏡時間軸與一鍵接續延伸（Last-Frame Continuation）**：
+   - **影片素材（`<Video 1-3>`）**：支援拖曳或點擊上傳 MP4 / MOV（2～15 秒），原聲一併帶入（接到 `ref_video_audios`）。上傳後自動檢查長度，超出 2～15 秒會移除；第一支影片若為直式，畫面比例自動切成直式。
+3. **影片換人模式（Character Swap）**：
+   - 勾選「換人模式」後，把 `<Video 1>` 裡的人換成 `<Picture 1>` 的角色，保留原片的鏡頭、背景、其他人、動作節奏與原聲。
+   - 後端自動疊加社群 [MiniMax H3 Character Swap LoRA](https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA)（`h3_character_swap_pro4500_1000.safetensors`，強度 1.0），並在提示詞加入換人指示。
+   - 使用建議：4～5 秒的連續鏡頭（不要有剪接）、一次只換一個人，並在分鏡中具體描述原片人物的動作（模型不會自動照抄動作）。特寫時的表情可能跟不上原片。
+4. **分鏡時間軸與一鍵接續延伸（Last-Frame Continuation）**：
    - 內建故事板時間軸（Storyboard Timeline），將各次生成結果組織為連續鏡頭（Shot 1, Shot 2...）。
    - 提供「延伸此鏡頭（接續生成下一鏡）」按鈕：透過後端 OpenCV 即時無失真擷取當前影片最後一幀，自動將其設為下一段的 `<Picture 1>`，使鏡頭銜接流暢無縫。
-4. **LLM 導演提示詞工坊與一鍵智慧解析（LLM Workshop & Smart Import）**：
+5. **LLM 導演提示詞工坊與一鍵智慧解析（LLM Workshop & Smart Import）**：
    - **一鍵組裝 Meta-Prompt**：自動感知目前上傳的圖片張數與音訊狀態，將您的簡要構想封裝為包含 MiniMax H3 嚴格語法規範（`<Picture 1-9>`、`<Audio 1>`、`<d>[Chinese]...</d>`）的高階指令，一鍵複製直接餵給 **Qwen 2.5/3.8**、**ChatGPT** 或 **Claude**。
    - **一鍵貼回智慧解析（Smart Import）**：外部 LLM 生成完成後，只需複製回覆並在 Studio 點擊「貼回解析」，系統瞬間自動解析主體、留存特徵、分鏡時序、運鏡與台詞、環境音景與配樂，完全免去手動逐欄複製的痛點！
-5. **雲端運算參數控制**：
+6. **雲端運算參數控制**：
    - 影片長度（4～15 秒滑動條，預設 12 秒）。
    - GPU 規格選擇（A100 極速推薦、V100、T4 經濟型、L4）。
+   - 畫面比例：橫式 1376×768 或直式 768×1376（手機／短影音原片請選直式）。
    - 高記憶體（High-Mem）切換開關、自訂隨機種子（Seed）。
-6. **5 階段視覺化步進條與即時日誌**：
+7. **5 階段視覺化步進條與即時日誌**：
    - 即時步進器（雲端連線 ➔ 資產上傳 ➔ A100 模型推論 ➔ 成果下載 ➔ 完成）。
    - 支援瀏覽器桌面通知（完成時彈出提醒，無需長時間盯盤）。
    - 終端機日誌視窗，即時串流遠端執行進度。
-7. **歷史鏡頭庫與分鏡下載**：
+8. **歷史鏡頭庫與分鏡下載**：
    - 生成完成後即時於網頁播放預覽，提供一鍵下載 MP4。
    - 歷史清單自動讀取 `outputs/` 目錄，顯示歷史影片大小、時間並支援隨時回播或載入延伸。
 
@@ -139,6 +145,15 @@ minimax-h3-studio/
   - 執行後餘額：`198.87 Units`
   - **總共僅消耗：1.13 Units**（推論耗時約 4~5 分鐘）
 - **關機安全保護**：任務結束後遠端 Session 立即自動中止（`Active assignments: 0`，`Rate: 0.00/hr`），未造成任何閒置漏點。
+
+### 5.1 影片換人模式實測（2026-10-21）
+
+- **運算節點**：Google Colab A100 GPU (High-RAM)
+- **輸入**：5 秒直式自拍唱歌影片（576×1024，裁剪並轉為 24 fps）作為 `<Video 1>`，一張橘貓照片作為 `<Picture 1>`
+- **輸出**：5.17 秒、直式 768×1376、24 fps，含音訊，4.3 MiB
+- **結果**：橘貓取代原片人物，毛色與條紋和參考圖一致；雲、草地、山、外套與鏡頭構圖都保留，嘴型有隨歌聲開合。原片上的字幕與貼圖在輸出中消失。
+- **各階段耗時**：安裝 29 秒、下載模型（含 Character Swap LoRA）121 秒、ComfyUI 啟動 24 秒、推論 191 秒，總計約 7 分鐘
+- **GPU 分配**：Colab 沒有排隊機制，A100 滿載時會直接回傳 `503 Service Unavailable`。本次前兩次申請被拒，第 3 次成功；被拒時不會扣點。
 
 ---
 
@@ -217,6 +232,19 @@ AI Agent 不僅能啟動 Web 介面供人類操作，還能直接作為**「自�
    res = requests.post("http://localhost:7860/api/generate", json=payload)
    print(res.json())
    ```
+   影片換人：額外帶入 `reference_videos`（最多 3 支，2～15 秒）、`character_swap` 與 `aspect`，提示詞中以 `<Video 1>` 指稱原片：
+   ```python
+   payload = {
+       "prompt": "...",  # 描述原片人物動作，並寫明保留 <Video 1> 的鏡頭、背景與原聲
+       "reference_images": ["uploads/new_character.png"],  # <Picture 1> = 新角色
+       "reference_videos": ["uploads/source_5s.mp4"],      # <Video 1> = 原片
+       "character_swap": True,
+       "aspect": "portrait",                               # landscape（預設）或 portrait
+       "duration_seconds": 5,
+       "gpu": "A100"
+   }
+   ```
+   直接用 `python scripts/runner.py batch --manifest jobs.json` 批次執行時，manifest 的每個 job 也接受相同欄位（`reference_videos`、`character_swap`、`aspect`）。
 2. **多鏡頭連續生成與自動拼接**：
    - Agent 可在第一段影片生成完成後，調用 `POST /api/extract_last_frame` 自動擷取最後一幀。
    - 將該幀做為第二鏡頭的 `<Picture 1>` 進行無縫接續生成。
