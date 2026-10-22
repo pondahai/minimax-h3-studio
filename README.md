@@ -68,7 +68,7 @@ minimax-h3-studio/
    - **影片素材（`<Video 1-3>`）**：支援拖曳或點擊上傳 MP4 / MOV（2～15 秒），原聲一併帶入（接到 `ref_video_audios`）。上傳後自動檢查長度，超出 2～15 秒會移除；第一支影片若為直式，畫面比例自動切成直式。
 3. **影片換人模式（Character Swap）**：
    - 勾選「換人模式」後，把 `<Video 1>` 裡的人換成 `<Picture 1>` 的角色，保留原片的鏡頭、背景、其他人、動作節奏與原聲。
-   - 後端自動疊加社群 [MiniMax H3 Character Swap LoRA](https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA)（`h3_character_swap_pro4500_1000.safetensors`，強度 1.0），並在提示詞加入換人指示。
+   - 後端自動疊加社群 [MiniMax H3 Character Swap LoRA](https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA)（`h3_character_swap_v1.5.safetensors`，強度 1.0），並在提示詞加入換人指示。
    - 使用建議：4～5 秒的連續鏡頭（不要有剪接）、一次只換一個人，並在分鏡中具體描述原片人物的動作（模型不會自動照抄動作）。特寫時的表情可能跟不上原片。
 4. **分鏡時間軸與一鍵接續延伸（Last-Frame Continuation）**：
    - 內建故事板時間軸（Storyboard Timeline），將各次生成結果組織為連續鏡頭（Shot 1, Shot 2...）。
