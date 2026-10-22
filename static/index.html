@@ -316,6 +316,18 @@
         </div>
       </div>
 
+      <!-- LLM Prompt Expansion -->
+      <div class="rounded-xl border border-zinc-800 bg-surface-900/60 p-3 space-y-2">
+        <span class="text-xs font-semibold text-zinc-400 flex items-center space-x-1.5">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400"></i>
+          <span>LLM 擴寫提示詞</span>
+        </span>
+        <textarea id="expandIdeaInput" rows="2" placeholder="用中文寫簡短構想，例如：把射手換成參考圖的女生，連服裝一起換；留空則潤飾下方現有 Prompt" class="w-full bg-surface-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 focus:outline-none focus:border-purple-500"></textarea>
+        <button id="expandPromptBtn" onclick="expandPromptWithLLM()" class="w-full py-2 bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold rounded-lg transition">
+          ✨ 擴寫成完整 Prompt
+        </button>
+      </div>
+
       <!-- Raw Prompt Drawer (Toggleable) -->
       <div class="rounded-xl border border-zinc-800 bg-surface-900/60 p-3">
         <div class="flex items-center justify-between cursor-pointer" onclick="toggleRawPrompt()">
@@ -693,13 +705,17 @@
       probe.onloadedmetadata = () => {
         const sec = probe.duration;
         vid.duration = sec;
-        if (sec < 2 || sec > 15) {
+        const isFirst = uploadedVideos.indexOf(vid) === 0;
+        if (sec > 15 && isFirst && sec >= 4) {
+          // 長片只有換人模式能用：送出時自動切成 ≤ 8 秒的段落依序換人，再接成一支
+          const segs = Math.ceil(sec / 8);
+          alert(`「${vid.original_name}」長 ${sec.toFixed(1)} 秒，超過單次 15 秒上限。\n\n勾選換人模式後送出，會自動切成 ${segs} 段（每段約 ${(sec / segs).toFixed(1)} 秒）依序換人，最後接成一支完整影片。`);
+        } else if (sec < 2 || sec > 15) {
           alert(`「${vid.original_name}」長 ${sec.toFixed(1)} 秒，超出 H3 參照影片 2～15 秒限制，已移除；請先裁剪後再上傳。`);
           const idx = uploadedVideos.indexOf(vid);
           if (idx >= 0) removeVideo(idx);
           return;
-        }
-        if (sec > 6) {
+        } else if (sec > 6) {
           alert(`「${vid.original_name}」長 ${sec.toFixed(1)} 秒。換人模式建議 4～5 秒的連續鏡頭，較長的片段容易漂移。`);
         }
         if (uploadedVideos.indexOf(vid) === 0 && probe.videoHeight > probe.videoWidth) {
@@ -942,6 +958,39 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       chev.classList.toggle('rotate-180');
     }
 
+    // LLM Prompt Expansion：構想 + 素材狀態 → 完整 H3 Prompt，填入可編輯的 Prompt 欄
+    async function expandPromptWithLLM() {
+      const area = document.getElementById('rawPromptArea');
+      const btn = document.getElementById('expandPromptBtn');
+      const orig = btn.innerText;
+      btn.disabled = true;
+      btn.innerText = '⏳ LLM 擴寫中…';
+      try {
+        const res = await fetch('/api/expand_prompt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            idea: document.getElementById('expandIdeaInput').value,
+            current_prompt: area.value,
+            image_count: uploadedImages.length,
+            video_count: uploadedVideos.length,
+            audio_count: uploadedAudios.length,
+            character_swap: document.getElementById('characterSwapToggle').checked,
+            duration_seconds: parseFloat(document.getElementById('durRange').value)
+          })
+        });
+        const d = await res.json();
+        if (!d.ok) throw new Error(d.detail || d.error);
+        area.value = d.prompt;
+        if (area.classList.contains('hidden')) toggleRawPrompt();
+      } catch (e) {
+        alert('LLM 擴寫失敗: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = orig;
+      }
+    }
+
     // Launch Generation
     async function launchGeneration() {
       if (uploadedImages.length === 0) {
@@ -951,6 +1000,16 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       const characterSwap = document.getElementById('characterSwapToggle').checked;
       if (characterSwap && (uploadedVideos.length === 0 || workflowMode !== 'ref2va')) {
         alert('換人模式需在 Ref2VA 分頁使用，並上傳一支原片作為 <Video 1>。');
+        return;
+      }
+      const longVideo = uploadedVideos.find(v => v.duration > 15);
+      const longSwap = !!longVideo;
+      if (longSwap && (!characterSwap || uploadedVideos.length !== 1 || uploadedVideos[0] !== longVideo)) {
+        alert('超過 15 秒的原片只能用於換人模式，且只能上傳這一支影片（會自動分段處理）。');
+        return;
+      }
+      if (longSwap && uploadedImages.length > 8) {
+        alert('長片分段換人最多 8 張參照圖片（保留一格給段落接續畫面）。');
         return;
       }
 
@@ -1010,6 +1069,16 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         aspect: document.getElementById('aspectSelect').value,
         high_mem: true
       };
+      const endpoint = longSwap ? '/api/generate_long_swap' : '/api/generate';
+      const body = longSwap ? {
+        title: 'Long Character Swap',
+        reference_images: reqBody.reference_images,
+        source_video: longVideo.path,
+        aspect: reqBody.aspect,
+        prompt: prompt,
+        gpu: reqBody.gpu,
+        high_mem: true
+      } : reqBody;
 
       const btn = document.getElementById('dispatchBtn');
       btn.disabled = true;
@@ -1017,10 +1086,10 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       document.getElementById('stopSessionBtn').classList.remove('hidden');
 
       try {
-        const res = await fetch('/api/generate', {
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(reqBody)
+          body: JSON.stringify(body)
         });
         const d = await res.json();
         if (d.ok) {

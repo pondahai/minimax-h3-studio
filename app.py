@@ -262,6 +262,89 @@ def ai_copilot(req: AICoPilotRequest):
     }
 
 
+# LLM 提示詞擴寫：OpenAI 相容的 /v1/chat/completions（llama.cpp、Ollama、LM Studio、雲端皆可）
+LLM_BASE_URL = os.environ.get("H3_LLM_BASE_URL", "http://100.89.149.50:8002/v1").rstrip("/")
+LLM_MODEL = os.environ.get("H3_LLM_MODEL", "")  # 空白 = 用伺服器第一個模型
+LLM_API_KEY = os.environ.get("H3_LLM_API_KEY", "")
+LLM_TIMEOUT = float(os.environ.get("H3_LLM_TIMEOUT", "180"))
+LLM_THINKING = os.environ.get("H3_LLM_THINKING", "1") == "1"  # Qwen3 等推理模型先推理再作答
+
+EXPAND_SYSTEM_PROMPT = """You write prompts for MiniMax H3, a reference-to-video model that generates video with synchronized audio.
+Output ONLY the final prompt in English: one paragraph, no title, no markdown, no explanation.
+
+Rules:
+- Refer to reference images exactly as <Picture 1> ... <Picture N>, reference videos as <Video 1> ... <Video N>, reference audio as <Audio 1> ... <Audio N>. Only use tags for assets that exist.
+- Describe who the subject is (tie them to their <Picture N>), what they do moment by moment, camera framing and movement, setting, lighting, and the soundscape.
+- Spoken lines go inside <d>[Chinese] ...</d> (or <d>[English] ...</d>), preceded by who speaks, e.g. The woman says, <d>[Chinese] 你好。</d>
+- Keep actions physically plausible and paced to fit the requested duration.
+- Write the user's idea faithfully; add concrete visual detail, never change its intent."""
+
+EXPAND_SWAP_RULES = """Character swap mode: <Video 1> is the source performance, <Picture 1> is the new character.
+- Start with: Replace the [describe the person] in <Video 1> with the character from <Picture 1>.
+- State to keep the reference character's face, hair, body and clothing from <Picture 1> (unless the user says otherwise).
+- Follow the source performance's pose, gaze, expression, movement and timing; describe the actions concretely.
+- Preserve the scene, camera, other people and the original audio of <Video 1>.
+- Do not invent dialogue; the original audio is kept.
+- You cannot see <Video 1>: do not invent exact timestamps, weapon/prop types or outcomes that the user did not state; describe only what the user's idea says, in concrete but generic terms."""
+
+
+class ExpandPromptRequest(BaseModel):
+    idea: str
+    current_prompt: Optional[str] = ""
+    image_count: int = 0
+    video_count: int = 0
+    audio_count: int = 0
+    character_swap: bool = False
+    duration_seconds: float = 12
+
+
+def _llm_chat(messages: List[Dict[str, str]]) -> str:
+    import urllib.request
+    import re
+
+    def call(path: str, payload: Optional[dict] = None) -> dict:
+        headers = {"Content-Type": "application/json"}
+        if LLM_API_KEY:
+            headers["Authorization"] = f"Bearer {LLM_API_KEY}"
+        data = json.dumps(payload).encode("utf-8") if payload is not None else None
+        request = urllib.request.Request(LLM_BASE_URL + path, data=data, headers=headers)
+        with urllib.request.urlopen(request, timeout=LLM_TIMEOUT) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+
+    model = LLM_MODEL or call("/models")["data"][0]["id"]
+    result = call("/chat/completions", {
+        "model": model,
+        "messages": messages,
+        "temperature": 0.7,
+        # 推理內容另計 token，開 thinking 時要留足空間，否則正文會被截掉
+        "max_tokens": 8000 if LLM_THINKING else 1500,
+        "chat_template_kwargs": {"enable_thinking": LLM_THINKING},
+    })
+    text = (result["choices"][0]["message"].get("content") or "").strip()
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip()
+    if not text:
+        raise RuntimeError("LLM 沒有回傳內容。")
+    return text
+
+
+@app.post("/api/expand_prompt")
+def expand_prompt(req: ExpandPromptRequest):
+    """Expand a short idea (or refine the current prompt) into a full H3 prompt via an LLM."""
+    if not req.idea.strip() and not (req.current_prompt or "").strip():
+        raise HTTPException(status_code=400, detail="請先輸入構想或現有提示詞。")
+    assets = (f"Available assets: {req.image_count} image(s), {req.video_count} video(s), "
+              f"{req.audio_count} audio clip(s). Requested duration: {req.duration_seconds:g} seconds.")
+    system = EXPAND_SYSTEM_PROMPT + ("\n\n" + EXPAND_SWAP_RULES if req.character_swap else "")
+    user = assets + "\n\nUser idea (may be in Chinese):\n" + (req.idea.strip() or "(none)")
+    if (req.current_prompt or "").strip():
+        user += "\n\nCurrent prompt to improve (keep what still fits the idea):\n" + req.current_prompt.strip()
+    try:
+        prompt = _llm_chat([{"role": "system", "content": system}, {"role": "user", "content": user}])
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"LLM 擴寫失敗（{LLM_BASE_URL}）：{exc}")
+    return {"ok": True, "prompt": prompt}
+
+
 class ShotItem(BaseModel):
     start_seconds: float
     description: str
@@ -325,6 +408,7 @@ def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: i
     manifest_path.write_text(json.dumps(manifest_data, ensure_ascii=False, indent=2), encoding="utf-8")
 
     current_state["is_running"] = True
+    current_state["task"] = "single"
     current_state["status"] = "starting"
     current_state["stage"] = 1
     current_state["stage_label"] = "申請分配 Google Colab A100 GPU"
@@ -445,6 +529,215 @@ def start_generation(req: GenerateRequest):
         return {"ok": True, "job_id": job_id, "message": "任務已排入 Google Colab 佇列"}
 
 
+# 長片分段換人：原片切成 ≤ 8 秒的段落，依序換人（上一段結尾畫面當下一段的接續參考），最後接成一支
+LONG_SWAP_MAX_SEGMENT = 8.0
+LONG_SWAP_CONTINUITY = (
+    " The video starts exactly like <Picture {n}>: same person, same pose, same framing and lighting;"
+    " <Picture {n}> is only a continuity frame, the character identity still comes from <Picture 1>."
+)
+
+
+class LongSwapRequest(BaseModel):
+    title: Optional[str] = "Long Character Swap"
+    reference_images: List[str]
+    source_video: str
+    aspect: Optional[str] = "landscape"
+    prompt: str
+    gpu: str = "A100"
+    high_mem: bool = True
+    timeout: int = 1500
+    seed: Optional[int] = None
+
+
+def _ffmpeg_path() -> str:
+    path = shutil.which("ffmpeg")
+    if not path:
+        raise RuntimeError("找不到 ffmpeg，長片分段換人需要 ffmpeg 切段與合併（請安裝並加入 PATH）。")
+    return path
+
+
+def _run_ffmpeg(args: List[str]) -> None:
+    import subprocess
+    proc = subprocess.run([_ffmpeg_path(), "-v", "error", "-y", *args], capture_output=True, text=True,
+                          encoding="utf-8", errors="replace")
+    if proc.returncode != 0:
+        raise RuntimeError(f"ffmpeg 失敗：{proc.stderr.strip()[-400:]}")
+
+
+def _video_duration(path: Path) -> float:
+    cap = cv2.VideoCapture(str(path))
+    frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    fps = cap.get(cv2.CAP_PROP_FPS) or 0
+    cap.release()
+    if frames <= 0 or fps <= 0:
+        raise RuntimeError(f"無法讀取影片長度：{path.name}")
+    return frames / fps
+
+
+def _frame_at(video: Path, seconds: float, out_path: Path) -> None:
+    """Save the frame shown at `seconds` (the segment's cut point, not the generated tail)."""
+    cap = cv2.VideoCapture(str(video))
+    total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps = cap.get(cv2.CAP_PROP_FPS) or 24
+    cap.set(cv2.CAP_PROP_POS_FRAMES, max(0, min(total - 1, round(seconds * fps) - 1)))
+    ok, frame = cap.read()
+    cap.release()
+    if not ok:
+        raise RuntimeError(f"無法擷取接續畫面：{video.name}")
+    cv2.imwrite(str(out_path), frame)
+
+
+def plan_segments(duration: float) -> List[tuple]:
+    count = max(1, int(-(-duration // LONG_SWAP_MAX_SEGMENT)))
+    length = duration / count
+    return [(i * length, length) for i in range(count)]
+
+
+def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, segments: List[tuple]):
+    global current_state
+    run_id = f"long_{int(time.time())}_{uuid.uuid4().hex[:4]}"
+    work = UPLOADS_DIR / run_id
+    work.mkdir(parents=True, exist_ok=True)
+    session = f"h3-{run_id}".replace("_", "-")
+    seed = req.seed if req.seed is not None else int(time.time()) % 1000000
+    outputs: List[Path] = []
+
+    current_state.update({
+        "is_running": True, "task": "long_swap", "status": "starting", "stage": 1, "error": None,
+        "session": session, "segment": 0, "segment_count": len(segments), "jobs": [],
+        "stage_label": "建立 Colab GPU 執行階段",
+        "log_tail": [f"[*] 長片分段換人：{len(segments)} 段，每段約 {segments[0][1]:.1f} 秒"],
+    })
+    try:
+        runner.start_session(session, req.gpu, req.high_mem)
+        continuity: Optional[Path] = None
+        for index, (start, length) in enumerate(segments):
+            if not current_state["is_running"]:
+                raise RuntimeError("任務已取消。")
+            current_state["segment"] = index + 1
+            current_state["status"] = "running"
+            clip = work / f"source_{index + 1:02d}.mp4"
+            _run_ffmpeg(["-ss", f"{start:.3f}", "-t", f"{length:.3f}", "-i", str(source),
+                         "-c:v", "libx264", "-crf", "18", "-c:a", "aac", str(clip)])
+
+            refs = list(images)
+            prompt = req.prompt
+            if continuity is not None:
+                refs.append(str(continuity))
+                prompt += LONG_SWAP_CONTINUITY.format(n=len(refs))
+            job_id = f"{run_id}_seg{index + 1:02d}"
+            manifest = {"jobs": [{
+                "id": job_id,
+                "title": f"{req.title} {index + 1}/{len(segments)}",
+                "mode": "reference",
+                "reference_images": refs,
+                "reference_audios": [],
+                "reference_videos": [str(clip)],
+                "character_swap": True,
+                "aspect": "portrait" if req.aspect == "portrait" else "landscape",
+                "prompt": prompt,
+                # 生成長度會向上對齊；要求整數秒向上取整，合併時再裁回原片段長度以保持時間軸同步
+                "duration_seconds": max(4, int(-(-length // 1))),
+                "seed": seed,
+                "output_name": f"{job_id}.mp4",
+            }]}
+            manifest_path = BASE_DIR / f".manifest_{job_id}.json"
+            manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+            try:
+                result = runner.run_batch(
+                    manifest_path, session=session, gpu=req.gpu, high_mem=req.high_mem,
+                    stop_on_complete=False, progress_path=PROGRESS_FILE, output_dir=OUTPUTS_DIR,
+                    exec_timeout=req.timeout,
+                )
+            finally:
+                manifest_path.unlink(missing_ok=True)
+            job = next((j for j in result.get("jobs", []) if j.get("status") == "completed"), None)
+            if not job:
+                raise RuntimeError(result.get("error") or f"第 {index + 1} 段生成失敗。")
+            output = Path(job["output"])
+            (OUTPUTS_DIR / f"{output.stem}.json").write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
+            outputs.append(output)
+            current_state["log_tail"].append(f"[*] 第 {index + 1}/{len(segments)} 段完成")
+            if index + 1 < len(segments):
+                continuity = work / f"continuity_{index + 1:02d}.png"
+                _frame_at(output, length, continuity)
+
+        current_state["status"] = "merging"
+        final = OUTPUTS_DIR / f"{run_id}_full.mp4"
+        inputs: List[str] = []
+        chains = []
+        for i, (path, (_, length)) in enumerate(zip(outputs, segments)):
+            inputs += ["-i", str(path)]
+            chains.append(f"[{i}:v]trim=0:{length:.3f},setpts=PTS-STARTPTS[v{i}];"
+                          f"[{i}:a]atrim=0:{length:.3f},asetpts=PTS-STARTPTS[a{i}]")
+        joined = "".join(f"[v{i}][a{i}]" for i in range(len(outputs)))
+        graph = ";".join(chains) + f";{joined}concat=n={len(outputs)}:v=1:a=1[v][a]"
+        _run_ffmpeg([*inputs, "-filter_complex", graph, "-map", "[v]", "-map", "[a]",
+                     "-c:v", "libx264", "-crf", "18", "-c:a", "aac", str(final)])
+        meta = {"id": run_id, "title": req.title, "status": "completed", "output": str(final),
+                "segments": [str(p) for p in outputs], "seed": seed, "finished_at": runner.now_iso()}
+        (OUTPUTS_DIR / f"{final.stem}.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+        current_state["jobs"] = [meta]
+        current_state["status"] = "completed"
+        current_state["log_tail"].append(f"[*] 已合併 {len(outputs)} 段：{final.name}")
+    except Exception as exc:
+        if current_state["status"] != "cancelled":
+            current_state["status"] = "failed"
+            current_state["error"] = str(exc)
+        current_state["log_tail"].append(f"錯誤：{exc}")
+    finally:
+        try:
+            runner.stop_session(session)
+        except Exception:
+            runner.emergency_stop_session(session)
+        current_state["is_running"] = False
+        shutil.rmtree(work, ignore_errors=True)
+
+
+@app.post("/api/generate_long_swap")
+def start_long_swap(req: LongSwapRequest):
+    """Character-swap a source video longer than one H3 clip by chaining short segments."""
+    global active_generation_thread
+    with generation_lock:
+        if current_state["is_running"]:
+            raise HTTPException(status_code=400, detail="另一個影片生成任務正在進行中。")
+        if cv2 is None:
+            raise HTTPException(status_code=500, detail="OpenCV (cv2) is not installed.")
+        try:
+            _ffmpeg_path()
+        except RuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc))
+        if not (1 <= len(req.reference_images) <= 8):
+            raise HTTPException(status_code=400, detail="需要 1 到 8 張參照圖片（保留一格給接續畫面）。")
+
+        images = []
+        for img in req.reference_images:
+            p = Path(img)
+            if not p.is_absolute():
+                p = UPLOADS_DIR / p.name
+            if not p.is_file():
+                raise HTTPException(status_code=400, detail=f"找不到參照圖片：{img}")
+            images.append(str(p))
+        source = Path(req.source_video)
+        if not source.is_absolute():
+            source = UPLOADS_DIR / source.name
+        if not source.is_file():
+            raise HTTPException(status_code=400, detail=f"找不到原片：{req.source_video}")
+
+        duration = _video_duration(source)
+        if duration < 4:
+            raise HTTPException(status_code=400, detail="原片至少要 4 秒。")
+        segments = plan_segments(duration)
+
+        current_state["is_running"] = True
+        active_generation_thread = threading.Thread(
+            target=_long_swap_worker, args=(req, images, source, segments), daemon=True,
+        )
+        active_generation_thread.start()
+        return {"ok": True, "segments": len(segments), "segment_seconds": round(segments[0][1], 2),
+                "message": f"已排入 {len(segments)} 段換人任務"}
+
+
 @app.post("/api/cancel")
 def cancel_generation():
     """Immediately abort current task and terminate remote Colab VM."""
@@ -480,6 +773,13 @@ def get_status():
             pass
 
     status_str = progress.get("status") or current_state["status"]
+    long_swap = current_state.get("task") == "long_swap"
+    if long_swap:
+        # 每段 run_batch 都會把進度檔寫成 completed；整體結果以長片 worker 的狀態為準
+        if not current_state["is_running"] or current_state["status"] in ("starting", "merging"):
+            status_str = current_state["status"]
+        elif status_str in ("completed", "failed", "partial"):
+            status_str = "running"
 
     # Compute stages 1-5
     stage = current_state["stage"]
@@ -510,6 +810,21 @@ def get_status():
         stage = 0
         stage_label = "任務失敗"
         progress_percent = 100
+    elif status_str == "merging":
+        stage = 4
+        stage_label = "4/5 合併各段影片"
+        progress_percent = 95
+    elif status_str == "cancelled":
+        stage = 0
+        stage_label = current_state["stage_label"]
+
+    jobs = progress.get("jobs", [])
+    log_tail = progress.get("log_tail", current_state["log_tail"])
+    if long_swap:
+        if current_state["is_running"] and current_state.get("segment"):
+            stage_label = f"第 {current_state['segment']}/{current_state['segment_count']} 段 · {stage_label}"
+        jobs = current_state["jobs"]
+        log_tail = (current_state["log_tail"] + progress.get("log_tail", [])[-15:])[-30:]
 
     return {
         "ok": True,
@@ -520,8 +835,8 @@ def get_status():
         "progress_percent": progress_percent,
         "session": progress.get("session") or current_state["session"],
         "gpu": progress.get("gpu"),
-        "jobs": progress.get("jobs", []),
-        "log_tail": progress.get("log_tail", current_state["log_tail"]),
+        "jobs": jobs,
+        "log_tail": log_tail,
         "updated_at": progress.get("updated_at") or current_state["updated_at"],
         "error": current_state["error"] or progress.get("error"),
     }

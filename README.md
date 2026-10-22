@@ -70,6 +70,8 @@ minimax-h3-studio/
    - 勾選「換人模式」後，把 `<Video 1>` 裡的人換成 `<Picture 1>` 的角色，保留原片的鏡頭、背景、其他人、動作節奏與原聲。
    - 後端自動疊加社群 [MiniMax H3 Character Swap LoRA](https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA)（`h3_character_swap_v1.5.safetensors`，強度 1.0），並在提示詞加入換人指示。
    - 使用建議：4～5 秒的連續鏡頭（不要有剪接）、一次只換一個人，並在分鏡中具體描述原片人物的動作（模型不會自動照抄動作）。特寫時的表情可能跟不上原片。
+   - **LLM 擴寫提示詞**：在「LLM 擴寫提示詞」輸入簡短中文構想（留空則潤飾現有 Prompt），後端（`/api/expand_prompt`）依目前素材數量、片長與是否換人模式，請 LLM 寫成符合 H3 語法的完整英文 Prompt，填入可編輯的 Prompt 欄。介面為 OpenAI 相容的 `/v1/chat/completions`，以環境變數設定：`H3_LLM_BASE_URL`（預設 `http://100.89.149.50:8002/v1`）、`H3_LLM_MODEL`（空白 = 伺服器第一個模型）、`H3_LLM_API_KEY`、`H3_LLM_THINKING`（預設 `1`，推理模型先推理再作答，品質較好但約 30～40 秒；設 `0` 約 2 秒）。LLM 看不到影片，請在構想中寫明道具與動作。
+   - **長片分段換人**：換人模式可上傳超過 15 秒的原片（只能這一支影片）。送出後後端（`/api/generate_long_swap`）會用 ffmpeg 把原片切成每段 ≤ 8 秒，在同一個 Colab session 依序換人；第 2 段起把上一段在切點的畫面加為最後一張 `<Picture N>` 當接續參考，最後把各段裁回原片段長度、接成 `outputs/long_*_full.mp4`。需要本機安裝 ffmpeg。接縫處的構圖可能略有跳動（接續畫面只是參考圖，不是強制首幀）。
 4. **分鏡時間軸與一鍵接續延伸（Last-Frame Continuation）**：
    - 內建故事板時間軸（Storyboard Timeline），將各次生成結果組織為連續鏡頭（Shot 1, Shot 2...）。
    - 提供「延伸此鏡頭（接續生成下一鏡）」按鈕：透過後端 OpenCV 即時無失真擷取當前影片最後一幀，自動將其設為下一段的 `<Picture 1>`，使鏡頭銜接流暢無縫。
@@ -159,6 +161,12 @@ minimax-h3-studio/
 
 ## 6. 快速上手指南
 
+### 事前準備
+- 安裝相依套件：`pip install -r requirements.txt`（含 `google-colab-cli`）。
+- 執行 `colab usage` 完成 Google 授權並確認算力餘額（見 [7.2 節](#72-ai-agent-部署-sop-與自檢清單)）。
+- 長片分段換人需要本機 [ffmpeg](https://ffmpeg.org/)（在 PATH 中）。
+- LLM 擴寫提示詞需要可連線的 OpenAI 相容 LLM 伺服器（預設 `http://100.89.149.50:8002/v1`，可用 `H3_LLM_BASE_URL` 改）。
+
 ### 啟動服務
 直接雙擊執行目錄下的：
 ```cmd
@@ -202,7 +210,9 @@ AI Agent 在接獲指令後，應依照下列標準檢查步驟執行：
    ```
 2. **Google Colab 算力與憑證檢查**：
    - 執行 `colab usage` 檢查傳回之 `Current balance`。
-   - 若回報尚未登入或 Token 過期，Agent 應提示使用者手動執行 `colab login` 完成 Google OAuth2 授權（憑證保存在本機 `~/.colab-cli-oauth-token.json`）。
+   - Colab CLI 沒有 `login` 子指令：第一次執行需要授權的指令（如 `colab usage`）時會自動開瀏覽器完成 Google OAuth2 授權，憑證保存在 `~/.config/colab-cli/token.json`。
+   - 若登入到沒有算力的帳號（餘額 0）或 Token 過期，刪除 `~/.config/colab-cli/token.json` 後重新執行 `colab usage`，在瀏覽器選擇正確的 Google 帳號。
+   - Windows 上若用 Microsoft Store 版 Python 安裝，`colab.exe` 位於 `%LOCALAPPDATA%\Packages\PythonSoftwareFoundation.Python.3.12_*\LocalCache\local-packages\Python312\Scripts`，需自行加入 PATH（加入後開新終端機才生效）。
 3. **Windows 平台原生適配檢查**：
    - 若使用者為 Windows 系統，官方 `google-colab-cli 0.7.4` 預設因引用 Unix 的 `termios` 模組會發生例外。
    - Agent 可參考本專案 [4.1 節](#41-colab-cli-windows-原生相容性修復termios--tty) 的修復指引，安全保護 `colab_cli/console.py` 中的 Unix 專用模組匯入。
@@ -245,6 +255,28 @@ AI Agent 不僅能啟動 Web 介面供人類操作，還能直接作為**「自�
    }
    ```
    直接用 `python scripts/runner.py batch --manifest jobs.json` 批次執行時，manifest 的每個 job 也接受相同欄位（`reference_videos`、`character_swap`、`aspect`）。
+
+   長片分段換人（原片可超過 15 秒，自動切成 ≤ 8 秒的段落、在同一個 Colab session 依序換人並合併；需要 ffmpeg）：
+   ```python
+   payload = {
+       "prompt": "...",                                    # 換人提示詞，套用到每一段
+       "reference_images": ["uploads/new_character.png"],  # 最多 8 張，保留一格給接續畫面
+       "source_video": "uploads/source_long.mp4",
+       "aspect": "portrait",
+       "gpu": "A100"
+   }
+   res = requests.post("http://localhost:7860/api/generate_long_swap", json=payload)
+   # 進度：GET /api/status 的 stage_label 會顯示「第 i/N 段」；完成後 jobs[0].output 為 outputs/long_*_full.mp4
+   ```
+
+   LLM 擴寫提示詞（約 30～40 秒，關閉 thinking 約 2 秒）：
+   ```python
+   res = requests.post("http://localhost:7860/api/expand_prompt", json={
+       "idea": "把開槍的男人換成參考圖的女生，連服裝一起換",
+       "image_count": 1, "video_count": 1, "character_swap": True, "duration_seconds": 8
+   })
+   prompt = res.json()["prompt"]
+   ```
 2. **多鏡頭連續生成與自動拼接**：
    - Agent 可在第一段影片生成完成後，調用 `POST /api/extract_last_frame` 自動擷取最後一幀。
    - 將該幀做為第二鏡頭的 `<Picture 1>` 進行無縫接續生成。
