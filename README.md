@@ -2,6 +2,8 @@
 
 基於 Google Colab CLI 與 MiniMax H3 (Ref2VA) 模型架構打造的本機視覺化 Web 控制中心，讓您能在本地透過優雅直觀的前端介面，一鍵調用 Google Colab 雲端 A100 GPU 進行短片生成，並即時監控算力餘額與推論進度。
 
+> 📘 **第一次使用？** 請看 [使用手冊（docs/USER_GUIDE.md）](docs/USER_GUIDE.md)：從安裝、Colab 登入到每種工作流的操作步驟、限制與實測時間。
+
 ---
 
 ## 目錄
