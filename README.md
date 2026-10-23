@@ -2,7 +2,7 @@
 
 基於 Google Colab CLI 與 MiniMax H3 (Ref2VA) 模型架構打造的本機視覺化 Web 控制中心，讓您能在本地透過優雅直觀的前端介面，一鍵調用 Google Colab 雲端 A100 GPU 進行短片生成，並即時監控算力餘額與推論進度。
 
-> 📘 **第一次使用？** 請看 [使用手冊（docs/USER_GUIDE.md）](docs/USER_GUIDE.md)：從安裝、Colab 登入到每種工作流的操作步驟、限制與實測時間。
+> 📘 **第一次使用？** 請看 [使用手冊（docs/USER_GUIDE.md）](docs/USER_GUIDE.md)：從安裝、Colab 登入到每種工作流的操作步驟、限制與實測時間。花費估算見 [成本估算（docs/COST_ESTIMATE.md）](docs/COST_ESTIMATE.md)。
 
 ---
 
@@ -49,7 +49,8 @@ minimax-h3-studio/
 ├── current_progress.json   # 即時推論任務狀態與終端機日誌快取
 ├── README.md               # 本專案完整技術與架構文檔
 ├── docs/
-│   └── USER_GUIDE.md       # 使用手冊（安裝、各工作流操作步驟、限制與實測時間）
+│   ├── USER_GUIDE.md       # 使用手冊（安裝、各工作流操作步驟、限制與實測時間）
+│   └── COST_ESTIMATE.md    # 成本估算（台幣計價、各工作流單次花費、LLM 放在哪裡划算）
 ├── scripts/
 │   ├── runner.py           # Colab 任務執行器（建立 session、上傳素材、執行 notebook、下載成果）
 │   └── backup_models.py    # 把鎖定版本的模型備份到 Google Drive（HF 來源消失時的備援）
