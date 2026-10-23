@@ -263,7 +263,7 @@ def ai_copilot(req: AICoPilotRequest):
 
 
 # LLM 提示詞擴寫：OpenAI 相容的 /v1/chat/completions（llama.cpp、Ollama、LM Studio、雲端皆可）
-LLM_BASE_URL = os.environ.get("H3_LLM_BASE_URL", "http://100.89.149.50:8002/v1").rstrip("/")
+LLM_BASE_URL = os.environ.get("H3_LLM_BASE_URL", "http://localhost:8080/v1").rstrip("/")
 LLM_MODEL = os.environ.get("H3_LLM_MODEL", "")  # 空白 = 用伺服器第一個模型
 LLM_API_KEY = os.environ.get("H3_LLM_API_KEY", "")
 LLM_TIMEOUT = float(os.environ.get("H3_LLM_TIMEOUT", "180"))

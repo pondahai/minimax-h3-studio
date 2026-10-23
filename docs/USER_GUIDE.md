@@ -84,7 +84,7 @@ Active assignments: 0
 | 元件 | 什麼時候需要 | 怎麼確認 |
 |---|---|---|
 | [ffmpeg](https://ffmpeg.org/) | [長片分段換人](#43-長片分段換人) | `ffmpeg -version` 有輸出 |
-| OpenAI 相容的 LLM 伺服器 | [LLM 擴寫提示詞](#53-llm-擴寫內建) | 預設連 `http://100.89.149.50:8002/v1`，見 [5.3](#53-llm-擴寫內建) |
+| OpenAI 相容的 LLM 伺服器 | [LLM 擴寫提示詞](#53-llm-擴寫內建) | 預設連本機 `http://localhost:8080/v1`，其他位址見 [5.3](#53-llm-擴寫內建) |
 
 ### 1.5 啟動 Studio
 
@@ -311,7 +311,7 @@ H3 的提示詞要用英文寫，並遵守標籤格式。Studio 提供三種輔�
 
 | 變數 | 預設 | 說明 |
 |---|---|---|
-| `H3_LLM_BASE_URL` | `http://100.89.149.50:8002/v1` | 任何 OpenAI 相容的伺服器，例如 llama.cpp、Ollama（`http://localhost:11434/v1`）、LM Studio（`http://localhost:1234/v1`） |
+| `H3_LLM_BASE_URL` | `http://localhost:8080/v1` | 任何 OpenAI 相容的伺服器，例如 llama.cpp、Ollama（`http://localhost:11434/v1`）、LM Studio（`http://localhost:1234/v1`） |
 | `H3_LLM_MODEL` | 空白 | 空白時用伺服器上的第一個模型 |
 | `H3_LLM_API_KEY` | 空白 | 雲端服務才需要 |
 | `H3_LLM_VISION` | `1` | 把參考圖和影片畫面送給 LLM；設成 `0` 只送文字 |
@@ -385,7 +385,7 @@ A100 滿載時，Colab 會直接拒絕（503），而且沒有排隊機制。被
 不是換人模式的話，影片限 2～15 秒。超過 15 秒的影片只有換人模式能用，會自動分段處理。
 
 **Q：LLM 擴寫失敗？**
-確認 LLM 伺服器連得上，例如用瀏覽器開 `http://100.89.149.50:8002/v1/models`。換其他伺服器請設定 `H3_LLM_BASE_URL`。
+確認 LLM 伺服器連得上，例如用瀏覽器開 `<你的 H3_LLM_BASE_URL>/models`（預設 `http://localhost:8080/v1/models`）。換其他伺服器請設定 `H3_LLM_BASE_URL`。
 
 **Q：生成的影片存在哪裡？**
 在 `outputs/` 資料夾。每支 MP4 旁邊都有一個同名的 `.json`，記錄提示詞、模式、是否開換人、比例、要求秒數、用了哪些素材、seed 和各階段耗時。結果不如預期時，先看這個檔案。
