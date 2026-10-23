@@ -48,10 +48,17 @@ minimax-h3-studio/
 ├── start_studio.bat        # Windows 一鍵啟動腳本（自動開啟服務與命令視窗）
 ├── current_progress.json   # 即時推論任務狀態與終端機日誌快取
 ├── README.md               # 本專案完整技術與架構文檔
+├── docs/
+│   └── USER_GUIDE.md       # 使用手冊（安裝、各工作流操作步驟、限制與實測時間）
+├── scripts/
+│   ├── runner.py           # Colab 任務執行器（建立 session、上傳素材、執行 notebook、下載成果）
+│   └── backup_models.py    # 把鎖定版本的模型備份到 Google Drive（HF 來源消失時的備援）
+├── assets/
+│   └── MiniMax_H3_Turbo_Colab.ipynb  # 在 Colab 上執行的推論 notebook（ComfyUI + MiniMax H3，版本已鎖定）
 ├── static/
 │   └── index.html          # 前端 Single Page Application（Tailwind CSS + Lucide 圖標）
-├── uploads/                # 本地暫存的使用者上傳參照圖片
-└── outputs/                # 生成完畢並自動自 Colab 下載的 MP4 影片與元資料 (.json)
+├── uploads/                # 本地暫存的使用者上傳參照圖片、音訊與影片
+└── outputs/                # 生成的 MP4 與同名 .json（提示詞、輸入設定、seed、各階段耗時）
 ```
 
 ---
