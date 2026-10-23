@@ -257,6 +257,26 @@ def start_session(
         state.update({"status": "failed", "error": str(exc), "updated_at": now_iso()})
         write_progress(progress_path, state)
         raise
+    if DRIVE_FALLBACK:
+        mount_drive(session, on_line=on_line)
+
+
+# Google Drive 模型備援：HF 下載失敗時改從 Drive 讀（需先執行 scripts/backup_models.py 備份）
+DRIVE_FALLBACK = os.environ.get("H3_DRIVE_FALLBACK", "0") == "1"
+DRIVE_MODELS_DIR = os.environ.get("H3_DRIVE_MODELS_DIR", "/content/drive/MyDrive/minimax-h3-models")
+_drive_sessions: set[str] = set()
+
+
+def mount_drive(session: str, on_line: Callable[[str], None] | None = None) -> bool:
+    """Mount Drive without prompting; a missing grant just disables the fallback for this session."""
+    try:
+        call_colab(["drivemount", "--session", session], label="mount Google Drive", timeout=180,
+                   on_line=on_line, stall_timeout=120)
+    except Exception as exc:
+        print(f"[!] Google Drive 掛載失敗，本次不使用 Drive 備援：{exc}")
+        return False
+    _drive_sessions.add(session)
+    return True
 
 
 def stop_session(session: str, progress_path: Path | None = None) -> None:
@@ -685,6 +705,8 @@ def run_batch(
             ]
             if is_first_frame:
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")
+            if session in _drive_sessions:
+                env_values.append(f"H3_DRIVE_MODELS={DRIVE_MODELS_DIR}")
             exec_args = ["exec", "--session", session, "--timeout", str(effective_exec_timeout)]
             for value in env_values:
                 exec_args.extend(["--env", value])

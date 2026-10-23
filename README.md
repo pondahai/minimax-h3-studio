@@ -72,7 +72,7 @@ minimax-h3-studio/
    - 勾選「換人模式」後，把 `<Video 1>` 裡的人換成 `<Picture 1>` 的角色，保留原片的鏡頭、背景、其他人、動作節奏與原聲。
    - 後端自動疊加社群 [MiniMax H3 Character Swap LoRA](https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA)（`h3_character_swap_v1.5.safetensors`，強度 1.0），並在提示詞加入換人指示。
    - 使用建議：4～5 秒的連續鏡頭（不要有剪接）、一次只換一個人，並在分鏡中具體描述原片人物的動作（模型不會自動照抄動作）。特寫時的表情可能跟不上原片。
-   - **LLM 擴寫提示詞**：在「LLM 擴寫提示詞」輸入簡短中文構想（留空則潤飾現有 Prompt），後端（`/api/expand_prompt`）依目前素材數量、片長與是否換人模式，請 LLM 寫成符合 H3 語法的完整英文 Prompt，填入可編輯的 Prompt 欄。介面為 OpenAI 相容的 `/v1/chat/completions`，以環境變數設定：`H3_LLM_BASE_URL`（預設 `http://100.89.149.50:8002/v1`）、`H3_LLM_MODEL`（空白 = 伺服器第一個模型）、`H3_LLM_API_KEY`、`H3_LLM_THINKING`（預設 `1`，推理模型先推理再作答，品質較好但約 30～40 秒；設 `0` 約 2 秒）。LLM 看不到影片，請在構想中寫明道具與動作。
+   - **LLM 擴寫提示詞**：在「LLM 擴寫提示詞」輸入簡短中文構想（留空則潤飾現有 Prompt），後端（`/api/expand_prompt`）依目前素材數量、片長與是否換人模式，請 LLM 寫成符合 H3 語法的完整英文 Prompt，填入可編輯的 Prompt 欄。介面為 OpenAI 相容的 `/v1/chat/completions`，以環境變數設定：`H3_LLM_BASE_URL`（預設 `http://100.89.149.50:8002/v1`）、`H3_LLM_MODEL`（空白 = 伺服器第一個模型）、`H3_LLM_API_KEY`、`H3_LLM_THINKING`（預設 `1`，推理模型先推理再作答，品質較好但約 30～40 秒；設 `0` 約 2 秒）。擴寫時會把參考圖與原片的 6 張畫面一起送給支援看圖的 LLM（`H3_LLM_VISION=0` 關閉），讓提示詞依實際畫面描述場景與動作。
    - **長片分段換人**：換人模式可上傳超過 15 秒的原片（只能這一支影片）。送出後後端（`/api/generate_long_swap`）會用 ffmpeg 把原片切成每段 ≤ 8 秒，在同一個 Colab session 依序換人；第 2 段起把上一段在切點的畫面加為最後一張 `<Picture N>` 當接續參考，最後把各段裁回原片段長度、接成 `outputs/long_*_full.mp4`。需要本機安裝 ffmpeg。接縫處的構圖可能略有跳動（接續畫面只是參考圖，不是強制首幀）。
 4. **分鏡時間軸與一鍵接續延伸（Last-Frame Continuation）**：
    - 內建故事板時間軸（Storyboard Timeline），將各次生成結果組織為連續鏡頭（Shot 1, Shot 2...）。
@@ -168,6 +168,7 @@ minimax-h3-studio/
 - 執行 `colab usage` 完成 Google 授權並確認算力餘額（見 [7.2 節](#72-ai-agent-部署-sop-與自檢清單)）。
 - 長片分段換人需要本機 [ffmpeg](https://ffmpeg.org/)（在 PATH 中）。
 - LLM 擴寫提示詞需要可連線的 OpenAI 相容 LLM 伺服器（預設 `http://100.89.149.50:8002/v1`，可用 `H3_LLM_BASE_URL` 改）。
+- 模型與 ComfyUI 版本已鎖定（`H3_PIN_UPSTREAM=0` 改回最新版）；可用 `python scripts/backup_models.py` 把模型備份到 Google Drive，並以 `H3_DRIVE_FALLBACK=1` 啟用備援，詳見 [使用手冊 6.5 節](docs/USER_GUIDE.md#65-模型來源與備份)。
 
 ### 啟動服務
 直接雙擊執行目錄下的：

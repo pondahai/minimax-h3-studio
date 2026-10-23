@@ -277,15 +277,21 @@ Rules:
 - Describe who the subject is (tie them to their <Picture N>), what they do moment by moment, camera framing and movement, setting, lighting, and the soundscape.
 - Spoken lines go inside <d>[Chinese] ...</d> (or <d>[English] ...</d>), preceded by who speaks, e.g. The woman says, <d>[Chinese] 你好。</d>
 - Keep actions physically plausible and paced to fit the requested duration.
-- Write the user's idea faithfully; add concrete visual detail, never change its intent."""
+- Write the user's idea faithfully; add concrete visual detail, never change its intent.
+- When frames of a reference video are attached, describe its setting, subjects, camera and action exactly as the frames show them; never relocate or reinvent what <Video N> contains.
+- When no frames of a reference video are attached, you cannot see it: do not invent its setting, subjects or action; describe it only as the user's idea does."""
 
 EXPAND_SWAP_RULES = """Character swap mode: <Video 1> is the source performance, <Picture 1> is the new character.
-- Start with: Replace the [describe the person] in <Video 1> with the character from <Picture 1>.
-- State to keep the reference character's face, hair, body and clothing from <Picture 1> (unless the user says otherwise).
-- Follow the source performance's pose, gaze, expression, movement and timing; describe the actions concretely.
+- Start with: Replace the [describe the person in <Video 1>] in <Video 1> with the character from <Picture 1>.
+- State to keep the reference character's face, hair, body and clothing from <Picture 1> (unless the user says otherwise); describe that look briefly if the image is attached.
+- Follow the source performance's pose, gaze, expression, movement and timing; describe the actions concretely, in the order the frames show them.
 - Preserve the scene, camera, other people and the original audio of <Video 1>.
+- This is a replacement from the first frame, not a transformation: never describe dissolving, morphing or one figure turning into another.
 - Do not invent dialogue; the original audio is kept.
-- You cannot see <Video 1>: do not invent exact timestamps, weapon/prop types or outcomes that the user did not state; describe only what the user's idea says, in concrete but generic terms."""
+- Do not invent exact timestamps, prop types or outcomes that neither the frames nor the user's idea show."""
+
+LLM_VISION = os.environ.get("H3_LLM_VISION", "1") == "1"  # 把參考圖與影片畫面一起送給支援看圖的 LLM
+LLM_VIDEO_FRAMES = 6
 
 
 class ExpandPromptRequest(BaseModel):
@@ -296,9 +302,65 @@ class ExpandPromptRequest(BaseModel):
     audio_count: int = 0
     character_swap: bool = False
     duration_seconds: float = 12
+    image_paths: Optional[List[str]] = []
+    video_path: Optional[str] = None
 
 
-def _llm_chat(messages: List[Dict[str, str]]) -> str:
+def _upload_file(path: Optional[str]) -> Optional[Path]:
+    """Only read files the user uploaded (or generated) through Studio."""
+    if not path:
+        return None
+    p = Path(path)
+    if not p.is_absolute():
+        p = UPLOADS_DIR / p.name
+    p = p.resolve()
+    if p.is_file() and any(p.is_relative_to(d.resolve()) for d in (UPLOADS_DIR, OUTPUTS_DIR)):
+        return p
+    return None
+
+
+def _jpeg_data_url(frame, max_side: int = 768) -> str:
+    import base64
+    h, w = frame.shape[:2]
+    scale = min(1.0, max_side / max(h, w))
+    if scale < 1.0:
+        frame = cv2.resize(frame, (int(w * scale), int(h * scale)))
+    ok, buf = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+    return "data:image/jpeg;base64," + base64.b64encode(buf.tobytes()).decode()
+
+
+def _vision_parts(req: "ExpandPromptRequest") -> tuple:
+    """Reference images and evenly spaced video frames as chat image parts, plus the video length."""
+    parts: List[dict] = []
+    video_seconds = None
+    if cv2 is None:
+        return parts, video_seconds
+    for index, path in enumerate((req.image_paths or [])[:4], start=1):
+        p = _upload_file(path)
+        image = cv2.imread(str(p)) if p else None
+        if image is not None:
+            parts += [{"type": "text", "text": f"<Picture {index}>:"},
+                      {"type": "image_url", "image_url": {"url": _jpeg_data_url(image)}}]
+    video = _upload_file(req.video_path)
+    if video:
+        cap = cv2.VideoCapture(str(video))
+        total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        fps = cap.get(cv2.CAP_PROP_FPS) or 24
+        if total > 0:
+            video_seconds = total / fps
+            parts.append({"type": "text", "text": f"Frames of <Video 1> in order ({video_seconds:.1f} s long):"})
+            for i in range(LLM_VIDEO_FRAMES):
+                index = int(i * (total - 1) / (LLM_VIDEO_FRAMES - 1))
+                cap.set(cv2.CAP_PROP_POS_FRAMES, index)
+                ok, frame = cap.read()
+                if ok:
+                    parts += [{"type": "text", "text": f"t={index / fps:.1f}s"},
+                              {"type": "image_url", "image_url": {"url": _jpeg_data_url(frame)}}]
+        cap.release()
+    return parts, video_seconds
+
+
+def _llm_chat(messages: List[Dict[str, Any]]) -> str:
     import urllib.request
     import re
 
@@ -332,17 +394,30 @@ def expand_prompt(req: ExpandPromptRequest):
     """Expand a short idea (or refine the current prompt) into a full H3 prompt via an LLM."""
     if not req.idea.strip() and not (req.current_prompt or "").strip():
         raise HTTPException(status_code=400, detail="請先輸入構想或現有提示詞。")
+    parts, video_seconds = _vision_parts(req) if LLM_VISION else ([], None)
     assets = (f"Available assets: {req.image_count} image(s), {req.video_count} video(s), "
               f"{req.audio_count} audio clip(s). Requested duration: {req.duration_seconds:g} seconds.")
+    if video_seconds:
+        assets += f" <Video 1> is {video_seconds:.1f} seconds long."
     system = EXPAND_SYSTEM_PROMPT + ("\n\n" + EXPAND_SWAP_RULES if req.character_swap else "")
     user = assets + "\n\nUser idea (may be in Chinese):\n" + (req.idea.strip() or "(none)")
     if (req.current_prompt or "").strip():
         user += "\n\nCurrent prompt to improve (keep what still fits the idea):\n" + req.current_prompt.strip()
+    text_only = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+    used_vision = bool(parts)
     try:
-        prompt = _llm_chat([{"role": "system", "content": system}, {"role": "user", "content": user}])
+        if parts:
+            try:
+                prompt = _llm_chat([text_only[0], {"role": "user", "content": [{"type": "text", "text": user}, *parts]}])
+            except Exception:
+                # LLM 不支援看圖時退回純文字
+                used_vision = False
+                prompt = _llm_chat(text_only)
+        else:
+            prompt = _llm_chat(text_only)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"LLM 擴寫失敗（{LLM_BASE_URL}）：{exc}")
-    return {"ok": True, "prompt": prompt}
+    return {"ok": True, "prompt": prompt, "used_vision": used_vision}
 
 
 class ShotItem(BaseModel):
@@ -402,6 +477,21 @@ class GenerateRequest(BaseModel):
     output_name: Optional[str] = None
 
 
+def _job_settings(job: dict) -> dict:
+    """Inputs worth keeping next to an output: the prompt and what it was generated from."""
+    names = lambda paths: [Path(p).name for p in paths or []]
+    return {
+        "prompt": job.get("prompt"),
+        "mode": job.get("mode"),
+        "character_swap": job.get("character_swap", False),
+        "aspect": job.get("aspect"),
+        "requested_seconds": job.get("duration_seconds"),
+        "reference_images": names(job.get("reference_images")),
+        "reference_audios": names(job.get("reference_audios")),
+        "reference_videos": names(job.get("reference_videos")),
+    }
+
+
 def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: int):
     global current_state
     manifest_path = BASE_DIR / f".manifest_{uuid.uuid4().hex[:8]}.json"
@@ -432,10 +522,12 @@ def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: i
         current_state["stage_label"] = "影片已完成並下載至本地"
         current_state["log_tail"].append("[*] 批次生成完成，Colab Session 已安全關閉。")
 
-        # Save metadata for history
+        # Save metadata for history（連同提示詞與輸入設定，方便事後檢討與重現）
+        settings = {j["id"]: _job_settings(j) for j in manifest_data["jobs"]}
         for job in result.get("jobs", []):
             meta_file = OUTPUTS_DIR / f"{Path(job['output']).stem}.json"
-            meta_file.write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
+            meta = {**job, **settings.get(job.get("id"), {})}
+            meta_file.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
     except Exception as exc:
         current_state["status"] = "failed"
@@ -655,7 +747,8 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
             if not job:
                 raise RuntimeError(result.get("error") or f"第 {index + 1} 段生成失敗。")
             output = Path(job["output"])
-            (OUTPUTS_DIR / f"{output.stem}.json").write_text(json.dumps(job, ensure_ascii=False, indent=2), encoding="utf-8")
+            meta = {**job, **_job_settings(manifest["jobs"][0])}
+            (OUTPUTS_DIR / f"{output.stem}.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
             outputs.append(output)
             current_state["log_tail"].append(f"[*] 第 {index + 1}/{len(segments)} 段完成")
             if index + 1 < len(segments):
@@ -675,7 +768,9 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
         _run_ffmpeg([*inputs, "-filter_complex", graph, "-map", "[v]", "-map", "[a]",
                      "-c:v", "libx264", "-crf", "18", "-c:a", "aac", str(final)])
         meta = {"id": run_id, "title": req.title, "status": "completed", "output": str(final),
-                "segments": [str(p) for p in outputs], "seed": seed, "finished_at": runner.now_iso()}
+                "segments": [str(p) for p in outputs], "seed": seed, "finished_at": runner.now_iso(),
+                "prompt": req.prompt, "character_swap": True, "aspect": req.aspect,
+                "reference_images": [Path(p).name for p in images], "source_video": source.name}
         (OUTPUTS_DIR / f"{final.stem}.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
         current_state["jobs"] = [meta]
         current_state["status"] = "completed"

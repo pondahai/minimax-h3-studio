@@ -721,6 +721,12 @@
         if (uploadedVideos.indexOf(vid) === 0 && probe.videoHeight > probe.videoWidth) {
           document.getElementById('aspectSelect').value = 'portrait';
         }
+        // 秒數對齊原片：比原片長的部分模型只能自己編
+        if (isFirst && sec <= 15) {
+          const dur = Math.min(15, Math.max(4, Math.ceil(sec)));
+          document.getElementById('durRange').value = dur;
+          document.getElementById('durVal').innerText = dur;
+        }
       };
       probe.src = vid.url;
     }
@@ -963,6 +969,15 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       const area = document.getElementById('rawPromptArea');
       const btn = document.getElementById('expandPromptBtn');
       const orig = btn.innerText;
+      const idea = document.getElementById('expandIdeaInput').value;
+      const swapToggle = document.getElementById('characterSwapToggle');
+      // 想換人卻沒開換人模式：一般模式會把「換掉」寫成變身劇情，而不是照原片換人
+      if (uploadedVideos.length > 0 && !swapToggle.checked && /換|替換|取代|replace|swap/i.test(idea)) {
+        if (confirm('構想看起來是要換人，但「換人模式」沒有勾選。\n\n要開啟換人模式再擴寫嗎？（取消則照一般模式擴寫）')) {
+          swapToggle.checked = true;
+          setWorkflowMode('ref2va');
+        }
+      }
       btn.disabled = true;
       btn.innerText = '⏳ LLM 擴寫中…';
       try {
@@ -970,13 +985,16 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            idea: document.getElementById('expandIdeaInput').value,
+            idea: idea,
             current_prompt: area.value,
             image_count: uploadedImages.length,
             video_count: uploadedVideos.length,
             audio_count: uploadedAudios.length,
-            character_swap: document.getElementById('characterSwapToggle').checked,
-            duration_seconds: parseFloat(document.getElementById('durRange').value)
+            character_swap: swapToggle.checked,
+            duration_seconds: parseFloat(document.getElementById('durRange').value),
+            // 讓支援看圖的 LLM 看到參考圖與原片畫面，避免憑空編造影片內容
+            image_paths: uploadedImages.map(img => img.path),
+            video_path: uploadedVideos.length > 0 ? uploadedVideos[0].path : null
           })
         });
         const d = await res.json();
