@@ -54,11 +54,12 @@
       </button>
       <button id="modeTabFL" onclick="setWorkflowMode('fl2va')" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
         <i data-lucide="git-commit" class="w-3.5 h-3.5"></i>
-        <span>🎬 FL2VA 首尾過渡</span>
+        <span>🎬 FL2VA 首幀生成</span>
       </button>
-      <button id="modeTabT2V" onclick="setWorkflowMode('t2va')" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
+      <!-- T2VA 尚未接上後端（仍要求至少 1 張圖，且會被當成 Ref2VA），先停用 -->
+      <button id="modeTabT2V" disabled title="尚未支援：請改用 Ref2VA 並上傳一張風格參考圖" class="px-3.5 py-1.5 rounded-lg text-zinc-600 cursor-not-allowed transition flex items-center space-x-1.5">
         <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-        <span>✍️ T2VA 純文字</span>
+        <span>✍️ T2VA 純文字（未支援）</span>
       </button>
     </div>
 
@@ -138,7 +139,7 @@
           <input type="file" id="audioFileInput" multiple accept="audio/*" class="hidden" onchange="handleAudioSelect(event)">
           <i data-lucide="music" class="w-5 h-5 text-zinc-500 group-hover:text-emerald-400 mx-auto mb-1 transition"></i>
           <p class="text-xs text-zinc-300 font-medium">上傳 2～15 秒人聲音檔</p>
-          <p class="text-[10px] text-zinc-500 mt-0.5">MP3/WAV，自動對應 &lt;Audio 1&gt;</p>
+          <p class="text-[10px] text-zinc-500 mt-0.5">MP3/WAV，依序對應 &lt;Audio 1&gt;～&lt;Audio 3&gt;</p>
         </div>
 
         <!-- Audio List -->
@@ -165,7 +166,7 @@
         </div>
 
         <label class="flex items-start space-x-2 mt-3 text-[11px] text-zinc-300 cursor-pointer">
-          <input type="checkbox" id="characterSwapToggle" class="mt-0.5 accent-amber-500">
+          <input type="checkbox" id="characterSwapToggle" class="mt-0.5 accent-amber-500" onchange="updateEstimate()">
           <span><b class="text-amber-300">換人模式</b>：把 &lt;Video 1&gt; 裡的人換成 &lt;Picture 1&gt;（Character Swap LoRA）。建議 4～5 秒連續鏡頭、一次一人，並在分鏡描述原片人物的動作。</span>
         </label>
 
@@ -181,7 +182,7 @@
           <span>多模態標籤調度提示</span>
         </div>
         <p>• 圖片於提示詞中使用 <code class="text-brand-300">&lt;Picture 1&gt;</code> 標註</p>
-        <p>• 音色於提示詞中使用 <code class="text-emerald-300">&lt;Audio 1&gt;</code> 標註</p>
+        <p>• 音色於提示詞中使用 <code class="text-emerald-300">&lt;Audio 1～3&gt;</code> 標註，可在分鏡台詞旁指定</p>
         <p>• 影片於提示詞中使用 <code class="text-amber-300">&lt;Video 1&gt;</code> 標註（換人模式以它為原片）</p>
         <p>• 對話台詞自動封裝為 <code class="text-purple-300">&lt;d&gt;[Chinese] ...&lt;/d&gt;</code></p>
       </div>
@@ -297,7 +298,6 @@
               <input type="text" class="shot-dialogue-input w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="角色台詞（例如：你好，很高興認識你。）" value="你好，歡迎來到未來的世界。">
               <select class="shot-voice-select bg-surface-900 border border-zinc-700/70 rounded-lg px-2 py-1 text-[11px] text-zinc-300 shrink-0">
                 <option value="">預設音色</option>
-                <option value="Audio 1">🎙️ Audio 1 音色</option>
               </select>
             </div>
           </div>
@@ -352,13 +352,13 @@
             <i data-lucide="sliders" class="w-4 h-4 text-brand-400"></i>
             <span>雲端調度設定</span>
           </span>
-          <span class="text-[11px] text-emerald-400 font-semibold">⚡ 預估耗時約 4.5 分鐘 | ~1.1 CU</span>
+          <span id="estimateLabel" class="text-[11px] text-emerald-400 font-semibold">⚡ 預估耗時約 4.5 分鐘 | ~0.5 CU</span>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-[11px] font-semibold text-zinc-400 mb-1">秒數: <span id="durVal" class="text-brand-400 font-bold font-mono">12</span>s</label>
-            <input type="range" id="durRange" min="4" max="15" value="12" class="w-full accent-brand-500 cursor-pointer" oninput="document.getElementById('durVal').innerText = this.value">
+            <input type="range" id="durRange" min="4" max="15" value="12" class="w-full accent-brand-500 cursor-pointer" oninput="document.getElementById('durVal').innerText = this.value; updateEstimate()">
           </div>
           <div>
             <label class="block text-[11px] font-semibold text-zinc-400 mb-1">GPU 規格</label>
@@ -497,6 +497,7 @@
       fetchHistory();
       setInterval(fetchBalance, 30000);
       setupDropZones();
+      updateEstimate();
     });
 
     // Workflow Mode Switching
@@ -504,13 +505,11 @@
       workflowMode = mode;
       const tRef = document.getElementById('modeTabRef');
       const tFL = document.getElementById('modeTabFL');
-      const tT2V = document.getElementById('modeTabT2V');
       const activeClass = 'px-3.5 py-1.5 rounded-lg bg-brand-600 text-white shadow transition flex items-center space-x-1.5';
       const inactiveClass = 'px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5';
 
       tRef.className = mode === 'ref2va' ? activeClass : inactiveClass;
       tFL.className = mode === 'fl2va' ? activeClass : inactiveClass;
-      tT2V.className = mode === 't2va' ? activeClass : inactiveClass;
 
       if (mode === 't2va') {
         document.getElementById('rawPromptArea').classList.remove('hidden');
@@ -529,6 +528,7 @@
         if (data.ok) {
           document.getElementById('balanceVal').innerText = Number(data.balance).toFixed(2);
           document.getElementById('rateVal').innerText = Number(data.rate_per_hour).toFixed(2);
+          if (Number(data.rate_per_hour) > 0) { cuPerHour = Number(data.rate_per_hour); updateEstimate(); }
         } else {
           document.getElementById('balanceVal').innerText = '未授權';
         }
@@ -691,7 +691,44 @@
         vidContainer.appendChild(card);
       });
       document.getElementById('videoCountBadge').innerText = `${uploadedVideos.length}/3`;
+      // 音色選單跟著已上傳的音訊數量更新，保留原本的選擇
+      document.querySelectorAll('.shot-voice-select').forEach(sel => { sel.innerHTML = voiceOptionsHtml(sel.value); });
+      updateEstimate();
       lucide.createIcons();
+    }
+
+    // 分鏡音色選單：預設音色 + 每段已上傳音訊各一項
+    function voiceOptionsHtml(voice = '') {
+      const m = String(voice || '').match(/[1-3]/);
+      const picked = m && Number(m[0]) <= uploadedAudios.length ? `Audio ${m[0]}` : '';
+      let html = `<option value="" ${!picked ? 'selected' : ''}>預設音色</option>`;
+      uploadedAudios.forEach((_, idx) => {
+        const v = `Audio ${idx + 1}`;
+        html += `<option value="${v}" ${picked === v ? 'selected' : ''}>🎙️ ${v} 音色</option>`;
+      });
+      return html;
+    }
+
+    // 預估耗時：開機準備約 3 分鐘 + 推論（約隨片長平方成長，係數取自使用手冊第 6 節實測）
+    let cuPerHour = 6.77;
+    function updateEstimate() {
+      const label = document.getElementById('estimateLabel');
+      if (!label) return;
+      const sec = parseFloat(document.getElementById('durRange').value);
+      const swap = document.getElementById('characterSwapToggle').checked && uploadedVideos.length > 0;
+      const longVideo = uploadedVideos.find(v => v.duration > 15);
+      if (swap && longVideo) {
+        const segs = Math.ceil(longVideo.duration / 8);
+        label.className = 'text-[11px] text-amber-400 font-semibold';
+        label.innerText = `⚡ 長片分段換人：${segs} 段，每段約 ${(longVideo.duration / segs).toFixed(1)} 秒，逐段計時`;
+        return;
+      }
+      const k = swap ? 7 : (uploadedVideos.length > 0 ? 2.9 : 0.6);
+      const minutes = 3 + k * sec * sec / 60;
+      const cu = minutes / 60 * cuPerHour;
+      const warn = swap && sec > 10;
+      label.className = `text-[11px] font-semibold ${warn ? 'text-red-400' : 'text-emerald-400'}`;
+      label.innerText = `⚡ 預估耗時約 ${minutes.toFixed(1)} 分鐘 | ~${cu.toFixed(1)} CU` + (warn ? '（換人超過 10 秒容易超時）' : '');
     }
 
     function removeImage(idx) { uploadedImages.splice(idx, 1); renderAssetLists(); }
@@ -705,6 +742,7 @@
       probe.onloadedmetadata = () => {
         const sec = probe.duration;
         vid.duration = sec;
+        updateEstimate();
         const isFirst = uploadedVideos.indexOf(vid) === 0;
         if (sec > 15 && isFirst && sec >= 4) {
           // 長片只有換人模式能用：送出時自動切成 ≤ 8 秒的段落依序換人，再接成一支
@@ -726,6 +764,7 @@
           const dur = Math.min(15, Math.max(4, Math.ceil(sec)));
           document.getElementById('durRange').value = dur;
           document.getElementById('durVal').innerText = dur;
+          updateEstimate();
         }
       };
       probe.src = vid.url;
@@ -757,7 +796,9 @@
         : `目前已上傳 1 張圖片，映射為 <Picture 1>。`;
       
       const audioRefDesc = hasAudio
-        ? `目前已上傳 1 份音訊，映射為 <Audio 1>。請在主體定義與分鏡中指定角色以 <Audio 1> 的音色發聲。`
+        ? (uploadedAudios.length > 1
+          ? `目前已上傳 ${uploadedAudios.length} 份音訊，依序映射為 <Audio 1> 至 <Audio ${uploadedAudios.length}>。可讓不同角色各用一段音色，請在主體定義與分鏡中指定每個角色以哪一段音色發聲，voice 欄位填 "Audio N"。`
+          : `目前已上傳 1 份音訊，映射為 <Audio 1>。請在主體定義與分鏡中指定角色以 <Audio 1> 的音色發聲。`)
         : `未上傳音訊（使用預設自然環境聲音與角色微表情演出）。`;
 
       const vidCount = uploadedVideos.length;
@@ -943,8 +984,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
           <span class="text-[11px] text-zinc-400 shrink-0">角色台詞:</span>
           <input type="text" class="shot-dialogue-input w-full bg-surface-900 border border-zinc-700/70 rounded-lg px-2.5 py-1 text-xs text-zinc-200" placeholder="角色台詞" value="${escapeHtml(dialogue)}">
           <select class="shot-voice-select bg-surface-900 border border-zinc-700/70 rounded-lg px-2 py-1 text-[11px] text-zinc-300 shrink-0">
-            <option value="" ${!voice ? 'selected' : ''}>預設音色</option>
-            <option value="Audio 1" ${voice.includes('1') ? 'selected' : ''}>🎙️ Audio 1 音色</option>
+            ${voiceOptionsHtml(voice)}
           </select>
         </div>
       `;
@@ -1040,7 +1080,9 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
             start_seconds: parseFloat(card.querySelector('.shot-start-val').value || 0),
             description: card.querySelector('.shot-desc-input').value || 'The camera frames the scene.',
             dialogue: card.querySelector('.shot-dialogue-input').value || '',
-            speaker: 'The subject (S1)'
+            speaker: card.querySelector('.shot-voice-select').value
+              ? `The subject (S1), with the voice of <${card.querySelector('.shot-voice-select').value}>,`
+              : 'The subject (S1)'
           });
         });
 
