@@ -83,6 +83,7 @@ def parse_usage(output: str) -> dict[str, Any]:
 
 DEFAULT_STALL_TIMEOUT_SECONDS = 480.0  # 8 minutes heartbeat timeout
 DEFAULT_MAX_EXEC_TIMEOUT_SECONDS = 1500.0  # 25 minutes hard execution timeout
+TEXT_ENCODERS = {"official", "heretic"}
 
 
 def _colab_path() -> str:
@@ -480,6 +481,10 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
         character_swap = bool(raw.get("character_swap"))
         if character_swap and (mode != "reference" or not video_paths):
             raise ValueError(f"Job {index} character swap needs Ref2VA mode and a source video.")
+        # 文字編碼器：official（Comfy-Org）或 heretic（社群未審查版，同格式可直接替換）
+        text_encoder = str(raw.get("text_encoder") or "official").lower()
+        if text_encoder not in TEXT_ENCODERS:
+            raise ValueError(f"Job {index} text_encoder must be one of {sorted(TEXT_ENCODERS)}.")
         if mode == "reference":
             invalid = sorted({int(n) for n in VIDEO_RE.findall(prompt) if int(n) < 1 or int(n) > len(video_paths)})
             if invalid:
@@ -506,6 +511,7 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
             "reference_audios": audio_paths,
             "reference_videos": video_paths,
             "character_swap": character_swap,
+            "text_encoder": text_encoder,
             "aspect": "portrait" if str(raw.get("aspect", "")).lower() == "portrait" else "landscape",
             "duration_seconds": duration,
             "seed": seed,
@@ -702,6 +708,7 @@ def run_batch(
                 "H3_REFERENCE_VIDEOS=" + json.dumps(remote_videos, separators=(",", ":")),
                 "H3_CHARACTER_SWAP=" + ("1" if job.get("character_swap") else "0"),
                 "H3_ASPECT=" + job.get("aspect", "landscape"),
+                "H3_TEXT_ENCODER=" + job.get("text_encoder", "official"),
             ]
             if is_first_frame:
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")

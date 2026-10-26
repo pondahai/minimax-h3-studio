@@ -354,6 +354,17 @@ H3 的提示詞要用英文寫，並遵守標籤格式。Studio 提供三種輔�
 
 想改回每次抓最新版（例如要測試上游的新功能），啟動 Studio 前設定 `H3_PIN_UPSTREAM=0`。
 
+### 文字編碼器：官方或 Heretic
+
+生成設定裡的「文字編碼器」可以選：
+
+- **官方 Qwen3-VL（預設）**：Comfy-Org 的 `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors`。
+- **Heretic 社群版**：[Momoking/Qwen3-VL-32B-Heretic-MiniMax-H3-NVFP4](https://huggingface.co/Momoking/Qwen3-VL-32B-Heretic-MiniMax-H3-NVFP4)，去除審查的 Qwen3-VL-32B，同樣是 NVFP4、15.7 GB。
+
+只換掉文字編碼器（決定模型怎麼理解提示詞），擴散模型、VAE 與 LoRA 都不變。Colab 每次都是新機器，只會下載選中的那一個，下載量和時間跟官方版差不多。Heretic 版是社群從 INT8 重新量化，畫質可能略遜於官方版；使用上仍受 MiniMax H3 授權約束。直接用 manifest 或 API 時，在 job 加上 `"text_encoder": "heretic"`。
+
+> ⚠️ Heretic 選項還沒在 Colab 上實際跑過。
+
 ### 備份到 Google Drive（防止來源被刪除）
 
 1. 確認 Google Drive 有足夠空間：Ref2VA 加換人約 **39 GiB**，再加 FL2VA 約 **84 GiB**。免費版只有 15 GB，需要 Google One。
@@ -361,7 +372,7 @@ H3 的提示詞要用英文寫，並遵守標籤格式。Studio 提供三種輔�
    ```bash
    python scripts/backup_models.py
    ```
-   要連 FL2VA 模型一起備份的話，加上 `--with-fl2va`；只想先看會備份哪些檔案，加上 `--dry-run`。
+   要連 FL2VA 模型一起備份的話，加上 `--with-fl2va`；有用 Heretic 文字編碼器的話，加上 `--with-heretic`（約 15 GiB）；只想先看會備份哪些檔案，加上 `--dry-run`。
 3. **第一次執行**時，終端機會出現一個 Google Drive 授權網址。用瀏覽器開啟並同意授權，再回到終端機按 Enter。
 4. 已經備份過的檔案會自動略過，中斷後重新執行就會接著備份。
 5. 啟動 Studio 前設定 `H3_DRIVE_FALLBACK=1`。之後每次開 Colab 都會先掛載 Drive；只有在 HF 下載失敗時，才改從 Drive 複製模型。HF 正常時速度不受影響。

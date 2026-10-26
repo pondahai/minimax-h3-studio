@@ -376,6 +376,13 @@
               <option value="portrait">直式 768×1376（手機／短影音原片）</option>
             </select>
           </div>
+          <div class="col-span-2">
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">文字編碼器</label>
+            <select id="textEncoderSelect" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2 py-1 text-xs text-zinc-200">
+              <option value="official" selected>官方 Qwen3-VL（Comfy-Org）</option>
+              <option value="heretic">Heretic 社群版（未審查，Momoking）</option>
+            </select>
+          </div>
         </div>
 
         <!-- Big Launch CTA -->
@@ -1127,6 +1134,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         duration_seconds: parseInt(document.getElementById('durRange').value),
         gpu: document.getElementById('gpuSelect').value,
         aspect: document.getElementById('aspectSelect').value,
+        text_encoder: document.getElementById('textEncoderSelect').value,
         high_mem: true
       };
       const endpoint = longSwap ? '/api/generate_long_swap' : '/api/generate';
@@ -1135,6 +1143,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         reference_images: reqBody.reference_images,
         source_video: longVideo.path,
         aspect: reqBody.aspect,
+        text_encoder: reqBody.text_encoder,
         prompt: prompt,
         gpu: reqBody.gpu,
         high_mem: true
