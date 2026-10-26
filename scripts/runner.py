@@ -481,8 +481,8 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
         character_swap = bool(raw.get("character_swap"))
         if character_swap and (mode != "reference" or not video_paths):
             raise ValueError(f"Job {index} character swap needs Ref2VA mode and a source video.")
-        # 文字編碼器：official（Comfy-Org）或 heretic（社群未審查版，同格式可直接替換）
-        text_encoder = str(raw.get("text_encoder") or "official").lower()
+        # 文字編碼器：heretic（預設，社群未審查版）或 official（Comfy-Org），同格式可直接替換
+        text_encoder = str(raw.get("text_encoder") or "heretic").lower()
         if text_encoder not in TEXT_ENCODERS:
             raise ValueError(f"Job {index} text_encoder must be one of {sorted(TEXT_ENCODERS)}.")
         if mode == "reference":
@@ -708,7 +708,7 @@ def run_batch(
                 "H3_REFERENCE_VIDEOS=" + json.dumps(remote_videos, separators=(",", ":")),
                 "H3_CHARACTER_SWAP=" + ("1" if job.get("character_swap") else "0"),
                 "H3_ASPECT=" + job.get("aspect", "landscape"),
-                "H3_TEXT_ENCODER=" + job.get("text_encoder", "official"),
+                "H3_TEXT_ENCODER=" + job.get("text_encoder", "heretic"),
             ]
             if is_first_frame:
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")

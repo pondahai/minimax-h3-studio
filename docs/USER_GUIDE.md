@@ -358,12 +358,12 @@ H3 的提示詞要用英文寫，並遵守標籤格式。Studio 提供三種輔�
 
 生成設定裡的「文字編碼器」可以選：
 
-- **官方 Qwen3-VL（預設）**：Comfy-Org 的 `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors`。
-- **Heretic 社群版**：[Momoking/Qwen3-VL-32B-Heretic-MiniMax-H3-NVFP4](https://huggingface.co/Momoking/Qwen3-VL-32B-Heretic-MiniMax-H3-NVFP4)，去除審查的 Qwen3-VL-32B，同樣是 NVFP4、15.7 GB。
+- **Heretic 社群版（預設）**：[Momoking/Qwen3-VL-32B-Heretic-MiniMax-H3-NVFP4](https://huggingface.co/Momoking/Qwen3-VL-32B-Heretic-MiniMax-H3-NVFP4)，去除審查的 Qwen3-VL-32B，同樣是 NVFP4、15.7 GB。
+- **官方 Qwen3-VL**：Comfy-Org 的 `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors`。
 
-只換掉文字編碼器（決定模型怎麼理解提示詞），擴散模型、VAE 與 LoRA 都不變。Colab 每次都是新機器，只會下載選中的那一個，下載量和時間跟官方版差不多。Heretic 版是社群從 INT8 重新量化，畫質可能略遜於官方版；使用上仍受 MiniMax H3 授權約束。直接用 manifest 或 API 時，在 job 加上 `"text_encoder": "heretic"`。
+只換掉文字編碼器（決定模型怎麼理解提示詞），擴散模型、VAE 與 LoRA 都不變。Colab 每次都是新機器，只會下載選中的那一個，下載量和時間跟官方版差不多。Heretic 版是社群從 INT8 重新量化，畫質可能略遜於官方版；使用上仍受 MiniMax H3 授權約束。直接用 manifest 或 API 時，沒指定就用 Heretic；要用官方版，在 job 加上 `"text_encoder": "official"`。
 
-> ⚠️ Heretic 選項還沒在 Colab 上實際跑過。
+> Heretic 已在 Colab 上跑完一次 Ref2VA 12 秒生成（A100）。
 
 ### 備份到 Google Drive（防止來源被刪除）
 

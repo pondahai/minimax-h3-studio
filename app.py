@@ -468,7 +468,7 @@ class GenerateRequest(BaseModel):
     reference_videos: Optional[List[str]] = []
     character_swap: bool = False
     aspect: Optional[str] = "landscape"
-    text_encoder: Optional[str] = "official"
+    text_encoder: Optional[str] = "heretic"
     prompt: str
     duration_seconds: int = 12
     gpu: str = "A100"
@@ -606,7 +606,7 @@ def start_generation(req: GenerateRequest):
                     "reference_videos": resolved_videos,
                     "character_swap": req.character_swap,
                     "aspect": "portrait" if req.aspect == "portrait" else "landscape",
-                    "text_encoder": req.text_encoder or "official",
+                    "text_encoder": req.text_encoder or "heretic",
                     "prompt": req.prompt,
                     "duration_seconds": req.duration_seconds,
                     "seed": req.seed if req.seed is not None else int(time.time()) % 1000000,
@@ -637,7 +637,7 @@ class LongSwapRequest(BaseModel):
     reference_images: List[str]
     source_video: str
     aspect: Optional[str] = "landscape"
-    text_encoder: Optional[str] = "official"
+    text_encoder: Optional[str] = "heretic"
     prompt: str
     gpu: str = "A100"
     high_mem: bool = True
@@ -731,7 +731,7 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
                 "reference_videos": [str(clip)],
                 "character_swap": True,
                 "aspect": "portrait" if req.aspect == "portrait" else "landscape",
-                "text_encoder": req.text_encoder or "official",
+                "text_encoder": req.text_encoder or "heretic",
                 "prompt": prompt,
                 # 生成長度會向上對齊；要求整數秒向上取整，合併時再裁回原片段長度以保持時間軸同步
                 "duration_seconds": max(4, int(-(-length // 1))),
@@ -775,7 +775,7 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
         meta = {"id": run_id, "title": req.title, "status": "completed", "output": str(final),
                 "segments": [str(p) for p in outputs], "seed": seed, "finished_at": runner.now_iso(),
                 "prompt": req.prompt, "character_swap": True, "aspect": req.aspect,
-                "text_encoder": req.text_encoder or "official",
+                "text_encoder": req.text_encoder or "heretic",
                 "reference_images": [Path(p).name for p in images], "source_video": source.name}
         (OUTPUTS_DIR / f"{final.stem}.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
         current_state["jobs"] = [meta]
