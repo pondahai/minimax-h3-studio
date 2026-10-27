@@ -539,11 +539,13 @@
       canvas.addEventListener('click', scheduleStoryboardPreview);
     });
 
+    const ACTIVE_STATUSES = ['starting', 'uploading', 'running', 'generating', 'downloading', 'merging', 'stopping_session'];
+
     // 重新整理或另開分頁時，若後端仍在生成就接續追蹤進度
     async function resumePollingIfRunning() {
       try {
         const data = await (await fetch('/api/status')).json();
-        if (data.is_running) {
+        if (data.is_running || ACTIVE_STATUSES.includes(data.status)) {
           document.getElementById('dispatchBtn').disabled = true;
           document.getElementById('dispatchBtn').classList.add('opacity-50', 'cursor-not-allowed');
           document.getElementById('stopSessionBtn').classList.remove('hidden');

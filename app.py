@@ -500,12 +500,18 @@ def _begin_run(task: str) -> None:
     """Mark a new run before its thread starts, so the first status poll doesn't
     read the previous run's finished progress file and stop polling."""
     PROGRESS_FILE.unlink(missing_ok=True)
-    current_state.update(is_running=True, task=task, status="starting", stage=1, error=None,
+    # run 編號：中斷後立刻重新生成時，舊任務的背景執行緒結束得比較晚，不能讓它改到新任務的狀態
+    current_state.update(run=current_state.get("run", 0) + 1, is_running=True, task=task, status="starting", stage=1, error=None,
                          stage_label="申請分配 Google Colab A100 GPU", log_tail=["[*] 準備啟動新的生成任務..."])
 
 
 def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: int):
     global current_state
+    run = current_state.get("run")
+
+    def superseded() -> bool:
+        return current_state.get("run") != run or current_state["status"] in ("stopped", "cancelled")
+
     manifest_path = BASE_DIR / f".manifest_{uuid.uuid4().hex[:8]}.json"
     manifest_path.write_text(json.dumps(manifest_data, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -528,13 +534,12 @@ def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: i
             output_dir=OUTPUTS_DIR,
             exec_timeout=timeout,
         )
-        if current_state["status"] in ("stopped", "cancelled"):
-            return
-        current_state["status"] = result.get("status", "completed")
-        current_state["is_running"] = False
-        current_state["stage"] = 5
-        current_state["stage_label"] = "影片已完成並下載至本地"
-        current_state["log_tail"].append("[*] 批次生成完成，Colab Session 已安全關閉。")
+        if not superseded():
+            current_state["status"] = result.get("status", "completed")
+            current_state["is_running"] = False
+            current_state["stage"] = 5
+            current_state["stage_label"] = "影片已完成並下載至本地"
+            current_state["log_tail"].append("[*] 批次生成完成，Colab Session 已安全關閉。")
 
         # Save metadata for history（連同提示詞與輸入設定，方便事後檢討與重現）
         settings = {j["id"]: _job_settings(j) for j in manifest_data["jobs"]}
@@ -544,7 +549,7 @@ def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: i
             meta_file.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
     except Exception as exc:
-        if current_state["status"] in ("stopped", "cancelled"):
+        if superseded():
             return
         current_state["status"] = "failed"
         current_state["error"] = str(exc)
@@ -712,6 +717,7 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
     work.mkdir(parents=True, exist_ok=True)
     session = f"h3-{run_id}".replace("_", "-")
     seed = req.seed if req.seed is not None else int(time.time()) % 1000000
+    run = current_state.get("run")
     outputs: List[Path] = []
 
     current_state.update({
@@ -798,16 +804,18 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
         current_state["status"] = "completed"
         current_state["log_tail"].append(f"[*] 已合併 {len(outputs)} 段：{final.name}")
     except Exception as exc:
-        if current_state["status"] != "cancelled":
-            current_state["status"] = "failed"
-            current_state["error"] = str(exc)
-        current_state["log_tail"].append(f"錯誤：{exc}")
+        if current_state.get("run") == run:
+            if current_state["status"] not in ("cancelled", "stopped"):
+                current_state["status"] = "failed"
+                current_state["error"] = str(exc)
+            current_state["log_tail"].append(f"錯誤：{exc}")
     finally:
         try:
             runner.stop_session(session)
         except Exception:
             runner.emergency_stop_session(session)
-        current_state["is_running"] = False
+        if current_state.get("run") == run:
+            current_state["is_running"] = False
         shutil.rmtree(work, ignore_errors=True)
 
 
