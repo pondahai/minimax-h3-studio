@@ -84,6 +84,7 @@ def parse_usage(output: str) -> dict[str, Any]:
 DEFAULT_STALL_TIMEOUT_SECONDS = 480.0  # 8 minutes heartbeat timeout
 DEFAULT_MAX_EXEC_TIMEOUT_SECONDS = 1500.0  # 25 minutes hard execution timeout
 TEXT_ENCODERS = {"official", "heretic"}
+FIRST_FRAME_FITS = {"crop", "blur", "pad"}
 
 
 def _colab_path() -> str:
@@ -485,6 +486,10 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
         text_encoder = str(raw.get("text_encoder") or "heretic").lower()
         if text_encoder not in TEXT_ENCODERS:
             raise ValueError(f"Job {index} text_encoder must be one of {sorted(TEXT_ENCODERS)}.")
+        # FL2VA 首幀比例與輸出不同時的處理：crop 置中裁切、blur 模糊背景、pad 黑邊
+        first_frame_fit = str(raw.get("first_frame_fit") or "crop").lower()
+        if first_frame_fit not in FIRST_FRAME_FITS:
+            raise ValueError(f"Job {index} first_frame_fit must be one of {sorted(FIRST_FRAME_FITS)}.")
         if mode == "reference":
             invalid = sorted({int(n) for n in VIDEO_RE.findall(prompt) if int(n) < 1 or int(n) > len(video_paths)})
             if invalid:
@@ -512,6 +517,7 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
             "reference_videos": video_paths,
             "character_swap": character_swap,
             "text_encoder": text_encoder,
+            "first_frame_fit": first_frame_fit,
             "aspect": "portrait" if str(raw.get("aspect", "")).lower() == "portrait" else "landscape",
             "duration_seconds": duration,
             "seed": seed,
@@ -709,6 +715,7 @@ def run_batch(
                 "H3_CHARACTER_SWAP=" + ("1" if job.get("character_swap") else "0"),
                 "H3_ASPECT=" + job.get("aspect", "landscape"),
                 "H3_TEXT_ENCODER=" + job.get("text_encoder", "heretic"),
+                "H3_FIRST_FRAME_FIT=" + job.get("first_frame_fit", "crop"),
             ]
             if is_first_frame:
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")

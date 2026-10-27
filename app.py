@@ -469,6 +469,7 @@ class GenerateRequest(BaseModel):
     character_swap: bool = False
     aspect: Optional[str] = "landscape"
     text_encoder: Optional[str] = "heretic"
+    first_frame_fit: Optional[str] = "crop"
     prompt: str
     duration_seconds: int = 12
     gpu: str = "A100"
@@ -487,6 +488,7 @@ def _job_settings(job: dict) -> dict:
         "character_swap": job.get("character_swap", False),
         "aspect": job.get("aspect"),
         "text_encoder": job.get("text_encoder", "official"),
+        "first_frame_fit": job.get("first_frame_fit"),
         "requested_seconds": job.get("duration_seconds"),
         "reference_images": names(job.get("reference_images")),
         "reference_audios": names(job.get("reference_audios")),
@@ -518,6 +520,8 @@ def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: i
             output_dir=OUTPUTS_DIR,
             exec_timeout=timeout,
         )
+        if current_state["status"] in ("stopped", "cancelled"):
+            return
         current_state["status"] = result.get("status", "completed")
         current_state["is_running"] = False
         current_state["stage"] = 5
@@ -532,6 +536,8 @@ def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: i
             meta_file.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
     except Exception as exc:
+        if current_state["status"] in ("stopped", "cancelled"):
+            return
         current_state["status"] = "failed"
         current_state["error"] = str(exc)
         current_state["is_running"] = False
@@ -607,6 +613,7 @@ def start_generation(req: GenerateRequest):
                     "character_swap": req.character_swap,
                     "aspect": "portrait" if req.aspect == "portrait" else "landscape",
                     "text_encoder": req.text_encoder or "heretic",
+                    "first_frame_fit": req.first_frame_fit or "crop",
                     "prompt": req.prompt,
                     "duration_seconds": req.duration_seconds,
                     "seed": req.seed if req.seed is not None else int(time.time()) % 1000000,
@@ -874,6 +881,10 @@ def get_status():
             pass
 
     status_str = progress.get("status") or current_state["status"]
+    # 手動停止／取消後，進度檔仍停在中斷前的狀態；以使用者的操作為準
+    manually_stopped = current_state["status"] in ("stopped", "cancelled")
+    if manually_stopped:
+        status_str = current_state["status"]
     long_swap = current_state.get("task") == "long_swap"
     if long_swap:
         # 每段 run_batch 都會把進度檔寫成 completed；整體結果以長片 worker 的狀態為準
@@ -915,12 +926,14 @@ def get_status():
         stage = 4
         stage_label = "4/5 合併各段影片"
         progress_percent = 95
-    elif status_str == "cancelled":
+    elif status_str in ("cancelled", "stopped"):
         stage = 0
         stage_label = current_state["stage_label"]
 
     jobs = progress.get("jobs", [])
     log_tail = progress.get("log_tail", current_state["log_tail"])
+    if manually_stopped and not long_swap:
+        log_tail = (log_tail + current_state["log_tail"][-2:])[-30:]
     if long_swap:
         if current_state["is_running"] and current_state.get("segment"):
             stage_label = f"第 {current_state['segment']}/{current_state['segment_count']} 段 · {stage_label}"

@@ -383,6 +383,14 @@
               <option value="official">官方 Qwen3-VL（Comfy-Org）</option>
             </select>
           </div>
+          <div class="col-span-2">
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">首幀比例不符時（FL2VA）</label>
+            <select id="firstFrameFitSelect" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2 py-1 text-xs text-zinc-200">
+              <option value="crop" selected>置中裁切填滿</option>
+              <option value="blur">模糊背景延伸</option>
+              <option value="pad">黑邊</option>
+            </select>
+          </div>
         </div>
 
         <!-- Big Launch CTA -->
@@ -505,7 +513,23 @@
       setInterval(fetchBalance, 30000);
       setupDropZones();
       updateEstimate();
+      resumePollingIfRunning();
     });
+
+    // 重新整理或另開分頁時，若後端仍在生成就接續追蹤進度
+    async function resumePollingIfRunning() {
+      try {
+        const data = await (await fetch('/api/status')).json();
+        if (data.is_running) {
+          document.getElementById('dispatchBtn').disabled = true;
+          document.getElementById('dispatchBtn').classList.add('opacity-50', 'cursor-not-allowed');
+          document.getElementById('stopSessionBtn').classList.remove('hidden');
+          startPolling();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
 
     // Workflow Mode Switching
     function setWorkflowMode(mode) {
@@ -1135,6 +1159,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         gpu: document.getElementById('gpuSelect').value,
         aspect: document.getElementById('aspectSelect').value,
         text_encoder: document.getElementById('textEncoderSelect').value,
+        first_frame_fit: document.getElementById('firstFrameFitSelect').value,
         high_mem: true
       };
       const endpoint = longSwap ? '/api/generate_long_swap' : '/api/generate';
@@ -1212,7 +1237,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
               triggerCompletionNotification();
             }
           }
-        } else if (data.status === 'failed') {
+        } else if (['failed', 'stopped', 'cancelled'].includes(data.status)) {
           clearInterval(pollTimer);
           document.getElementById('dispatchBtn').disabled = false;
           document.getElementById('dispatchBtn').classList.remove('opacity-50', 'cursor-not-allowed');
