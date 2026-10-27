@@ -496,6 +496,14 @@ def _job_settings(job: dict) -> dict:
     }
 
 
+def _begin_run(task: str) -> None:
+    """Mark a new run before its thread starts, so the first status poll doesn't
+    read the previous run's finished progress file and stop polling."""
+    PROGRESS_FILE.unlink(missing_ok=True)
+    current_state.update(is_running=True, task=task, status="starting", stage=1, error=None,
+                         stage_label="申請分配 Google Colab A100 GPU", log_tail=["[*] 準備啟動新的生成任務..."])
+
+
 def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: int):
     global current_state
     manifest_path = BASE_DIR / f".manifest_{uuid.uuid4().hex[:8]}.json"
@@ -622,6 +630,7 @@ def start_generation(req: GenerateRequest):
             ]
         }
 
+        _begin_run("single")
         active_generation_thread = threading.Thread(
             target=_background_worker,
             args=(manifest_data, req.gpu, req.high_mem, req.timeout),
@@ -837,7 +846,7 @@ def start_long_swap(req: LongSwapRequest):
             raise HTTPException(status_code=400, detail="原片至少要 4 秒。")
         segments = plan_segments(duration)
 
-        current_state["is_running"] = True
+        _begin_run("long_swap")
         active_generation_thread = threading.Thread(
             target=_long_swap_worker, args=(req, images, source, segments), daemon=True,
         )

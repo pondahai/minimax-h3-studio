@@ -57,7 +57,14 @@ def write_progress(path: Path | None, state: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_name(path.name + ".tmp")
     temp.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    os.replace(temp, path)
+    # Windows 上 Studio 輪詢讀檔時 os.replace 會短暫被拒；進度檔只是顯示用，重試後仍失敗就略過，不能讓它中斷生成或跳過關機
+    for attempt in range(10):
+        try:
+            os.replace(temp, path)
+            return
+        except PermissionError:
+            time.sleep(0.05 * (attempt + 1))
+    print(f"[!] 進度檔暫時無法更新，略過這次：{path}", flush=True)
 
 
 def parse_usage(output: str) -> dict[str, Any]:

@@ -249,8 +249,21 @@
         </div>
       </div>
 
+      <!-- Prompt Source Switch：導演分鏡與自由 Prompt 互斥，送出時只用目前選中的一邊 -->
+      <div class="rounded-xl border border-zinc-800 bg-surface-900/60 p-2.5 flex flex-wrap items-center justify-between gap-2">
+        <span class="text-[11px] font-semibold text-zinc-400">本次生成使用的提示詞</span>
+        <div class="flex rounded-lg bg-surface-850 p-0.5 text-xs">
+          <button id="sourceBtnFree" onclick="setPromptSource('free')" class="px-3 py-1 rounded-md transition">✍️ 自由 Prompt</button>
+          <button id="sourceBtnStoryboard" onclick="setPromptSource('storyboard')" class="px-3 py-1 rounded-md transition">🎬 導演分鏡</button>
+        </div>
+      </div>
+
       <!-- Storyboard Canvas (Ref2VA View) -->
-      <div id="ref2vaCanvas" class="rounded-2xl border border-zinc-800 bg-surface-900/80 p-4 backdrop-blur shadow-lg space-y-3.5">
+      <div id="ref2vaCanvas" class="relative rounded-2xl border border-zinc-800 bg-surface-900/80 p-4 backdrop-blur shadow-lg space-y-3.5">
+        <div id="storyboardInactiveNote" class="hidden text-[11px] text-amber-300/90 bg-amber-950/30 border border-amber-800/50 rounded-lg px-2.5 py-1.5">
+          目前使用「自由 Prompt」，分鏡欄位不會送出。要用分鏡，請切到上方「🎬 導演分鏡」。
+        </div>
+        <div id="storyboardFields" class="space-y-3.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-2">
             <i data-lucide="film" class="w-4 h-4 text-brand-400"></i>
@@ -314,6 +327,7 @@
             <input type="text" id="musicInput" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2.5 py-1.5 text-xs text-zinc-200 font-mono" value="Uplifting cinematic strings with subtle piano chords.">
           </div>
         </div>
+        </div>
       </div>
 
       <!-- LLM Prompt Expansion -->
@@ -333,11 +347,15 @@
         <div class="flex items-center justify-between cursor-pointer" onclick="toggleRawPrompt()">
           <span class="text-xs font-semibold text-zinc-400 flex items-center space-x-1.5">
             <i data-lucide="code" class="w-3.5 h-3.5"></i>
-            <span>檢視 / 自由編輯完整 Prompt</span>
+            <span id="rawPromptTitle">自由 Prompt（送出時使用這段）</span>
           </span>
           <i id="rawPromptChevron" data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 transition"></i>
         </div>
         <textarea id="rawPromptArea" rows="5" class="w-full bg-surface-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 font-mono mt-2 hidden focus:outline-none focus:border-brand-500"></textarea>
+        <div id="storyboardPreviewBar" class="hidden mt-2 flex items-center justify-between gap-2">
+          <span id="storyboardPreviewStatus" class="text-[10px] text-zinc-500">分鏡組成的預覽（唯讀），送出時會依分鏡重新組成。</span>
+          <button onclick="convertPreviewToFree()" class="shrink-0 text-[11px] px-2.5 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-zinc-200">轉成自由 Prompt 編輯</button>
+        </div>
       </div>
 
     </div>
@@ -514,6 +532,11 @@
       setupDropZones();
       updateEstimate();
       resumePollingIfRunning();
+      applyPromptSource();
+      const canvas = document.getElementById('ref2vaCanvas');
+      canvas.addEventListener('input', scheduleStoryboardPreview);
+      canvas.addEventListener('change', scheduleStoryboardPreview);
+      canvas.addEventListener('click', scheduleStoryboardPreview);
     });
 
     // 重新整理或另開分頁時，若後端仍在生成就接續追蹤進度
@@ -978,6 +1001,9 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         setTimeout(() => canvas.classList.remove('ring-2', 'ring-purple-500'), 1000);
       }
 
+      setPromptSource('storyboard');
+      refreshStoryboardPreview();
+
       // Hide smart import box
       toggleSmartImportModal();
       document.getElementById('smartImportText').value = '';
@@ -1035,6 +1061,117 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       chev.classList.toggle('rotate-180');
     }
 
+    function showRawPrompt() {
+      if (document.getElementById('rawPromptArea').classList.contains('hidden')) toggleRawPrompt();
+    }
+
+    // 提示詞來源：'free' 用自由 Prompt；'storyboard' 每次依分鏡重新組成（Prompt 欄只當預覽）
+    let promptSource = 'free';
+    let freePromptDraft = '';
+    let previewTimer = null;
+
+    function setPromptSource(source) {
+      const area = document.getElementById('rawPromptArea');
+      if (source === promptSource) return;
+      if (source === 'storyboard') freePromptDraft = area.value;   // 切回自由 Prompt 時還原
+      else area.value = freePromptDraft;
+      promptSource = source;
+      applyPromptSource();
+      if (source === 'storyboard') refreshStoryboardPreview();
+    }
+
+    function applyPromptSource() {
+      const storyboard = promptSource === 'storyboard';
+      const on = 'px-3 py-1 rounded-md transition bg-brand-600 text-white shadow';
+      const off = 'px-3 py-1 rounded-md transition text-zinc-400 hover:text-white';
+      document.getElementById('sourceBtnFree').className = storyboard ? off : on;
+      document.getElementById('sourceBtnStoryboard').className = storyboard ? on : off;
+
+      const fields = document.getElementById('storyboardFields');
+      fields.classList.toggle('opacity-40', !storyboard);
+      fields.classList.toggle('pointer-events-none', !storyboard);
+      fields.querySelectorAll('input, select, button').forEach(el => { el.disabled = !storyboard; });
+      document.getElementById('storyboardInactiveNote').classList.toggle('hidden', storyboard);
+
+      const area = document.getElementById('rawPromptArea');
+      area.readOnly = storyboard;
+      area.classList.toggle('text-zinc-400', storyboard);
+      area.placeholder = storyboard ? '' : '在此貼上或撰寫完整 Prompt，或用上方「LLM 擴寫」產生。';
+      document.getElementById('rawPromptTitle').innerText = storyboard
+        ? '完整 Prompt 預覽（由導演分鏡組成）'
+        : '自由 Prompt（送出時使用這段）';
+      document.getElementById('storyboardPreviewBar').classList.toggle('hidden', !storyboard);
+      showRawPrompt();
+    }
+
+    function buildStoryboardPayload() {
+      const characterSwap = document.getElementById('characterSwapToggle').checked;
+      const shots = [];
+      document.querySelectorAll('.shot-card').forEach(card => {
+        shots.push({
+          start_seconds: parseFloat(card.querySelector('.shot-start-val').value || 0),
+          description: card.querySelector('.shot-desc-input').value || 'The camera frames the scene.',
+          dialogue: card.querySelector('.shot-dialogue-input').value || '',
+          speaker: card.querySelector('.shot-voice-select').value
+            ? `The subject (S1), with the voice of <${card.querySelector('.shot-voice-select').value}>,`
+            : 'The subject (S1)'
+        });
+      });
+      return {
+        subject_definitions: document.getElementById('subjectInput').value,
+        summary: 'Cinematic sequence of S1.',
+        retention_analysis: document.getElementById('retentionInput').value,
+        shots: shots,
+        overall_soundscape: document.getElementById('soundscapeInput').value,
+        non_diegetic_music: document.getElementById('musicInput').value,
+        image_count: uploadedImages.length,
+        duration_seconds: parseFloat(document.getElementById('durRange').value),
+        // 換人模式：明確指示以 <Video 1> 為原片、<Picture 1> 為新角色
+        detailed_description: characterSwap
+          ? 'Replace the person in <Video 1> with the character from <Picture 1>. Keep the camera movement, framing, background, props, other people, timing and actions of <Video 1> unchanged; only the replaced person takes on the face, hair, body and outfit of <Picture 1>.'
+          : ''
+      };
+    }
+
+    async function composeStoryboardPrompt() {
+      const res = await fetch('/api/compose_prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildStoryboardPayload())
+      });
+      return await res.json();
+    }
+
+    async function refreshStoryboardPreview() {
+      if (promptSource !== 'storyboard') return;
+      const status = document.getElementById('storyboardPreviewStatus');
+      try {
+        const d = await composeStoryboardPrompt();
+        if (promptSource !== 'storyboard') return;
+        if (d.ok) {
+          document.getElementById('rawPromptArea').value = d.prompt;
+          status.innerText = '分鏡組成的預覽（唯讀），送出時會依分鏡重新組成。';
+          status.className = 'text-[10px] text-zinc-500';
+        } else {
+          document.getElementById('rawPromptArea').value = '';
+          status.innerText = '分鏡還不能組成：' + d.error;
+          status.className = 'text-[10px] text-amber-400';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function scheduleStoryboardPreview() {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(refreshStoryboardPreview, 400);
+    }
+
+    function convertPreviewToFree() {
+      freePromptDraft = document.getElementById('rawPromptArea').value;
+      setPromptSource('free');
+    }
+
     // LLM Prompt Expansion：構想 + 素材狀態 → 完整 H3 Prompt，填入可編輯的 Prompt 欄
     async function expandPromptWithLLM() {
       const area = document.getElementById('rawPromptArea');
@@ -1070,8 +1207,9 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         });
         const d = await res.json();
         if (!d.ok) throw new Error(d.detail || d.error);
+        setPromptSource('free');
         area.value = d.prompt;
-        if (area.classList.contains('hidden')) toggleRawPrompt();
+        showRawPrompt();
       } catch (e) {
         alert('LLM 擴寫失敗: ' + e.message);
       } finally {
@@ -1102,47 +1240,21 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         return;
       }
 
-      // Compose Prompt
-      let prompt = document.getElementById('rawPromptArea').value.trim();
-      if (!prompt) {
-        const shots = [];
-        document.querySelectorAll('.shot-card').forEach(card => {
-          shots.push({
-            start_seconds: parseFloat(card.querySelector('.shot-start-val').value || 0),
-            description: card.querySelector('.shot-desc-input').value || 'The camera frames the scene.',
-            dialogue: card.querySelector('.shot-dialogue-input').value || '',
-            speaker: card.querySelector('.shot-voice-select').value
-              ? `The subject (S1), with the voice of <${card.querySelector('.shot-voice-select').value}>,`
-              : 'The subject (S1)'
-          });
-        });
-
-        const payload = {
-          subject_definitions: document.getElementById('subjectInput').value,
-          summary: 'Cinematic sequence of S1.',
-          retention_analysis: document.getElementById('retentionInput').value,
-          shots: shots,
-          overall_soundscape: document.getElementById('soundscapeInput').value,
-          non_diegetic_music: document.getElementById('musicInput').value,
-          image_count: uploadedImages.length,
-          duration_seconds: parseFloat(document.getElementById('durRange').value),
-          // 換人模式：明確指示以 <Video 1> 為原片、<Picture 1> 為新角色
-          detailed_description: characterSwap
-            ? 'Replace the person in <Video 1> with the character from <Picture 1>. Keep the camera movement, framing, background, props, other people, timing and actions of <Video 1> unchanged; only the replaced person takes on the face, hair, body and outfit of <Picture 1>.'
-            : ''
-        };
-
-        const res = await fetch('/api/compose_prompt', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const pData = await res.json();
-        if (pData.ok) {
-          prompt = pData.prompt;
-          document.getElementById('rawPromptArea').value = prompt;
-        } else {
+      // Compose Prompt：只用目前選中的來源；分鏡每次重新組成，不沿用舊內容
+      let prompt;
+      if (promptSource === 'storyboard') {
+        const pData = await composeStoryboardPrompt();
+        if (!pData.ok) {
           alert('合成提示詞失敗: ' + pData.error);
+          return;
+        }
+        prompt = pData.prompt;
+        document.getElementById('rawPromptArea').value = prompt;
+      } else {
+        prompt = document.getElementById('rawPromptArea').value.trim();
+        if (!prompt) {
+          alert('自由 Prompt 是空的。請撰寫或用「LLM 擴寫」產生，或切到「🎬 導演分鏡」。');
+          showRawPrompt();
           return;
         }
       }
@@ -1221,7 +1333,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         }
 
         // Completion
-        if (data.status === 'completed') {
+        if (data.status === 'completed' && !data.is_running) {
           clearInterval(pollTimer);
           document.getElementById('dispatchBtn').disabled = false;
           document.getElementById('dispatchBtn').classList.remove('opacity-50', 'cursor-not-allowed');
