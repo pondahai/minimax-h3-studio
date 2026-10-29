@@ -1,6 +1,6 @@
 # 《彩虹為什麼會出現？》
 
-漫畫轉影片工作流的第三篇（待驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-workflow.md](../../../docs/comic-to-video-workflow.md)。
+漫畫轉影片工作流的第三篇（2026-10-30 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-workflow.md](../../../docs/comic-to-video-workflow.md)。
 
 - 來源：社子文教基金會「科學天地／自然小探險隊」[《彩虹為什麼會出現？》](https://shezi.org.tw/science/rainbow/)（7 格）
 - 規格：10 段 120 秒、672×384 草稿等級；S07 續接 S06 末幀，其他段用 Qwen-Image 首幀；S02 加尾幀（首尾幀）
