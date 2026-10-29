@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style, three identical-sized cubes (light wood, translucent blue plastic, dark metal) sit side by side on an outdoor wooden table in a sunny forest clearing, in saturated colors and soft sunlight; no characters are in frame. At 00:00.000, The camera pushes in on three cubes as their surfaces turn semi-transparent, revealing sparse beige spheres inside the wood cube. Xiao Mei (S1) says in an off-screen voiceover, <d>[Chinese] 因為它們裡面的東西，塞得緊不緊不一樣！</d> At 00:04.000, The camera pans right to show the plastic cube filled with medium-density blue spheres and the metal cube packed tightly with black spheres. A narrator says in an off-screen voiceover, <d>[Chinese] 密度，就是相同體積裡有多少質量。</d> The on-screen characters' lips remain closed. At 00:08.000, The camera holds steady on the three cubes as the internal spheres gently sway and jiggle in place. A narrator says in an off-screen voiceover, <d>[Chinese] 塞得越緊，密度越大，通常也越重。</d> The on-screen characters' lips remain closed. The three cubes sit side by side with their internal particles vibrating softly.
+
+overall_soundscape: A light breeze rustles the leaves above, birds chirp in the background, and a soft thudding sound accompanies the slight shaking of the spheres inside the cubes.
+
+non_diegetic_music: N/A

@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Bright Japanese children's science anime style with saturated colors and soft sunlight, establishing a sunny forest clearing with an outdoor wooden table. Xiao Ming, Xiao Mei, and Ah Chai are centered in the frame, surrounded by lush green foliage. At 00:00.000, The camera tilts down from the canopy to reveal Xiao Ming, Xiao Mei, and Ah Chai standing together in the clearing. At 00:03.000, Xiao Ming holds a large yellow sponge in his right hand and a small grey stone in his left, looking at them with wide, excited eyes while swaying them gently. Xiao Ming (S1) says, <d>[Chinese] 哇！這塊海綿這麼大，卻比這顆石頭輕！</d> At 00:07.000, Xiao Mei rests her chin on her hands with a tilted head and curious expression while Ah Chai looks up at the sponge, ending with the trio posing together. Xiao Mei (S2) says, <d>[Chinese] 奇怪！大的東西一定比較重嗎？</d> The trio stands together in the clearing, with Xiao Ming holding the sponge and stone.
+
+overall_soundscape: Gentle rustling of leaves in the breeze, cheerful birds chirping overhead, and the light rustle of Ah Chai's tail wagging.
+
+non_diegetic_music: N/A

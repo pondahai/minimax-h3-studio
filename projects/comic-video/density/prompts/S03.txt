@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene in a sunny forest clearing, featuring an outdoor wooden table. Xiao Ming stands behind the table alongside Ah Chai. At 00:00.000, The camera pans smoothly from left to right across the wooden table, revealing three identical-sized cubes: a matte light wood cube, a translucent blue plastic cube, and a dark metallic cube, highlighting their distinct surface textures. Xiao Ming (S1) says, <d>[Chinese] 你看，這三個方塊一樣大，</d> At 00:04.000, Xiao Ming lifts each cube in sequence; he holds the wood cube with a relaxed smile, his arms strain slightly with the blue plastic cube, and his arms sink visibly under the weight of the dark metal cube. Xiao Ming (S1) says, <d>[Chinese] 可是重量完全不一樣！</d> At 00:08.000, Xiao Ming drops the metal cube with a sigh and shakes his wrist, while Ah Chai leans in to sniff the metal cube, culminating in a close-up shot of the three cubes lined up side-by-side. A tight close-up shot of the three cubes (wood, plastic, metal) lined up horizontally on the table surface.
+
+overall_soundscape: The sound of the cube being set down on the wood table, the rhythmic chirping of forest birds, and the soft rustling of leaves in the breeze.
+
+non_diegetic_music: N/A

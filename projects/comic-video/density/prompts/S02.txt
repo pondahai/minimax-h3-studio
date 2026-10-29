@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a sunny forest clearing with an outdoor wooden table, featuring Xiao Ming, Xiao Mei, and Ah Chai. Xiao Ming holds a large yellow sponge in his left hand and a grey stone in his right, while Xiao Mei looks on with excitement; the composition is centered and vibrant with saturated colors. At 00:00.000, Xiao Ming lowers the sponge and stone onto the wooden table, leaning forward with a happy expression to compare them, while the camera performs a slow push-in towards the group, causing the background foliage to blur slightly. A narrator says in an off-screen voiceover, <d>[Chinese] 原來，東西的輕重不只看大小，</d> The on-screen characters' lips remain closed. At 00:05.000, The camera zooms into an extreme close-up of the yellow sponge and grey stone sitting side-by-side on the table, with soft sunlight sparkling on their surfaces and Ah Chai's ears visible at the bottom edge of the frame. A narrator says in an off-screen voiceover, <d>[Chinese] 還要看裡面塞了多少東西，這就是密度！</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: The soft rustle of leaves in the breeze, the distant chirping of forest birds, and the gentle thud of objects settling onto the wooden surface.
+
+non_diegetic_music: N/A

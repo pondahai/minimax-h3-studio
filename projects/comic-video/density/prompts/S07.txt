@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors, Xiao Ming and Xiao Mei stand behind a sunny outdoor wooden table, arranging an experiment with a large clear water tank and various objects. At 00:00.000, The camera pans right across the wooden table, revealing a row of items: a cork, a red Lego brick, a small stone, a coin, a pink eraser, and a spoon, next to a clear water tank. Xiao Mei (S1) says, <d>[Chinese] 先猜猜看！</d> At 00:04.000, Xiao Mei lifts the cork while Xiao Ming picks up the coin, and they exchange thoughtful glances as Xiao Mei speaks with animated gestures. Xiao Mei (S1) says, <d>[Chinese] 你覺得這些東西會浮，還是會沉？</d> At 00:08.000, Close-up of Xiao Ming's hand gently lowering the cork into the water tank, capturing the moment the cork just touches the surface. Close-up of Xiao Ming's hand releasing the cork as it makes its first contact with the water surface.
+
+overall_soundscape: A gentle breeze rustles the leaves of the sunny forest clearing. The wooden table creaks slightly as the objects are placed down. Soft splashes ripple through the water in the tank.
+
+non_diegetic_music: N/A

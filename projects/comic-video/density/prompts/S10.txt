@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style, the scene opens on a sunny forest clearing with an outdoor wooden table. A clear glass cup filled with three distinct liquid layers sits at the center, bathed in soft sunlight. At 00:00.000, A close-up shot focuses on the glass cup, where light refracts and sparkles through the golden oil, clear water, and thick brown honey layers. Xiao Mei stands beside the table, gesturing with her hand as she speaks, her expression animated and educational. Xiao Mei (S1) says, <d>[Chinese] 因為密度不同！密度大的蜂蜜在最下面，</d> At 00:06.000, The camera smoothly pulls back to reveal a medium shot of Xiao Ming, Xiao Mei, and Ah Chai gathered around the table. Xiao Mei points a finger at the top layer of oil, Xiao Ming nods his head in agreement, and Ah Chai tilts his head curiously at the experiment. Xiao Mei (S1) says, <d>[Chinese] 密度小的油在最上面。</d> <Picture 2> (from [Shot 1]) aligns with the 12.00-second mark of the target video. The camera settles on a medium shot of the three characters standing together behind the wooden table, smiling at the separated liquid layers.
+
+overall_soundscape: The ambient sounds of a breezy forest and chirping birds fill the air. A soft whoosh accompanies the camera pull-back, followed by the light clinking of the glass cup settling on the wooden surface.
+
+non_diegetic_music: N/A

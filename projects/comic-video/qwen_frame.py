@@ -1,12 +1,14 @@
 """用 Spark 上的 Qwen-Image 2.1（ComfyUI :8188）依參考圖生成 16:9 首幀。
 
-用法：python qwen_frame.py <輸出前綴> <seed數> <參考圖...>   prompt 從 frame_prompt.txt 讀
+用法：python qwen_frame.py <篇目> <名稱> <seed數> <參考圖...>
+  prompt 從 <篇目>/frame_prompts/<名稱>.txt 讀，輸出 <篇目>/frames/<名稱>_seedN.png；選定後另存成 shots 指定的首幀檔名
 工作流比照 ~/qwen-image/gradio_app.py 的 turbo int8 路徑，但 latent 改用 EmptyLatentImage 固定 16:9。
 """
-import json, sys, time, urllib.request, uuid
+import json, time, urllib.request, uuid
 from pathlib import Path
 
-HERE = Path(__file__).parent
+import comic
+
 COMFY = "http://100.89.149.50:8188"
 W, H = 1344, 768  # 16:9，672×384 的兩倍
 SIGMAS = "1.0, 0.978453, 0.95418, 0.926626, 0.89508, 0.845148, 0.704534, 0.414568, 0.0"
@@ -15,7 +17,7 @@ NEGATIVE = "文字, 字母, 標題, 對話框, 招牌文字, 浮水印, logo, te
 
 def upload(path):
     boundary = uuid.uuid4().hex
-    body = (f'--{boundary}\r\nContent-Disposition: form-data; name="image"; filename="bf_{uuid.uuid4().hex[:8]}.png"\r\n'
+    body = (f'--{boundary}\r\nContent-Disposition: form-data; name="image"; filename="cv_{uuid.uuid4().hex[:8]}.png"\r\n'
             f"Content-Type: image/png\r\n\r\n").encode() + Path(path).read_bytes() + f"\r\n--{boundary}--\r\n".encode()
     req = urllib.request.Request(f"{COMFY}/upload/image", body, {"Content-Type": f"multipart/form-data; boundary={boundary}"})
     with urllib.request.urlopen(req) as r:
@@ -64,11 +66,13 @@ def run(wf, dest):
 
 if __name__ == "__main__":
     import urllib.parse
-    prefix, n, refs = sys.argv[1], int(sys.argv[2]), sys.argv[3:]
-    prompt = (HERE / "frame_prompt.txt").read_text(encoding="utf-8").strip()
+    cfg, d, args = comic.load()
+    name, n, refs = args[0], int(args[1]), args[2:]
+    prompt = (d / "frame_prompts" / f"{name}.txt").read_text(encoding="utf-8").strip()
     names = [upload(p) for p in refs]
     for seed in range(1, n + 1):
-        dest = HERE / f"{prefix}_seed{seed}.png"
+        dest = d / "frames" / f"{name}_seed{seed}.png"
+        dest.parent.mkdir(exist_ok=True)
         t = time.time()
-        run(workflow(prompt, names, seed, f"butterfly_{prefix}"), dest)
+        run(workflow(prompt, names, seed, f"{cfg['id']}_{name}"), dest)
         print(f"{dest.name} {time.time() - t:.0f}s", flush=True)

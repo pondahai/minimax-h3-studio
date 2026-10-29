@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style, Xiao Ming and Ah Chai stand in a sunny forest clearing before an outdoor wooden table holding two identical wooden boxes. At 00:00.000, Xiao Ming stands beside the boxes; the left box holds four blue balls, the right box is empty, and the camera holds a steady medium shot. A narrator says in an off-screen voiceover, <d>[Chinese] 這兩個盒子一樣大，</d> The on-screen characters' lips remain closed. At 00:04.000, Xiao Ming silently places blue balls one by one into the right box until it is overflowing, while the camera over-the-shoulder pans slightly to follow his motion. A narrator says in an off-screen voiceover, <d>[Chinese] 右邊塞進更多球，裡面的東西比較多，密度就比較大。</d> The on-screen characters' lips remain closed. At 00:08.000, Xiao Ming points at the full right box with a proud smile while Ah Chai wags his tail, and the camera returns to a steady medium shot. Xiao Ming (S1) says, <d>[Chinese] 密度等於質量除以體積！</d> Xiao Ming and Ah Chai smile proudly beside the full right box.
+
+overall_soundscape: A light breeze rustles the forest leaves overhead, soft bird chirping fills the air, and the gentle thud of blue balls settling into the wooden box.
+
+non_diegetic_music: N/A
