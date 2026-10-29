@@ -40,6 +40,7 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 | 腳本 | 用途 | 在哪跑 |
 |---|---|---|
 | `comic.py` | 讀 `<篇目>/config.json`（其他腳本共用） | — |
+| `draft_storyboard.py <篇目>` | 試驗：8002 看整篇原圖寫分鏡草稿 → `storyboard_8002.md`（目前品質不足，見 docs） | 本機 |
 | `expand.py <篇目> [段...]` | 分鏡＋漫畫分格圖送 8002 擴寫 → `prompts/SXX.txt` | 本機 |
 | `tts.py <篇目> [角色...]` | 逐句配音 → `audio/`、`audio/lines.json`；帶角色只重配那些角色 | 本機 |
 | `asr_check.py <篇目> [wav...]` | Breeze ASR 轉寫配音、和原文比對 | 本機 |
