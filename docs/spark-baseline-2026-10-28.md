@@ -42,6 +42,24 @@ H3 測試前的原始狀態，測完復原時逐項比對。SSH：`funsteam@100.
 - 和 Colab 唯一的差異：ComfyUI 多加了 `--disable-mmap --disable-pinned-memory`
 - 18:55 復原：四個服務（8006、8002、8188、7860）都有回應
 
+## 斷電與解析度測試（2026-10-28 晚上 ~ 10-29）
+
+- 10/28 20:13 暫停四個服務，開始跑 960×544。20:22 Spark 斷電，到 10/29 08:32 才開機。詳見 [spark-benchmark-notes.md](spark-benchmark-notes.md) 的「斷電事件」
+- 開機後 ComfyUI、Gradio（compose `always`）和 llama.cpp（crontab `@reboot`）都自動起來了。**vLLM 沒有起來**：它的重啟策略是 `unless-stopped`，手動停過的容器重開機後不會自動啟動，要手動執行 `docker start qwen3.8-nvfp4`
+- 10/29 08:39 再次暫停服務，重跑 960×544 和 672×384，08:56 完成
+- 08:59 恢復四個服務。vLLM 在 09:07 就緒（約 7.5 分鐘），四個服務都回應 200
+
+## 主螢幕戰情看板（tty1）
+
+- 實體螢幕 tty1 自動登入，由 `~/.bashrc` 執行 `nvtop`；`tty1-guard.service`（user systemd）執行 `~/.local/bin/tty1-guard.sh`，核心訊息印到螢幕時會重畫畫面
+- 10/29 修改：
+  - `~/.config/nvtop/interface.ini` 加上 GPU 溫度和功耗曲線（原檔備份為 `.bak`）。注意 `Pdev` 要寫成 `000F:01:00.0`，F 要大寫，寫小寫 nvtop 會忽略整段設定。之後用 nvtop 的 F2 設定、F12 存檔即可
+  - 修好 `tty1-guard.sh`（原檔備份為 `.bak`）：原本的腳本把變數寫死了（舊的 PID、空的條件判斷），所以從來沒有真的重畫過。現在改成每次用 `pgrep -x -t tty1 nvtop` 即時抓 PID
+- 尚未處理，需要 sudo：把 console 的訊息等級調低，避免核心訊息印到螢幕上
+  ```bash
+  echo 'kernel.printk = 3 4 1 7' | sudo tee /etc/sysctl.d/99-quiet-console.conf && sudo sysctl -p /etc/sysctl.d/99-quiet-console.conf
+  ```
+
 ## 輕量服務（不佔 GPU，可以照常運行）
 
 - `litellm_gateway`：4000，docker，always（路由很可能指向 8006/8002，上游停止期間會回錯誤）
