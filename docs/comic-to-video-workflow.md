@@ -119,8 +119,10 @@
 - 每段完成後抽幾格檢查（接縫、文字、角色外觀）
 
 ### 7. 配樂（H3）
-- Spark 沒有音樂模型，用 H3 生成「無人物的靜態花園畫面＋純配樂」（`prompts/music.txt`），只取音軌
-- 跑 3 個 seed，用 ASR 檢查有沒有混進人聲，再給使用者挑；選定的存成 `music/bgm.wav`
+- Spark 沒有音樂模型，用 H3 生成「無人物的靜態畫面＋純配樂」，只取音軌
+- **prompt 一定要用官方格式**（見下方「H3 prompt 格式」）：`[Shot 1]` 寫空景、`overall_soundscape` 只寫風聲鳥鳴、`non_diegetic_music` 寫樂器、節奏、力度。範例 `density/prompts/music_official.txt`
+  - 《密度》先用中文自由格式（結尾「純音樂，無對白、無人聲」）跑 seed 1、2，兩首都混進說話聲；改官方格式後同一個 seed 1 就乾淨。《蝴蝶》當時 3 首也有 1 首混人聲，原因相同
+- 跑 1 首、ASR 檢查（轉不出文字，只回 `<|7.55|>` 之類的時間戳＝乾淨）→ 給使用者聽；有人聲再換 seed。選定的存成 `music/bgm.wav`
 
 ### 8. 合成 → `python3 mux.py <篇目>`
 - H3 原生音軌**全部靜音**（它會自己編出非中文的說話聲）
@@ -133,11 +135,32 @@
 - 片尾標語放畫面上方（`{\an8}`）
 - 字型 Noto Sans CJK TC；壓字幕版另存 `butterfly_sub.mp4`，原版保留
 
+## H3 prompt 格式（官方，2026-10-29 查證）
+
+來源：專案內的官方 Colab notebook（`assets/MiniMax_H3_Turbo_Colab.ipynb`）與 MiniMax 官方〈[Video Prompt Writing Guide](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_base_en.md)〉。Studio 前端（`scripts/runner.py`）一直照這個格式寫，所以不會出現胡言亂語。
+
+```
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.   ← 有首幀時才加（t2va 沒有）
+
+integrated_multimodal_description: [Shot 1] …畫面、動作、說話者、台詞…
+[Shot 2] At 00:04.000, the camera cuts to …
+
+overall_soundscape: 1–4 句英文，環境音、動作聲、非語言人聲；不寫台詞
+
+non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫抽象情緒；沒有配樂填 N/A
+```
+
+- 英文書寫；台詞保留原文放在 `<d>[Chinese] …</d>`，說話者編號 `(S1)` 寫在標籤外
+- **只有 `<d>` 裡的內容會被唸出來**；不說話的角色不給說話者編號。官方沒有「無人聲」的寫法，寫了也沒用
+- 旁白：`says in an off-screen voiceover`，並寫明畫面角色嘴巴閉著
+- 台詞跨切鏡用 `<scenetrans>`，影片結束時話沒講完用 `<cutoff>`
+- **漫畫流程到目前為止（《蝴蝶》全片、《密度》全片）都用中文自由格式**，是 H3 會編出非中文說話聲、配樂混人聲的主因。影片段落改用官方格式（`expand.py` 輸出英文結構化 prompt，台詞放 `<d>` 讓 H3 對嘴，合成時仍換成 TTS）待討論定案
+
 ## 這次踩到的坑
 
 | 問題 | 原因 | 解法 |
 |---|---|---|
-| 影片裡有聽不懂的說話聲 | H3 依 prompt 中「角色說話」自己生成人聲 | 合成時靜音原生音軌；prompt 加「無對白、無人聲」 |
+| 影片裡有聽不懂的說話聲、配樂混人聲 | prompt 不是官方格式（中文自由段落），H3 自己猜音軌 | 合成時靜音原生音軌；配樂改官方格式後解決；影片段落待改 |
 | 結尾畫面出現亂碼字 | prompt 要求畫循環圖示，H3 自己加字 | 拿掉圖示，Qwen-Image 重做無文字首幀後重跑 |
 | 小男孩聲音不像小孩 | 自動選的音色描述不準 | 改成候選人工挑選 |
 | 4 句旁白混進日文／怪音（S04_09、S05_00、S09_00、S09_08） | reference 克隆在短句、並列詞上不穩 | 改 prompt 模式克隆＋ASR 篩選；把「長大後」改成「長大以後」也較穩 |

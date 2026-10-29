@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Bright Japanese children's anime style. A static wide shot of a sunny forest clearing with an empty wooden outdoor table; a clear glass of water sits on the table. Leaves sway gently in a light breeze and dappled sunlight drifts slowly across the table and the glass. No people or animals appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A soft breeze rustles the leaves, with faint distant birdsong in the background.
+
+non_diegetic_music: A light, bouncy instrumental piece led by marimba and pizzicato strings over a soft piano accompaniment, at a brisk moderate tempo with a steady, playful rhythm and gentle, even dynamics.
