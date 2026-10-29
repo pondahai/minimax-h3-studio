@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Bright Japanese children's anime style. A static wide shot of a green hillside after rain under a blue sky, with a soft rainbow arching over distant hills. Grass sways gently in a light breeze and small white clouds drift slowly across the sky. No people or animals appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A soft breeze rustles the grass, with faint distant birdsong and occasional water drops falling from leaves.
+
+non_diegetic_music: A bright, gentle instrumental piece led by glockenspiel and ukulele over soft piano chords, at a moderate tempo with a light, skipping rhythm and soft, even dynamics.
