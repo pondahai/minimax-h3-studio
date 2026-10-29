@@ -36,7 +36,7 @@ if __name__ == "__main__":
     srt = d / f"{cfg['id']}.srt"
     sub = d / f"{cfg['id']}_sub.mp4"
     srt.write_text("".join(f"{i}\n{ts(a)} --> {ts(b)}\n{t}\n\n" for i, (a, b, t) in enumerate(cues(cfg, d), 1)), encoding="utf-8")
-    style = "FontName=Noto Sans CJK TC,FontSize=20,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=2,Shadow=0,MarginV=14"
+    style = f"FontName={cfg.get('sub_font', 'Noto Sans CJK TC')},FontSize=20,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=2,Shadow=0,MarginV=14"
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(src), "-vf", f"subtitles={srt.name}:force_style='{style}'",
                     "-c:v", "libx264", "-crf", "18", "-preset", "medium", "-c:a", "copy", str(sub)],
                    check=True, cwd=d)
