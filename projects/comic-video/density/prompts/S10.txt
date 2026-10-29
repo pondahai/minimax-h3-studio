@@ -1,4 +1,7 @@
-明亮日系兒童科普動畫風、色彩飽和、森林空地、戶外木桌、柔和陽光。
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
 
-0–6秒：特寫鏡頭聚焦於桌上的透明玻璃杯，杯中清晰呈現三層液體分層：底部深褐色濃稠蜂蜜、中間淡藍色清水、頂部金黃色食用油。陽光從側面穿透液體，產生光暈與折射閃耀效果，液體質感流動且透亮。背景為虛化的森林綠意與木桌紋理。
-6–12秒：鏡頭緩慢拉遠至中景，展現小美與小明圍著木桌。小美身穿粉紅外套與紅格子衫，棕色雙馬尾輕晃，她伸出手指指向最上層的食用油，面帶自信微笑並點頭。小明身穿卡其探險帽與綠背心，藍背包在背後，他露出開心的笑容並點頭表示同意。阿柴橘白柯基犬佩戴綠色葉子領巾，歪著頭好奇地看著杯子。畫面定格於三人與分層杯子的構圖。音訊：無對白、無人聲，只有自然環境音與輕快的兒童配樂。
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene saturated with warm sunlight in a sunny forest clearing featuring an outdoor wooden table. Xiao Ming in his explorer hat and green vest stands beside Xiao Mei in her pink jacket and red plaid skirt, while Ah Chai the corgi sits happily nearby. At 00:00.000, A close-up shot of the glass cup on the wooden table reveals three distinct liquid layers. The camera focuses on the rich amber honey at the bottom and the clear blue water in the middle, while sunlight flares through the glass, causing the liquids to shimmer with vibrant color. Xiao Mei (S1) says, <d>[Chinese] 因為密度不同！密度大的蜂蜜在最下面，</d> At 00:06.000, The camera pulls back to reveal Xiao Ming and Xiao Mei standing by the table. Xiao Mei points her finger at the top layer of golden oil while speaking, and Xiao Ming nods his head in agreement. Ah Chai tilts his head curiously at the floating oil. Xiao Mei (S1) says, <d>[Chinese] 密度小的油在最上面。</d>
+
+overall_soundscape: A gentle forest breeze rustles the leaves overhead. The soft clinking of the glass cup against the wooden table and the rustling of Ah Chai's tail as he wags.
+
+non_diegetic_music: N/A

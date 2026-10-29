@@ -1,7 +1,7 @@
-明亮日系兒童科普動畫風、色彩飽和、森林空地、戶外木桌、柔和陽光。
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
 
-0–4秒：透明高身玻璃杯置於木桌上，鏡頭特寫。深褐色的蜂蜜呈現濃稠質感，緩緩從上方傾注進杯底，液體流動順暢。
-4–8秒：鏡頭保持特寫。清澈透明的清水沿著杯壁溫柔倒入，停留在蜂蜜層上方，水與蜂蜜界限分明，無混合。
-8–12秒：金黃色的食用油倒入，漂浮在清水之上。鏡頭慢推近，清晰呈現杯中分明的三層液體結構。最後畫面構圖：三層液體的玻璃杯置中正面特寫，背景是柔焦的森林綠意。
-末幀：特寫構圖，聚焦於玻璃杯中層次分明的液體，蜂蜜深褐在下，清水透明在中，食用油金黃在上，層次鮮明。
-音訊：無對白、無人聲，只有自然環境音與輕快的兒童配樂。
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a sunny forest clearing with an outdoor wooden table,. The camera focuses on a tall, transparent glass cup positioned centrally on the table, surrounded by clear saturated colors. At 00:00.000, A close-up of the tall glass cup as dark brown, viscous honey is poured from a container, slowly settling at the bottom of the glass. A narrator says in an off-screen voiceover, <d>[Chinese] 在杯子裡倒進蜂蜜、水，再倒油。</d> The on-screen characters' lips remain closed. At 00:04.000, The camera remains focused on the cup as clear water is poured carefully along the side, hovering above the honey layer without mixing. At 00:08.000, The camera slowly pushes in closer to the cup as golden cooking oil is poured on top, floating above the water, the three layers settling clearly. Xiao Ming (S1) says in an off-screen voiceover, <d>[Chinese] 哇！明明都是液體，為什麼分成三層？</d> A close-up of the tall glass cup clearly displaying three distinct, separated layers of liquid: dark brown honey at the bottom, clear water in the middle, and golden oil on top.
+
+overall_soundscape: The thick, heavy sound of honey pouring into the glass, followed by the clear splash of water, and the light glug of oil. In the background, a soft forest breeze rustles the leaves and distant birds chirp.
+
+non_diegetic_music: N/A

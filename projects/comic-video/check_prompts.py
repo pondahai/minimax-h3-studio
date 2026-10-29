@@ -47,7 +47,7 @@ def check_official(cfg, sid, block, prompt):
         issues.append(f"多出角色：{'、'.join(extra)}")
     for a, b in zip(stamps, stamps[1:] + [None]):
         seg = desc[desc.find(f"At 00:{a:02d}"):desc.find(f"At 00:{b:02d}") if b is not None else len(desc)]
-        if len(seg) < 80 or (STILL_EN.search(seg) and not re.search(r"\b(mov|push|pan|tilt|drop|sink|float|rais|lift|turn|wave|point|nod|lean|bob|ripple|bubbl)", seg, re.I)):
+        if len(seg) < 80 or (STILL_EN.search(seg) and not re.search(r"\b(mov|push|pan|tilt|drop|sink|float|rais|lift|turn|wave|point|nod|lean|bob|ripple|bubbl|sway|jiggl|vibrat|pour|settl)", seg, re.I)):
             issues.append(f"{a} 秒起 動作太少")
     return issues
 

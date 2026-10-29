@@ -1,7 +1,7 @@
-明亮日系兒童科普動畫風、色彩飽和、森林空地、戶外木桌、柔和陽光。
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
 
-0–4秒：林博士（白髮白鬍、圓眼鏡、白色實驗袍、綠領帶）站在畫面右側，臉上帶著慈祥的微笑，右手豎起食指指向天空，眼神充滿期待；鏡頭採用中景，保持平穩，背景是模糊的綠色樹葉與光斑。
-4–8秒：鏡頭橫移掃過戶外木桌表面，桌上整齊排列著五個實驗物品：一顆深紫色葡萄、一塊紅色積木、一個藍色塑料瓶蓋、一塊粉紅色橡皮擦、一顆灰黑色小石頭；小明（卡其探險帽、棕短髮、綠背心、藍背包）與小美（棕色雙馬尾、粉紅外套、紅格子衫）彎腰從兩側探頭，臉上露出好奇與專注的神情；阿柴（橘白柯基、綠色葉子領巾）坐在桌邊尾巴微搖；鏡頭平滑橫移，聚焦於物品質感與角色互動。
-8–12秒：林博士、小明、小美、阿柴並排站立於木桌後方，同時朝鏡頭方向開心揮手，陽光從畫面上方灑落，形成溫暖光暈；最後畫面構圖為四人一狗並排微笑揮手，背景為明亮的森林空地與木桌，構圖平衡且充滿活力。
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a sunny forest clearing featuring an outdoor wooden table. Dr. Lin, Xiao Ming, Xiao Mei, and Ah Chai are gathered around the table displaying various objects. At 00:00.000, Dr. Lin stands on the right side of the frame, wearing his white lab coat and green tie, smiling warmly while raising his index finger. The camera holds a steady medium shot as he gestures to emphasize his point. Dr. Lin (S1) says, <d>[Chinese] 不要只看大小，要比較同樣體積裡有多少質量。</d> At 00:04.000, The camera pans smoothly from right to left across the wooden table, revealing a lineup of objects: a bunch of purple grapes, a red Lego brick, a blue bottle cap, a pink eraser, and a small grey stone, while the children lean in to examine them. A narrator says in an off-screen voiceover, <d>[Chinese] 這些東西會浮還是會沉？先猜，再動手試試看！</d> The on-screen characters' lips remain closed. At 00:08.000, Dr. Lin, Xiao Ming, Xiao Mei, and Ah Chai all turn towards the camera and wave their hands cheerfully. Bright sunlight flares in the lens, illuminating their happy expressions as the scene concludes. Xiao Mei (S2) says, <d>[Chinese] 你也可以發現科學的祕密！</d> The group waves happily at the camera under the warm glow of the forest sun.
 
-音訊：無對白、無人聲，只有自然環境音與輕快的兒童配樂
+overall_soundscape: A gentle breeze rustles the forest leaves overhead. The soft clatter of wooden blocks and stones shifting on the table surface. A warm, ambient hum of nature fills the clearing.
+
+non_diegetic_music: N/A

@@ -1,9 +1,7 @@
-明亮日系兒童科普動畫風、色彩飽和、森林空地、戶外木桌、柔和陽光。
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
 
-0–4秒：戶外木桌上放置一個巨大的透明長方形水槽，清澈的水中，一塊黃色軟木塞和一個紅色塑料積木輕盈地浮在水面上，隨著水波微微晃動。小明（卡其探險帽、棕短髮、綠背心、藍背包）和小美（棕色雙馬尾、粉紅外套、紅格子衫）站在水槽後方，小美伸出手指著水面，閉著嘴開心微笑，眼睛發亮。鏡頭保持固定，捕捉水面輕柔的漣漪質感。
+integrated_multimodal_description: [Shot 1] A bright, saturated Japanese children's science anime scene set in a sunny outdoor clearing with a large wooden table holding a clear rectangular water tank. Xiao Ming and Xiao Mei stand behind the tank, accompanied by Ah Chai the corgi. At 00:00.000, Soft sunlight illuminates the water tank where a cork and a red Lego brick float gently on the surface; Xiao Mei points at the floating items while Xiao Ming looks on. A narrator says in an off-screen voiceover, <d>[Chinese] 軟木塞和積木浮起來了，</d> The on-screen characters' lips remain closed. At 00:04.000, Xiao Ming and Xiao Mei drop a coin, a spoon, and a small stone into the water, watching them sink rapidly to the bottom with rising bubbles. A narrator says in an off-screen voiceover, <d>[Chinese] 硬幣、湯匙和石頭沉下去。</d> The on-screen characters' lips remain closed. At 00:08.000, Xiao Ming raises a fist in triumph and speaks with a proud expression, then high-fives Xiao Mei across the tank while Ah Chai rests his paws on the table edge and wags his tail. Xiao Ming (S1) says, <d>[Chinese] 跟我猜的一樣！</d> Xiao Ming and Xiao Mei share a joyful high-five over the tank as Ah Chai watches happily.
 
-4–8秒：鏡頭開始緩慢推進，聚焦於水槽內部。小明和小美同時將一枚硬幣、一把湯匙和一個灰色小石頭放入水中。這三樣物品迅速穿透水面，拖著一串細小的氣泡沉入槽底，與浮在上面的物品形成鮮明對比。角色們專注地看著物品下沉，表情帶有驚喜。
+overall_soundscape: The gentle lapping of water against the tank walls, the rhythmic clinking of the sinking metal coin and spoon, and a soft breeze rustling the surrounding trees.
 
-8–12秒：鏡頭拉回至中景。小明抬頭，露出自信的微笑，握緊拳頭做出得意的姿勢，嘴巴張開說話（配合配音），接著與小美隔著水槽開心擊掌。阿柴（橘白柯基、綠色葉子領巾）跑上前，前腳搭在木桌邊緣，尾巴快速搖晃。畫面最後定格在兩人與阿柴圍著水槽歡樂互動的構圖上。
-
-音訊：無對白、無人聲，只有自然環境音與輕快的兒童配樂。
+non_diegetic_music: N/A

@@ -1,9 +1,7 @@
-明亮日系兒童科普動畫風、色彩飽和、森林空地、戶外木桌、柔和陽光。
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
 
-0–4秒：陽光下的戶外木桌，桌上整齊排列著軟木塞、紅色積木、小石頭、硬幣、粉紅橡皮擦與湯匙，旁邊放置著透明水槽。鏡頭由左至右橫移，捕捉物品排列。
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors, Xiao Ming and Xiao Mei stand behind a sunny outdoor wooden table, arranging an experiment with a large clear water tank and various objects. At 00:00.000, The camera pans right across the wooden table, revealing a row of items: a cork, a red Lego brick, a small stone, a coin, a pink eraser, and a spoon, next to a clear water tank. Xiao Mei (S1) says, <d>[Chinese] 先猜猜看！</d> At 00:04.000, Xiao Mei lifts the cork while Xiao Ming picks up the coin, and they exchange thoughtful glances as Xiao Mei speaks with animated gestures. Xiao Mei (S1) says, <d>[Chinese] 你覺得這些東西會浮，還是會沉？</d> At 00:08.000, Close-up of Xiao Ming's hand gently lowering the cork into the water tank, capturing the moment the cork just touches the surface. Close-up of Xiao Ming's hand releasing the cork as it makes its first contact with the water surface.
 
-4–8秒：雙人中景。小美舉起軟木塞，小明拿起硬幣，兩人對看思考。
+overall_soundscape: A gentle breeze rustles the leaves of the sunny forest clearing. The wooden table creaks slightly as the objects are placed down. Soft splashes ripple through the water in the tank.
 
-8–12秒：特寫。小明把軟木塞輕輕放進水裡（末幀：手放開，軟木塞剛碰到水面）。
-
-音訊：無對白、無人聲，只有自然環境音與輕快的兒童配樂。
+non_diegetic_music: N/A
