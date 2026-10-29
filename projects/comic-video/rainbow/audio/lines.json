@@ -1,0 +1,254 @@
+[
+ {
+  "file": "S01_00_小明.wav",
+  "sid": "S01",
+  "start": 0,
+  "end": 4,
+  "who": "小明",
+  "text": "哇！天空出現彩虹了！好美啊！",
+  "audio_sec": 4.64
+ },
+ {
+  "file": "S01_04_小美.wav",
+  "sid": "S01",
+  "start": 4,
+  "end": 8,
+  "who": "小美",
+  "text": "彩虹是怎麼出現的呢？",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S01_08_小美.wav",
+  "sid": "S01",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "我們一起來找答案吧！",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S02_00_旁白.wav",
+  "sid": "S02",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "看起來白色的陽光，",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S02_04_旁白.wav",
+  "sid": "S02",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "其實是很多顏色的光混在一起。",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S02_08_小美.wav",
+  "sid": "S02",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "原來白色的陽光裡，藏著七種顏色！",
+  "audio_sec": 4.96
+ },
+ {
+  "file": "S03_00_旁白.wav",
+  "sid": "S03",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "陽光照進小水滴，會發生三件事。",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S03_04_旁白.wav",
+  "sid": "S03",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "先折射，改變方向；",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S03_08_旁白.wav",
+  "sid": "S03",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "再在水滴裡反射，最後折射離開水滴。",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S04_00_小明.wav",
+  "sid": "S04",
+  "start": 0,
+  "end": 4,
+  "who": "小明",
+  "text": "不同顏色的光，折射的角度不一樣，",
+  "audio_sec": 4.32
+ },
+ {
+  "file": "S04_04_小明.wav",
+  "sid": "S04",
+  "start": 4,
+  "end": 8,
+  "who": "小明",
+  "text": "所以就分開成彩虹的顏色了！",
+  "audio_sec": 4.32
+ },
+ {
+  "file": "S05_00_旁白.wav",
+  "sid": "S05",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "我們看到的彩虹，是一道弧形。",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S05_04_旁白.wav",
+  "sid": "S05",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "其實彩虹是一個完整的圓，",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S05_08_旁白.wav",
+  "sid": "S05",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "只是下半部被地平線擋住了。",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S06_00_小美.wav",
+  "sid": "S06",
+  "start": 0,
+  "end": 3,
+  "who": "小美",
+  "text": "我們也來做彩虹吧！",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S06_03_旁白.wav",
+  "sid": "S06",
+  "start": 3,
+  "end": 8,
+  "who": "旁白",
+  "text": "把水杯放在陽光下，慢慢調整杯子和白紙的角度。",
+  "audio_sec": 5.12
+ },
+ {
+  "file": "S06_08_小美.wav",
+  "sid": "S06",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "哇！出現彩虹了！",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S07_00_小明.wav",
+  "sid": "S07",
+  "start": 0,
+  "end": 5,
+  "who": "小明",
+  "text": "原來在家也能做出彩虹，好神奇！",
+  "audio_sec": 5.12
+ },
+ {
+  "file": "S07_08_旁白.wav",
+  "sid": "S07",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "記得選晴天，千萬不要直視太陽喔！",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S08_00_小明.wav",
+  "sid": "S08",
+  "start": 0,
+  "end": 5,
+  "who": "小明",
+  "text": "要背對太陽，朝前方噴出細小的水霧，",
+  "audio_sec": 4.32
+ },
+ {
+  "file": "S08_05_小明.wav",
+  "sid": "S08",
+  "start": 5,
+  "end": 8,
+  "who": "小明",
+  "text": "就有機會看到彩虹！",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S08_08_小美.wav",
+  "sid": "S08",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "看到彩虹了！",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S09_00_旁白.wav",
+  "sid": "S09",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "彩虹會出現在太陽的相反方向。",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S09_04_旁白.wav",
+  "sid": "S09",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "所以太陽要在你的背後，",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S09_08_旁白.wav",
+  "sid": "S09",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "水滴在你前方，才能看到彩虹！",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S10_00_林博士.wav",
+  "sid": "S10",
+  "start": 0,
+  "end": 3,
+  "who": "林博士",
+  "text": "彩虹是大自然的分光魔術！",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S10_03_林博士.wav",
+  "sid": "S10",
+  "start": 3,
+  "end": 8,
+  "who": "林博士",
+  "text": "陽光和小水滴一起合作，把白光分成七種顏色。",
+  "audio_sec": 4.48
+ },
+ {
+  "file": "S10_08_小美.wav",
+  "sid": "S10",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "觀察大自然，發現更多祕密！",
+  "audio_sec": 4.32
+ }
+]
