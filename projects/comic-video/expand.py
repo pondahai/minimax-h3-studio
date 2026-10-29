@@ -7,7 +7,7 @@ config 的 prompt_format：
     讓 H3 照台詞對嘴；config 的 last_frames 列出有尾幀（frames/SXX_end.png）的段，會加官方尾幀句；H3 原生音軌合成時仍整條靜音、換成 TTS
   legacy＝《蝴蝶》當時的中文自由格式（H3 會自己編非中文人聲，不要再用）
 """
-import base64, json, re, urllib.request
+import base64, json, re, sys, urllib.request
 from pathlib import Path
 
 import comic
@@ -101,23 +101,32 @@ def shots(d):
         yield re.match(r"### (S\d+)", block).group(1), block
 
 
-def expand(cfg, sid, block):
+def expand(cfg, sid, block, tries=3):
     img = base64.b64encode((Path(cfg["panel_dir"]) / f"{cfg['panels'][sid]}.png").read_bytes()).decode()
     user = [{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img}"}},
             {"type": "text", "text": block}]
-    body = json.dumps({
+    req_body = {
         "messages": [{"role": "system", "content": system_prompt(cfg, len(rows(block)))}, {"role": "user", "content": user}],
         "temperature": 0.6, "max_tokens": 1500,
         "chat_template_kwargs": {"enable_thinking": False},
-    }).encode()
-    req = urllib.request.Request(URL, body, {"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=300) as r:
-        result = json.load(r)["choices"][0]["message"]["content"].strip()
-    if not official(cfg):
-        return result
-    parts = json.loads(re.sub(r"^```(?:json)?|```$", "", result).strip())
-    assert len(parts["ranges"]) == len(rows(block)), f"{sid}：LLM 回了 {len(parts['ranges'])} 段，分鏡有 {len(rows(block))} 段"
-    return assemble(cfg, sid, block, parts)
+    }
+    if official(cfg):
+        # 8002 偶爾回不合法的 JSON（《彩虹》S05、S06）：用 llama.cpp 的 JSON 文法限制輸出，段數不符再重試
+        req_body["response_format"] = {"type": "json_object"}
+    body = json.dumps(req_body).encode()
+    for attempt in range(1, tries + 1):
+        req = urllib.request.Request(URL, body, {"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=300) as r:
+            result = json.load(r)["choices"][0]["message"]["content"].strip()
+        if not official(cfg):
+            return result
+        try:
+            parts = json.loads(re.sub(r"^```(?:json)?|```$", "", result).strip())
+            assert len(parts["ranges"]) == len(rows(block)), f"LLM 回了 {len(parts['ranges'])} 段，分鏡有 {len(rows(block))} 段"
+            return assemble(cfg, sid, block, parts)
+        except (ValueError, KeyError, AssertionError) as e:
+            print(f"{sid} 第 {attempt} 次失敗：{e}", file=sys.stderr, flush=True)
+    sys.exit(f"{sid}：重試 {tries} 次仍失敗")
 
 
 if __name__ == "__main__":

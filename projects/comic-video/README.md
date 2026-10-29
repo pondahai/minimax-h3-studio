@@ -57,8 +57,8 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 | 欄位 | 內容 |
 |---|---|
 | `title`、`source` | 篇名、來源網址 |
-| `style`、`characters`、`no_text_rule` | 擴寫 system prompt 的風格、角色外觀、畫面不放字的規則 |
-| `panel_dir`、`panels` | 漫畫原圖所在的本機暫存資料夾（原圖不進 repo）、每段對應的分格 |
+| `style`、`characters`、`no_text_rule` | 擴寫 system prompt 的風格（只寫畫風，不寫場景道具）、角色外觀、畫面不放字的規則 |
+| `panel_dir`、`panels` | 漫畫原圖所在的本機暫存資料夾（原圖不進 repo）、每段對應的分格；兩段共用一格時指向切好的 `panel-0Xa`／`b` |
 | `voices`、`ref_text`、`ref_transcript` | 角色音色描述、參考音逐字稿（prompt 模式克隆用） |
 | `t2s`、`pronounce` | 送 TTS 前轉簡體、仍唸錯時的同音字替換 |
 | `shots` | `[段, 秒數, 首幀來源]`；首幀來源 `-`＝t2va、圖檔路徑＝用該圖、段名＝續接該段末幀 |
@@ -66,7 +66,7 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 
 ## 新增一篇
 
-1. 建 `<篇目>/`，寫 `config.json`、`storyboard.md`（格式照現有篇目）
+1. 建 `<篇目>/`，寫 `config.json`、`storyboard.md`（格式照現有篇目）；兩段共用一格的原圖先切塊
 2. `python expand.py <篇目>` → 檢查並修 `prompts/`
 3. 啟動 TTS → 新角色候選、**由人挑選**存成 `audio/ref_<角色>.wav`（同系列角色直接複製前一篇的）→ `python tts.py <篇目>` → `python asr_check.py <篇目>` → 壞句重配、人工試聽 → 關 TTS
 4. 啟動 8188 → 每個獨立段 `python qwen_frame.py <篇目> <段> 3 <原漫畫分格> <角色參考圖>` → 關 8188
