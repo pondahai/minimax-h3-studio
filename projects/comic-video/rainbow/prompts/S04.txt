@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors, Xiao Ming crouches in a lush, rain-drenched forest after the storm, where soft sunlight illuminates the scene and every rainbow glows with a distinct red outer edge and violet inner edge. The composition centers on Xiao Ming examining a leaf, accompanied by Xiao Mei and Ah Chai. At 00:00.000, The camera holds a medium shot as Xiao Ming crouches low, holding a magnifying glass up to a water droplet on a leaf tip that shimmers with rainbow light; he turns his head slightly to speak, his mouth moving with an explanatory expression. Xiao Ming (S1) says, <d>[Chinese] 不同顏色的光，折射的角度不一樣，</d> At 00:04.000, In a two-shot medium frame, Xiao Ming lowers the magnifying glass and turns toward Xiao Mei, spreading his arms wide in an enthusiastic gesture while his mouth moves as he speaks; Xiao Mei looks on with a focused expression. Xiao Ming (S1) says, <d>[Chinese] 所以就分開成彩虹的顏色了！</d> At 00:08.000, The camera zooms in from a medium shot to a close-up of the leaf tip as Xiao Mei smiles and nods in agreement, while Ah Chai leans forward to sniff the leaf; the water droplet loses its surface tension and falls with a splash.
+
+overall_soundscape: The rustling of leaves in a gentle breeze, the chirping of birds returning to the canopy, and the rhythmic dripping of water from the leaf tip.
+
+non_diegetic_music: N/A

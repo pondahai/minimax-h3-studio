@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set outdoors after rain, featuring Xiao Ming in his explorer gear standing in a composition that emphasizes the light path. Every rainbow has red on the outer edge and violet on the inner edge. At 00:00.000, Xiao Ming holds the nozzle steady, spraying a fine mist of water into the air while the low sun casts his shadow forward onto the droplets. A narrator says in an off-screen voiceover, <d>[Chinese] 彩虹會出現在太陽的相反方向。</d> The on-screen characters' lips remain closed. At 00:04.000, The camera pans smoothly to the right, shifting focus from Xiao Ming's back to the illuminated spray of water droplets suspended in the air. A narrator says in an off-screen voiceover, <d>[Chinese] 所以太陽要在你的背後，</d> The on-screen characters' lips remain closed. At 00:08.000, Tiny water droplets glisten and sparkle intensely as light refracts through them, revealing a bright rainbow emerging from the mist. A narrator says in an off-screen voiceover, <d>[Chinese] 水滴在你前方，才能看到彩虹！</d> The on-screen characters' lips remain closed. A close-up of the shimmering water droplets and the vibrant rainbow.
+
+overall_soundscape: A continuous, gentle hiss of the water spray fills the air. Soft ambient sounds of birds chirping and wind rustling through wet leaves accompany the scene.
+
+non_diegetic_music: N/A

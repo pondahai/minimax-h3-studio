@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime style video with saturated colors, set outdoors after rain with soft sunlight filtering through. The scene is a macro view of a large crystal-clear water droplet resting on a vibrant green leaf, illuminated by a beam of white sunlight entering from the upper left. At 00:00.000, The camera holds a steady macro shot of the water droplet on the leaf, gently swaying in the breeze as the white sunlight beam strikes its surface. A narrator says in an off-screen voiceover, <d>[Chinese] 陽光照進小水滴，會發生三件事。</d> The on-screen characters' lips remain closed. At 00:04.000, Inside the droplet, the white light bends sharply upon entry and begins to split into a spectrum of colors, streaming towards the back wall. A narrator says in an off-screen voiceover, <d>[Chinese] 先折射，改變方向；</d> The on-screen characters' lips remain closed. At 00:08.000, The separated rainbow colors bounce off the back interior of the droplet and refract outwards, expanding into a wide, vibrant fan of light. A narrator says in an off-screen voiceover, <d>[Chinese] 再在水滴裡反射，最後折射離開水滴。</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: The soft rustle of wet leaves and a gentle breeze. The sound of water droplets dripping onto the ground.
+
+non_diegetic_music: N/A
