@@ -1,5 +1,8 @@
 butterfly_draft.mp4
+butterfly_sub.mp4
 contact_sheet.png
-audio/*.wav
+*.wav
+frames/
+music/
 video/
 mixed/
