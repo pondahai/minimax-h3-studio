@@ -93,5 +93,15 @@
   "小美",
   "林博士"
  ],
- "tagline": null
+ "tagline": null,
+ "prompt_format": "official",
+ "no_text_rule_en": "No text of any kind may appear in the picture: no letters, labels, formulas, tables, signs or icons.",
+ "style_en": "bright Japanese children's science anime, saturated colors, a sunny forest clearing with an outdoor wooden table, soft sunlight",
+ "characters_en": "Xiao Ming (小明) = a boy with a khaki explorer hat with a green leaf badge, short brown hair, a green vest and a blue backpack; Xiao Mei (小美) = a girl with brown twin ponytails, a pink jacket and a red plaid skirt; Ah Chai (阿柴) = an orange-and-white corgi with a green leaf bandana; Dr. Lin (林博士) = a kind old scientist with white hair and beard, round glasses, a khaki explorer hat, a white lab coat and a green tie",
+ "names_en": {
+  "小明": "Xiao Ming",
+  "小美": "Xiao Mei",
+  "阿柴": "Ah Chai",
+  "林博士": "Dr. Lin"
+ }
 }

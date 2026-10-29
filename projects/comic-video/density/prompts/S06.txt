@@ -1,7 +1,7 @@
-明亮日系兒童科普動畫風、色彩飽和、森林空地、戶外木桌、柔和陽光。
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
 
-0–3秒：戶外木桌上放置一個裝滿清澈清水的透明大水槽，小明（卡其探險帽、棕短髮、綠背心、藍背包）雙手拿著一塊淺棕色木塊和一枚灰色石頭，身體微微前傾，眼神充滿期待地看向水槽；小美（棕色雙馬尾、粉紅外套、紅格子衫）站在一旁，雙手合十放在胸前，臉上洋溢著驚喜與興奮的表情，眼睛閃閃發亮；鏡頭為中景，柔和的陽光灑在木桌和水槽上，呈現溫暖自然的質感。
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a sunny forest clearing with an outdoor wooden table, featuring Xiao Ming in his khaki explorer hat and green vest, and Xiao Mei with her brown twin ponytails and pink jacket, centered around a large transparent water tank. At 00:00.000, Xiao Ming stands by the tank holding a wooden block in one hand and a stone in the other, grinning at the camera as he gestures towards the water; the camera slowly zooms in on his face and the tank. Xiao Ming (S1) says, <d>[Chinese] 我們把東西放進水裡看看！</d> At 00:03.000, Xiao Ming drops the wooden block into the tank; the block bobs and settles on the surface while the camera tilts down to focus on the floating wood and rising bubbles. A narrator says in an off-screen voiceover, <d>[Chinese] 木頭的密度比水小，會浮起來。</d> The on-screen characters' lips remain closed. At 00:07.000, Xiao Ming drops the stone, which sinks rapidly with a trail of bubbles; Xiao Mei clasps her hands together with a delighted expression, and the camera remains fixed on the stone resting at the bottom. A narrator says in an off-screen voiceover, <d>[Chinese] 石頭的密度比水大，就沉下去了。</d> The on-screen characters' lips remain closed.
 
-3–7秒：鏡頭切換至水槽側面特寫，小明的手將淺棕色木塊輕輕放入水中，木塊接觸水面後輕輕一晃，隨即順勢浮在水面上方，水波紋輕微盪漾；畫面清晰展現木塊漂浮的瞬間，光影在水面形成柔和折射，色彩鮮明。
+overall_soundscape: A gentle forest breeze rustles the leaves overhead, mixed with the crisp splash of the block hitting the water and the heavy thud of the stone settling on the tank floor.
 
-7–12秒：鏡頭維持側面特寫，小明的手將灰色石頭放入水中，石頭入水瞬間激起幾串透明氣泡，隨後緩緩沉入水槽底部；小美繼續雙手合十，臉上露出滿足且驚奇的微笑，眼神緊盯著沉底的石頭；最後畫面構圖為：前景是沉在底部的灰色石頭與氣泡，中景是浮在水面的木塊，背景是戶外森林與木桌，角色表情清晰可見，整體構圖平衡且充滿童趣。音訊：無對白、無人聲，只有自然環境音與輕快的兒童配樂。
+non_diegetic_music: N/A

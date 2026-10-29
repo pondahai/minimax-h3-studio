@@ -154,7 +154,13 @@ non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫
 - **只有 `<d>` 裡的內容會被唸出來**；不說話的角色不給說話者編號。官方沒有「無人聲」的寫法，寫了也沒用
 - 旁白：`says in an off-screen voiceover`，並寫明畫面角色嘴巴閉著
 - 台詞跨切鏡用 `<scenetrans>`，影片結束時話沒講完用 `<cutoff>`
-- **漫畫流程到目前為止（《蝴蝶》全片、《密度》全片）都用中文自由格式**，是 H3 會編出非中文說話聲、配樂混人聲的主因。影片段落改用官方格式（`expand.py` 輸出英文結構化 prompt，台詞放 `<d>` 讓 H3 對嘴，合成時仍換成 TTS）待討論定案
+- 《蝴蝶》全片、《密度》第一批都用中文自由格式，是 H3 編出非中文說話聲、配樂混人聲的主因
+- **`expand.py` 已改為輸出官方格式**（config `prompt_format: official`，《蝴蝶》保留 `legacy`）：
+  - LLM（8002）只回 JSON：`intro`、每列一句英文畫面描述 `ranges`、`final_frame`、`soundscape`；時間戳 `At 00:0X.000,`、`<d>[Chinese] 台詞</d>`、旁白 `A narrator says in an off-screen voiceover, … The on-screen characters' lips remain closed.`、首幀開頭句都由程式組，避免 LLM 抄錯
+  - 讓 8002 直接寫整段官方格式時，會把中文風格句、`小明＝…` 定義原樣貼進去、把規則文字照抄、多加時間戳，所以改成程式組裝
+  - 角色一律用 config 的英文名（`names_en`，如 Xiao Ming），說話者標籤也用同一個名字；中英混用 H3 可能對不上誰在說話
+  - config 需要 `style_en`、`characters_en`、`names_en`、`no_text_rule_en`
+- 驗證（《密度》S06，2026-10-29）：H3 原聲把三句台詞**一字不差唸成中文**（ASR 逐字相符），小明說話時張嘴、旁白時段閉嘴。合成時仍靜音原聲換 TTS，嘴型跟著真正的台詞時段走
 
 ## 這次踩到的坑
 

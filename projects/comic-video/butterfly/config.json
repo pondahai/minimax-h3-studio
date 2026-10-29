@@ -90,5 +90,6 @@
   "毛毛蟲",
   "蝴蝶"
  ],
- "tagline": "觀察・尊重・守護"
+ "tagline": "觀察・尊重・守護",
+ "prompt_format": "legacy"
 }
