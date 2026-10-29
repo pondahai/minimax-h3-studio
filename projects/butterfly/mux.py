@@ -10,6 +10,8 @@ AUDIO, VIDEO, MIXED = HERE / "audio", HERE / "video", HERE / "mixed"
 DUR = {"S07": 10}
 BED_VOLUME = 0.0  # H3 原生音軌會自己編出非中文的說話聲，與 TTS 疊在一起，故不使用
 GAP = 0.15
+MUSIC = HERE / "music" / "bgm.wav"  # 使用者選定的配樂（H3 生成的 12 秒片段）
+MUSIC_CLIP, MUSIC_XFADE, MUSIC_VOLUME = 12.25, 1.5, 0.22
 
 
 def schedule(lines, seg_dur):
@@ -44,6 +46,21 @@ def mix(sid, lines):
     subprocess.run(cmd, check=True)
 
 
+def add_music(src, dst, total):
+    """把 12 秒配樂以交叉淡化循環到片長，壓低音量墊在台詞下，頭尾淡入淡出。"""
+    copies = int(total // (MUSIC_CLIP - MUSIC_XFADE)) + 2
+    cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", str(src)] + ["-i", str(MUSIC)] * copies
+    chain, prev = [], "[1:a]"
+    for n in range(2, copies + 1):
+        chain.append(f"{prev}[{n}:a]acrossfade=d={MUSIC_XFADE}[m{n}]")
+        prev = f"[m{n}]"
+    chain.append(f"{prev}atrim=0:{total},volume={MUSIC_VOLUME},afade=t=in:d=1,afade=t=out:st={total - 3}:d=3[bgm]")
+    chain.append("[0:a][bgm]amix=inputs=2:normalize=0:duration=first[a]")
+    cmd += ["-filter_complex", ";".join(chain), "-map", "0:v", "-map", "[a]",
+            "-c:v", "copy", "-c:a", "aac", "-b:a", "160k", str(dst)]
+    subprocess.run(cmd, check=True)
+
+
 if __name__ == "__main__":
     MIXED.mkdir(exist_ok=True)
     report = json.loads((AUDIO / "lines.json").read_text(encoding="utf-8"))
@@ -52,6 +69,12 @@ if __name__ == "__main__":
         print(sid)
         mix(sid, [ln for ln in report if ln["sid"] == sid])
     (MIXED / "list.txt").write_text("".join(f"file '{s}.mp4'\n" for s in sids), encoding="utf-8")
+    dialog = MIXED / "dialog.mp4"
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(MIXED / "list.txt"),
-                    "-c", "copy", str(HERE / "butterfly_draft.mp4")], check=True)
+                    "-c", "copy", str(dialog)], check=True)
+    total = sum(DUR.get(s, 12) for s in sids)
+    if MUSIC.exists():
+        add_music(dialog, HERE / "butterfly_draft.mp4", total)
+    else:
+        dialog.replace(HERE / "butterfly_draft.mp4")
     print("輸出：", HERE / "butterfly_draft.mp4")

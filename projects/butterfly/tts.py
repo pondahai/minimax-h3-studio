@@ -1,6 +1,6 @@
 """從 storyboard.md 取出台詞，用 Spark VoxCPM2 TTS 配音，輸出 audio/SXX_<起秒>_<角色>.wav。
 
-每個角色先以 voice design 生成一段參考音（audio/ref_<角色>.wav），之後每句以 reference 克隆，保持音色一致。
+每個角色先以 voice design 生成一段參考音（audio/ref_<角色>.wav），之後每句以 prompt 模式克隆（reference 模式在短句上容易唸出非中文），保持音色一致。
 """
 import json, re, sys, urllib.request, uuid
 from pathlib import Path
@@ -15,6 +15,8 @@ VOICES = {
     "蝴蝶": "輕快優雅的卡通小精靈聲音",
 }
 REF_TEXT = "大家好，今天天氣真好，我們一起去森林裡看看吧！"
+# 參考音的逐字稿（prompt 模式克隆需要）；小明的參考音是使用者從候選挑的那句
+REF_TRANSCRIPT = {"小明": "哇！一隻小小的卵，竟然可以變成這麼美麗的蝴蝶！"}
 
 
 def post_json(payload):
@@ -71,7 +73,8 @@ if __name__ == "__main__":
         if only and who not in only:
             continue
         dest = out / f"{sid}_{start:02d}_{who}.wav"
-        r = post_multipart({"text": said, "clone_mode": "reference", "stable_voice": "true"}, out / f"ref_{who}.wav")
+        r = post_multipart({"text": said, "prompt_text": REF_TRANSCRIPT.get(who, REF_TEXT), "clone_mode": "prompt",
+                            "stable_voice": "false"}, out / f"ref_{who}.wav")
         fetch(r["url"], dest)
         slot = end - start
         flag = "" if r["audio_sec"] <= slot + 0.3 else "  <-- 超出時段"
