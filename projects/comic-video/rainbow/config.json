@@ -45,7 +45,7 @@
  ],
  "speakers": ["小明", "小美", "林博士"],
  "tagline": null,
- "last_frames": [],
+ "last_frames": ["S02"],
  "prompt_format": "official",
  "no_text_rule_en": "No text of any kind may appear in the picture: no letters, labels, numbers, formulas, signs or icons.",
  "style_en": "bright Japanese children's science anime, saturated colors, an outdoor setting after rain, soft sunlight; every rainbow has red on the outer edge and violet on the inner edge",
