@@ -74,6 +74,33 @@
 - 畫質還沒有逐格比對
 - 輸出檔：`outputs/spark_bench_run2_960x544.mp4`、`outputs/spark_bench_run3_672x384.mp4`
 
+### 純文字生影片 + 保留 llama.cpp（2026-10-29，run4_t2va）
+
+照部署方針只保留 llama.cpp（8002），停掉 8006、8188、7860，跑一支沒有首幀的 t2va。`MiniMaxH3ImageToVideo` 的 `first_frame` 本來就是選填（節點說明寫 "t2va and fl2va"），只是 notebook 程式碼一定要讀首幀；`run4_t2va/bench.py` 加了 `H3_T2VA=1` 開關，開啟時不讀圖、節點不接 `first_frame`。
+
+| 項目 | 設定 |
+|---|---|
+| 模式 | t2va（FL2VA 主模型，不接首幀），Turbo 8 步，INT8，Heretic 編碼器 |
+| 解析度 / 片長 | 960×544 / 12 秒 |
+| 提示詞 | 中式天庭構想，經 8002 擴寫（約 30 秒）；seed 164723 |
+| 其他負載 | llama.cpp 8002 開著但閒置，生成期間沒有送擴寫請求 |
+
+| | run2（四個服務全停，有首幀） | run4（只留 8002，t2va） |
+|---|---|---|
+| 推論時間 | 660.2 s | **620.2 s** |
+| 整個任務 | 約 11.1 分 | 約 10.5 分 |
+| 記憶體峰值（系統總用量） | 50.8 GB | **75.1 GB** |
+| swap | — | 0.65 → 0.87 GB |
+| GPU 最高溫 / 功耗 | 85°C / 89 W | 85°C / 87 W |
+
+- **記憶體夠用**：開跑前 29 GB（系統加 llama.cpp），峰值 75.1 GB，和部署方針估算的約 78 GB 接近，121 GB 裡還剩約 46 GB
+- **8002 全程可用**：每 5 秒檢查一次 `/health`，126 筆都是 200
+- **速度沒有變慢**，但 run4 是 t2va、提示詞也不同，不能把快 40 秒歸因於任何一方。只能說 llama.cpp 閒置時看不出影響
+- llama.cpp 的權重在統一記憶體的 GPU 配置裡，不算進程序 RSS（`llama.log` 只記到約 2.2 GB），要看記憶體壓力請看 `mem.log` 的總用量
+- 沒有斷電；最高溫和斷電那次一樣是 85°C
+- 執行腳本：`~/h3-bench/run_bench_t2va.sh run4_t2va`（另外記錄 `llama.log`：時間、llama-server RSS MB、8002 health 狀態碼）
+- 輸出檔：`outputs/spark_run4_t2va_960x544_heaven.mp4`（960×544、12.25 秒、含音訊）
+
 ### 斷電事件（2026-10-28 20:22）
 
 第一次跑 960×544 時，Spark 在推論約 8 分鐘時失去回應。隔天早上發現機器是**關機**狀態，開機後才恢復（10/29 08:32）。
@@ -120,7 +147,7 @@
 | Gradio | 7860 | 幾乎不占 | 停止（依賴 8188） |
 
 部署前要確認或處理的事：
-- [ ] **實測**：只保留 llama.cpp 時重跑測試 1，確認記憶體峰值和 H3 速度（目前只有「全部停掉」是實測過的，這個組合是估算）
+- [x] **實測**：只保留 llama.cpp 時重跑，確認記憶體峰值和 H3 速度。2026-10-29 以 960×544 t2va 實測（run4_t2va）：峰值 75.1 GB、推論 620 s，見上方「純文字生影片 + 保留 llama.cpp」。1376×768 和 llama.cpp 同時擴寫的情況還沒測
 - [ ] 停掉的三個服務設有 `restart: always` / `unless-stopped`，重開機或 docker daemon 重啟後會自動跑回來，要改重啟策略或另做處理
 - [ ] H3 的 ComfyUI 如果要常駐，要確認跑完一支片後會釋放模型（約 40 GB 以上），不然會擠壓 llama.cpp
 - [ ] 長片（超過 15 秒）的記憶體峰值還沒測過
@@ -142,6 +169,7 @@
 ~/h3-bench/run_bench.sh run1
 # 低解析度：run2（960×544）、run3（672×384）的 bench.py 第 185 行改寫了 WIDTH, HEIGHT
 # 多支連續跑（每支之間冷卻 120 秒）：~/h3-bench/run_series.sh run2 run3
+# 純文字 t2va（不需 first_frame.png）：~/h3-bench/run_bench_t2va.sh run4_t2va
 # 3. 結果：bench.log（各階段 [h3-stage] 計時）、output.mp4、mem.log（每 5 秒記錄的記憶體用量）、
 #    gpu.log（每 5 秒：時間 溫度°C, 功耗W, SM 時脈MHz, 使用率%）
 # 4. 依 spark-baseline 文件恢復四個服務
