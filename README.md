@@ -72,8 +72,12 @@ minimax-h3-studio/
 ├── static/
 │   └── index.html          # 前端 Single Page Application（Tailwind CSS + Lucide 圖標）
 ├── uploads/                # 本地暫存的使用者上傳參照圖片、音訊與影片
-└── outputs/                # 生成的 MP4 與同名 .json（提示詞、輸入設定、seed、各階段耗時）
+├── outputs/                # 生成的 MP4 與同名 .json（提示詞、輸入設定、seed、各階段耗時）
+└── projects/
+    └── butterfly/          # 漫畫轉影片工作流（獨立於 Studio 前端，在 DGX Spark 上執行）
 ```
+
+> **漫畫轉影片工作流**（2026-10-29 新增）：把分格漫畫做成有配音、配樂、字幕的短片，流程為分鏡 → 8002 擴寫 → TTS 配音 → H3 分段生成（首幀續接）→ 合成與字幕。它和上面的 Studio 前端是**分開的兩套流程**：不經過 `app.py` 和 Colab，全部用命令列腳本在 DGX Spark 上跑。說明見 [projects/butterfly/README.md](projects/butterfly/README.md)，完整復盤筆記見 [docs/comic-to-video-workflow.md](docs/comic-to-video-workflow.md)。
 
 ---
 
