@@ -111,7 +111,8 @@
 - 草稿等級：672×384、Turbo 8 步、INT8；每段 12 秒約 5.5 分鐘（含載入），段間冷卻 60 秒
 - 獨立段用 t2va（`H3_T2VA=1`）；續接段用 ffmpeg 取前段末幀當 `H3_INPUT_IMAGE`
 - 段落表在 `config.json` 的 `shots`：`[段, 秒數, 首幀來源]`，首幀來源 `-`＝t2va、圖檔路徑（如 `frames/S01.png`，選定的 seed 複製改名）＝用該圖、段名＝續接該段末幀
-- 從 Windows 傳到 Spark 的 `.sh` 要先轉成 LF 換行，否則 bash 會報 `$''` 指令找不到；`comic-video/.gitattributes` 已固定 `.sh` 為 LF，啟動前仍先 `bash -n` 檢查語法
+- 從 Windows 傳到 Spark 的 `.sh` 要先轉成 LF 換行，否則 bash 會報 `$'
+'` 指令找不到；`comic-video/.gitattributes` 已固定 `.sh` 為 LF，啟動前仍先 `bash -n` 檢查語法
 - Spark 上的目錄比照 repo：`~/h3-bench/comic-video/`（共用腳本＋`bench.py`）、`~/h3-bench/comic-video/<篇目>/`。《密度》已搬到新位置（第一批 11 段是重整前用舊腳本跑的）；《蝴蝶》還在 `~/h3-bench/butterfly/`
 - 重跑某段：把舊檔移到 `out/archive/<段>_v1.mp4`、`run/<段>_v1/`，更新 prompt／首幀／`config.json` 後 `bash run_series.sh <篇目> <段>`（其他已存在的段會跳過）
 - `run_series.sh`：整批依序跑，已有的段會跳過；失敗就停
@@ -186,3 +187,14 @@ non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫
 | H3 10 段（672×384） | 約 55 分鐘 |
 | Qwen-Image 首幀 3 張（turbo int8） | 約 1 分鐘（《密度》7 段×3 張約 10 分鐘，首張含載入約 1 分鐘） |
 | 合成＋壓字幕 | 約 2 分鐘 |
+
+## 尾幀（官方說明，2026-10-29 查證）
+
+H3 官方支援三種圖片錨定：首幀（I2VA）、尾幀（L2VA）、首尾幀（FL2VA，兩張圖）。
+- 尾幀寫法：`<Picture 1> (from [Shot N]) aligns with the S.SS-second mark of the target video.`（S.SS＝片長，取兩位小數）
+- 首尾幀：Picture 1 用首幀句，Picture 2 用上面的尾幀句；官方建議單一 [Shot]，讓模型連續內插。
+- 不支援片中任意秒數的關鍵幀。
+- 用途：續接段的「特寫拉遠」要角色入鏡時，可用「前段末幀＋Qwen 尾幀」鎖住角色外觀；物理結果（浮/沉）也能用尾幀鎖定。
+- 實作：放 `<篇目>/frames/SXX_end.png`、config `last_frames` 列入該段 → expand.py 加尾幀句、run_series.sh 傳 `H3_LAST_FRAME`（Spark bench.py 接到 MiniMaxH3ImageToVideo 的 last_frame）。
+- 尾幀用 Qwen-Image 做，參考圖放該段首幀（或前段末幀＋角色圖）；浮在水面的物體要寫「一半露出水面」，否則 Qwen 會畫成懸在水中，H3 就會讓它沉下去（密度 S08）。
+- 音量：mux.py 每句台詞先統一到 −20 LUFS（林博士 TTS 原本 −28.6，聽不清楚）。

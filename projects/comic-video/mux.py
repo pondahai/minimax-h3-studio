@@ -3,14 +3,16 @@
 用法（Spark）：python3 mux.py <篇目>
 
 台詞放在分鏡標的起秒；若前一句還沒講完就順延，講不完則用 atempo 加速（一般上限 1.35，段尾最後一句上限 1.5）。
+每句先統一響度到 LINE_LUFS，避免某個角色的聲線偏小聲。
 """
-import json, subprocess
+import json, re, subprocess
 
 import comic
 
 BED_VOLUME = 0.0  # H3 原生音軌會自己編出非中文的說話聲，與 TTS 疊在一起，故不使用
 GAP = 0.15
 MUSIC_FILE = "music/bgm.wav"  # 使用者選定的配樂（H3 生成的 12 秒片段）
+LINE_LUFS = -20.0  # 每句台詞先量響度再拉到同一音量（林博士原本 -28.6 LUFS，比其他角色小聲）
 MUSIC_CLIP, MUSIC_XFADE, MUSIC_VOLUME = 12.25, 1.5, 0.22
 
 
@@ -27,6 +29,13 @@ def schedule(lines, seg_dur):
     return plan
 
 
+def gain_db(wav):
+    """量 wav 的整體響度（LUFS），回傳拉到 LINE_LUFS 要加的 dB。"""
+    log = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(wav), "-af", "loudnorm=print_format=summary", "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    return LINE_LUFS - float(re.search(r"Input Integrated:\s*(-?[\d.]+)", log)[1])
+
+
 def mix(d, sid, seg_dur, lines):
     src = d / "video" / f"{sid}.mp4"
     dst = d / "mixed" / f"{sid}.mp4"
@@ -35,8 +44,9 @@ def mix(d, sid, seg_dur, lines):
     filters = [f"[0:a]volume={BED_VOLUME},apad[bed]"]
     labels = ["[bed]"]
     for n, (ln, t, tempo) in enumerate(plan, start=1):
-        cmd += ["-i", str(d / "audio" / ln["file"])]
-        filters.append(f"[{n}:a]aresample=48000,atempo={tempo:.3f},adelay={int(t * 1000)}:all=1[v{n}]")
+        wav = d / "audio" / ln["file"]
+        cmd += ["-i", str(wav)]
+        filters.append(f"[{n}:a]aresample=48000,volume={gain_db(wav):.1f}dB,alimiter=limit=0.95,atempo={tempo:.3f},adelay={int(t * 1000)}:all=1[v{n}]")
         labels.append(f"[v{n}]")
         print(f"  {ln['file']} @ {t:.2f}s x{tempo:.2f} → 結束 {t + ln['audio_sec'] / tempo:.2f}s")
     filters.append(f"{''.join(labels)}amix=inputs={len(labels)}:normalize=0,atrim=0:{seg_dur}[a]")

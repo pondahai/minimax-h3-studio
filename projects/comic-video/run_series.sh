@@ -1,6 +1,7 @@
 #!/bin/bash
 # 在 Spark 上依 <篇目>/config.json 的 shots 依序生成各段（672×384），已有的段會跳過；失敗就停。
 # shots 第三欄是首幀來源：- ＝t2va；圖檔路徑（如 frames/S01.png）＝用該圖；段名＝續接該段末幀。
+# 有 frames/<段>_end.png 就當尾幀（官方 FL2VA，首尾幀）。
 # 用法：bash run_series.sh <篇目> [起始段，例如 S05]
 # Spark 目錄：~/h3-bench/comic-video/（本目錄的腳本＋bench.py）、~/h3-bench/comic-video/<篇目>/
 set -u
@@ -30,10 +31,12 @@ while [ $# -gt 0 ]; do
     ffmpeg -y -loglevel error -sseof -0.1 -i "out/$src.mp4" -frames:v 1 -update 1 "run/$sid/first_frame.png" || { echo "$sid 取末幀失敗"; break; }
     MODE="-e H3_INPUT_IMAGE=/content/run/first_frame.png"
   fi
+  LAST=""
+  [ -f "frames/${sid}_end.png" ] && { cp "frames/${sid}_end.png" "run/$sid/last_frame.png"; LAST="-e H3_LAST_FRAME=/content/run/last_frame.png"; }
   echo "$(date -Is) $sid 開始（${dur}s，首幀 $src）"
   docker run --rm --name h3-$NAME --gpus all --ipc host \
     -e PYTORCH_NO_CUDA_MEMORY_CACHING=1 -e PYTHONUNBUFFERED=1 \
-    -e H3_INFERENCE_MODE=first_frame $MODE \
+    -e H3_INFERENCE_MODE=first_frame $MODE $LAST \
     -e 'H3_REFERENCE_AUDIOS=[]' -e 'H3_REFERENCE_VIDEOS=[]' -e 'H3_GUIDES=[]' \
     -e H3_PROMPT_FILE=/content/run/prompt.txt -e H3_DURATION_SECONDS=$dur -e H3_SEED=164723 \
     -e H3_OUTPUT_PREFIX=${NAME}_$sid -e H3_OUTPUT_PATH=/content/run/output.mp4 -e H3_JOB_TIMEOUT_SECONDS=3600 \

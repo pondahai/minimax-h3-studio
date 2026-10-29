@@ -4,7 +4,7 @@
 config 的 prompt_format：
   official（預設）＝H3 官方英文結構化格式（integrated_multimodal_description／overall_soundscape／non_diegetic_music）。
     LLM 只寫英文畫面描述（JSON），時間戳、<d>[Chinese] 台詞</d>、旁白 off-screen voiceover＋角色閉嘴由程式組，
-    讓 H3 照台詞對嘴；H3 原生音軌合成時仍整條靜音、換成 TTS
+    讓 H3 照台詞對嘴；config 的 last_frames 列出有尾幀（frames/SXX_end.png）的段，會加官方尾幀句；H3 原生音軌合成時仍整條靜音、換成 TTS
   legacy＝《蝴蝶》當時的中文自由格式（H3 會自己編非中文人聲，不要再用）
 """
 import base64, json, re, urllib.request
@@ -83,6 +83,8 @@ def assemble(cfg, sid, block, parts):
                 name = cfg.get("names_en", {}).get(who, who)
                 line += f" {name} ({speakers[who]}) says, <d>[Chinese] {said}</d>"
         sentences.append(line)
+    if sid in cfg.get("last_frames", []):  # 官方尾幀句：Picture 2 錨定在片長秒數
+        sentences.append(f"<Picture 2> (from [Shot 1]) aligns with the {comic.durations(cfg)[sid]:.2f}-second mark of the target video.")
     if parts.get("final_frame"):
         sentences.append(parts["final_frame"].strip())
     body = (f"integrated_multimodal_description: [Shot 1] {' '.join(sentences)}\n\n"
