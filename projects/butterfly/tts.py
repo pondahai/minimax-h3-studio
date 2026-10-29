@@ -8,7 +8,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 BASE = "http://100.89.149.50:8792"
 VOICES = {
-    "小明": "活潑開朗的十歲男孩，聲音清亮",
+    "小明": "七歲小男孩，稚嫩的童聲，音調很高，天真活潑",
     "小美": "開朗溫柔的十歲女孩，聲音甜美",
     "旁白": "溫柔親切的年輕女性旁白，語速平穩",
     "毛毛蟲": "可愛圓潤的卡通小動物聲音，有點貪吃",
@@ -58,7 +58,9 @@ if __name__ == "__main__":
     import urllib.parse
     out = HERE / "audio"
     out.mkdir(exist_ok=True)
-    report = []
+    only = set(sys.argv[1:])  # 可只重配指定角色，例如 python tts.py 小明
+    lines_path = out / "lines.json"
+    report = [ln for ln in json.loads(lines_path.read_text(encoding="utf-8")) if ln["who"] not in only] if only else []
     for who, desc in VOICES.items():
         ref = out / f"ref_{who}.wav"
         if not ref.exists():
@@ -66,6 +68,8 @@ if __name__ == "__main__":
             fetch(r["url"], ref)
             print(f"ref {who}: {r['audio_sec']}s", flush=True)
     for sid, start, end, who, said in lines():
+        if only and who not in only:
+            continue
         dest = out / f"{sid}_{start:02d}_{who}.wav"
         r = post_multipart({"text": said, "clone_mode": "reference", "stable_voice": "true"}, out / f"ref_{who}.wav")
         fetch(r["url"], dest)
@@ -74,4 +78,5 @@ if __name__ == "__main__":
         print(f"{dest.name}: {r['audio_sec']:.1f}s / 時段 {slot}s{flag}", flush=True)
         report.append({"file": dest.name, "sid": sid, "start": start, "end": end, "who": who,
                        "text": said, "audio_sec": r["audio_sec"]})
-    (out / "lines.json").write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
+    report.sort(key=lambda ln: (ln["sid"], ln["start"]))
+    lines_path.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
