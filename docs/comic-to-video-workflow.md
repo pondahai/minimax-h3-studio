@@ -15,7 +15,7 @@
 
 | 檔案 | 內容 | 存放位置 |
 |---|---|---|
-| `butterfly_draft.mp4`、`butterfly_sub.mp4` | 成片（原版、壓字幕版） | 本機 `projects/butterfly/`、Spark `~/h3-bench/butterfly/` |
+| `butterfly_draft.mp4`、`butterfly_sub.mp4`、`butterfly_share.mp4` | 成片（原版、壓字幕版、分享用瘦身版：壓字幕版以 CRF 27、AAC 96k、faststart 重新編碼，8.3 MB） | 本機 `projects/butterfly/`、Spark `~/h3-bench/butterfly/` |
 | `*.wav`（`audio/`、`audio/candidates/`） | 台詞配音、角色參考音、候選音 | 本機；配音另有一份在 Spark `~/h3-bench/butterfly/audio/` |
 | `music/` | H3 配樂候選與選定的 `bgm.wav` | 本機、Spark |
 | `frames/` | Qwen-Image 首幀候選 | 本機；選定的在 Spark `~/h3-bench/butterfly/frames/` |
