@@ -45,7 +45,7 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 | `asr_check.py <篇目> [wav...]` | Breeze ASR 轉寫配音、和原文比對 | 本機 |
 | `qwen_frame.py <篇目> <名稱> <seed數> <參考圖...>` | `frame_prompts/<名稱>.txt` → `frames/<名稱>_seedN.png` | 本機 |
 | `review.py <篇目>` | 分鏡審查頁 `review.html`（首幀候選＋時間軸＋台詞） | 本機 |
-| `run_series.sh <篇目> [起始段]` | 依 `shots` 依序生成全部分段 | Spark |
+| `run_series.sh <篇目> [起始段]` | 依 `shots` 依序生成全部分段；有 `frames/<段>_end.png` 就加尾幀（首尾幀） | Spark |
 | `run_jobs.sh <篇目> "<工作>"...` | 單獨重跑指定段或配樂 | Spark |
 | `mux.py <篇目>` | 配音依時間軸混入、配樂循環墊底 → `<篇目>_draft.mp4` | Spark（需 ffmpeg） |
 | `subs.py <篇目>` | 繁中字幕 `<篇目>.srt`＋壓字幕版 `<篇目>_sub.mp4` | Spark |
