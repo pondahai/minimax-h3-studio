@@ -16,6 +16,16 @@ VOICES = {
 }
 REF_TEXT = "大家好，今天天氣真好，我們一起去森林裡看看吧！"
 # 參考音的逐字稿（prompt 模式克隆需要）；小明的參考音是使用者從候選挑的那句
+# 多音字發音替換：只用在送給 TTS 的文字，字幕與 lines.json 保留原字（VoxCPM2 不支援拼音標註）
+PRONOUNCE = {"變乾": "變甘"}
+
+
+def speakable(text):
+    for a, b in PRONOUNCE.items():
+        text = text.replace(a, b)
+    return text
+
+
 REF_TRANSCRIPT = {"小明": "哇！一隻小小的卵，竟然可以變成這麼美麗的蝴蝶！"}
 
 
@@ -73,7 +83,7 @@ if __name__ == "__main__":
         if only and who not in only:
             continue
         dest = out / f"{sid}_{start:02d}_{who}.wav"
-        r = post_multipart({"text": said, "prompt_text": REF_TRANSCRIPT.get(who, REF_TEXT), "clone_mode": "prompt",
+        r = post_multipart({"text": speakable(said), "prompt_text": REF_TRANSCRIPT.get(who, REF_TEXT), "clone_mode": "prompt",
                             "stable_voice": "false"}, out / f"ref_{who}.wav")
         fetch(r["url"], dest)
         slot = end - start

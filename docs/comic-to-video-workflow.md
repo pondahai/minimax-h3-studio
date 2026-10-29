@@ -11,7 +11,19 @@
 | `butterfly_sub.mp4` | 壓字幕版（另外輸出，原版不動） |
 | `butterfly.srt` | 繁體中文字幕檔 |
 
-影片、wav、圖檔不進 git（見 `projects/butterfly/.gitignore`）；Spark 上的完整工作目錄是 `~/h3-bench/butterfly/`。
+### 不進 git 的檔案（`projects/butterfly/.gitignore`）
+
+| 檔案 | 內容 | 存放位置 |
+|---|---|---|
+| `butterfly_draft.mp4`、`butterfly_sub.mp4` | 成片（原版、壓字幕版） | 本機 `projects/butterfly/`、Spark `~/h3-bench/butterfly/` |
+| `*.wav`（`audio/`、`audio/candidates/`） | 台詞配音、角色參考音、候選音 | 本機；配音另有一份在 Spark `~/h3-bench/butterfly/audio/` |
+| `music/` | H3 配樂候選與選定的 `bgm.wav` | 本機、Spark |
+| `frames/` | Qwen-Image 首幀候選 | 本機；選定的在 Spark `~/h3-bench/butterfly/frames/` |
+| `contact_sheet.png` | 每 6 秒一格的總覽圖 | 本機 |
+| `video/`、`mixed/` | 各段原始影片、配好音的各段 | Spark：`out/`（各段，含 `out/archive/` 舊版）、`mixed/` |
+| 漫畫原圖 | 來源分格圖（版權屬原作者） | 本機暫存資料夾，`expand.py` 的 `PANEL_DIR` |
+
+進 git 的是可重現成品的部分：分鏡、prompt、`audio/lines.json`（台詞與排定時間）、字幕檔、腳本。Spark 上的完整工作目錄是 `~/h3-bench/butterfly/`（含各段的 `run/<段>/bench.log`）。
 
 ## 機器與服務
 
@@ -103,7 +115,6 @@
 | 4 句旁白混進日文／怪音（S04_09、S05_00、S09_00、S09_08） | reference 克隆在短句、並列詞上不穩 | 改 prompt 模式克隆＋ASR 篩選；把「長大後」改成「長大以後」也較穩 |
 | ASR 核對漏掉一句壞句 | 只看錯字，沒注意漏字 | 漏字一律當壞句 |
 | 「變乾」唸成 qián | 多音字判斷錯誤，TTS 無拼音標註 | 送 TTS 時以同音字「甘」替換 |
-| 生成的媒體檔被 commit 進 PR | `.gitignore` 沒涵蓋子資料夾 | 改用 `*.wav`、`frames/`、`music/` 等規則；PR 用 squash 合併，不讓媒體進 main 歷史 |
 | 看圖擴寫加入多餘角色 | 8002 照圖把角色塞進特寫 | 擴寫後程式檢查角色名稱，人工刪除 |
 | 獨立段畫風不一致（部分偏 3D） | t2va 段落沒有共用參考 | 尚未解決：可改為每段都用 Qwen-Image 首幀 |
 
