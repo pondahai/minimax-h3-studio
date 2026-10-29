@@ -1,4 +1,4 @@
-"""把 video/SXX.mp4 配上 TTS 台詞（H3 原生音軌壓低當環境音），再串成 butterfly_draft.mp4。
+"""把 video/SXX.mp4 配上 TTS 台詞（H3 原生音軌靜音），再串成 butterfly_draft.mp4。
 
 台詞放在分鏡標的起秒；若前一句還沒講完就順延，講不完則用 atempo 加速（一般上限 1.35，段尾最後一句上限 1.5）。
 """
@@ -8,7 +8,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 AUDIO, VIDEO, MIXED = HERE / "audio", HERE / "video", HERE / "mixed"
 DUR = {"S07": 10}
-BED_VOLUME = 0.3
+BED_VOLUME = 0.0  # H3 原生音軌會自己編出非中文的說話聲，與 TTS 疊在一起，故不使用
 GAP = 0.15
 
 
