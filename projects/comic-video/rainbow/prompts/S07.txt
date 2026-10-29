@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a sunny outdoor clearing after rain, featuring a wooden table bathed in soft sunlight with saturated colors. Xiao Ming, Xiao Mei, and Ah Chai are gathered around the table where a vibrant rainbow is projected onto a white sheet of paper, distinctively having red on the outer edge and violet on the inner edge. At 00:00.000, Xiao Ming and Xiao Mei huddle closely over the white paper to inspect the projected rainbow, while Xiao Ming claps his hands with a joyful expression and Ah Chai playfully rests his front paws on the table edge. Xiao Ming (S1) says, <d>[Chinese] 原來在家也能做出彩虹，好神奇！</d> At 00:05.000, Xiao Mei raises her hand to shade her eyes as she gazes upward toward the sky, then turns back to face Xiao Ming, wagging her finger gently to offer a reminder. A narrator says in an off-screen voiceover, <d>[Chinese] 記得選晴天，而且千萬不要直視太陽喔！</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: A gentle summer breeze rustles the leaves overhead, accompanied by the chirping of birds in the distance and the faint, crisp sound of water shifting inside the glass.
+
+non_diegetic_music: N/A

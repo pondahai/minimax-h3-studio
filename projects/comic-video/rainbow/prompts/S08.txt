@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A vibrant, saturated scene in a bright Japanese children's science anime style depicts a sunny forest clearing after rain with an outdoor wooden table visible in the foreground. Xiao Ming stands ready with his hose while Xiao Mei and Ah Chai watch in anticipation. At 00:00.000, Xiao Ming stands with his back to the sun, gripping a blue hose nozzle with both hands. He speaks with animated gestures, pointing the nozzle forward while looking back at his friends to explain the angle. Xiao Ming (S1) says, <d>[Chinese] 要背對太陽，朝前方噴出細小的水霧，</d> At 00:04.000, A fine mist of water sprays from the nozzle into the air, catching the sunlight. A distinct rainbow with red on the outer edge and violet on the inner edge slowly materializes within the mist as the camera slowly pushes in. Xiao Ming (S1) says, <d>[Chinese] 就有機會看到彩虹！</d> At 00:08.000, Xiao Mei clasps her hands together with a delighted expression, looking at the rainbow. Ah Chai the corgi jumps up playfully, trying to catch the falling water droplets. Xiao Mei (S2) says, <d>[Chinese] 看到彩虹了！</d>
+
+overall_soundscape: The rhythmic spraying of water mist fills the air. Ah Chai's paws scuff against the grass as he jumps, and birds chirp softly in the background.
+
+non_diegetic_music: N/A

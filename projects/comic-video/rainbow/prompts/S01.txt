@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Bright Japanese children's science anime style with saturated colors, set in a sunny forest clearing after rain with an outdoor wooden table, soft sunlight, and every rainbow having red on the outer edge and violet on the inner edge. Xiao Ming, Xiao Mei, and Ah Chai are present in a medium shot composition under a vibrant rainbow. At 00:00.000, Xiao Ming raises his head and extends his arm to point at the rainbow, his mouth moving in excitement as he speaks, while water droplets glisten on nearby leaves and the camera slowly tilts upward to follow his gesture. Xiao Ming (S1) says, <d>[Chinese] 哇！天空出現彩虹了！好美啊！</d> At 00:04.000, Xiao Mei clasps her hands together and tilts her head back to gaze at the rainbow, her mouth moving as she asks a question, while Ah Chai wags his tail and looks up, with the camera maintaining a steady medium shot. Xiao Mei (S2) says, <d>[Chinese] 彩虹是怎麼出現的呢？</d> At 00:08.000, Xiao Mei turns her head toward Xiao Ming and raises a fist in enthusiasm, her mouth moving as she speaks, while Xiao Ming nods vigorously in agreement, and the camera slowly pushes in closer to their faces. Xiao Mei (S2) says, <d>[Chinese] 我們一起來找答案吧！</d>
+
+overall_soundscape: The breeze rustles through wet leaves and distant birds chirp. Water droplets fall with light splashes onto the wooden table, accompanied by the soft padding of Ah Chai's paws.
+
+non_diegetic_music: N/A

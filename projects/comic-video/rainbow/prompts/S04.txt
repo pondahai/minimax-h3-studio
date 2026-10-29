@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene in a sunny forest clearing after rain, featuring an outdoor wooden table and lush greenery. Xiao Ming, a boy with a khaki explorer hat and green vest, crouches beside a grassy patch holding a magnifying glass, while Xiao Mei, a girl with twin ponytails and a pink jacket, stands nearby. At 00:00.000, Wide shot of Xiao Ming crouching beside a large green leaf, holding a magnifying glass up to a water droplet that glimmers with rainbow colors; the camera slowly pushes in as he speaks. Xiao Ming (S1) says, <d>[Chinese] 不同顏色的光，折射的角度不一樣，</d> At 00:04.000, Medium two-shot of Xiao Ming and Xiao Mei; Xiao Ming lowers his magnifying glass and gestures with both hands wide, explaining enthusiastically, while Xiao Mei looks on attentively. Xiao Ming (S1) says, <d>[Chinese] 所以就分開成彩虹的顏色了！</d> At 00:08.000, Medium shot transitioning to a close-up of the leaf tip: Xiao Mei smiles and nods, Ah Chai the corgi waddles in to sniff the leaf, and the rainbow water droplet falls from the tip with a visible splash. Close-up of the water droplet falling from the leaf tip, refracting light into a soft rainbow arc against the blurred forest background.
+
+overall_soundscape: Light rustling of leaves and distant chirping of birds after the rain. A soft 'plink' as the droplet falls, followed by a gentle breeze and Ah Chai's light panting.
+
+non_diegetic_music: N/A

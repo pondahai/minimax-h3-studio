@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Bright Japanese children's science anime style, saturated colors, and a sunny forest clearing with an outdoor wooden table and soft sunlight. Every rainbow has red on the outer edge and violet on the inner edge. Xiao Mei and Xiao Ming stand at the table with a clear plastic cup full of water and a sheet of white paper. At 00:00.000, Xiao Mei stands beside the wooden table, pointing at the transparent cup filled with water while speaking to Xiao Ming with an excited expression. Xiao Mei (S1) says, <d>[Chinese] 我們也來做彩虹吧！</d> At 00:04.000, Xiao Ming uses both hands to slowly rotate the water cup, while Xiao Mei slides the white paper aside to catch the projected light. A narrator says in an off-screen voiceover, <d>[Chinese] 把水杯放在陽光下，慢慢調整杯子和白紙的角度。</d> The on-screen characters' lips remain closed. At 00:08.000, A small arc of rainbow light appears on the white paper; Xiao Mei gasps in delight and points at the colorful band as the camera slowly pushes in. Xiao Mei (S1) says, <d>[Chinese] 哇！出現彩虹了！</d> Xiao Mei and Xiao Ming gaze at the rainbow on the white paper, with the water cup and the paper clearly visible in the frame.
+
+overall_soundscape: Soft rustling of leaves in the breeze and distant cheerful bird chirps. The gentle sound of plastic sliding on wood and a faint shimmering hum as the light refracts.
+
+non_diegetic_music: N/A

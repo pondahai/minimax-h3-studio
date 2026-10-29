@@ -1,0 +1,58 @@
+{
+ "title": "彩虹為什麼會出現？",
+ "source": "https://shezi.org.tw/science/rainbow/",
+ "style": "明亮日系兒童科普動畫風、色彩飽和、雨後森林空地、戶外木桌、柔和陽光",
+ "characters": "小明＝卡其探險帽、棕短髮、綠背心、藍背包；小美＝棕色雙馬尾、粉紅外套、紅格子裙；阿柴＝橘白柯基、綠色葉子領巾；林博士＝白髮白鬍、圓眼鏡、白色實驗袍、綠領帶",
+ "no_text_rule": "不要在畫面中出現任何文字、標籤、公式、表格或圖示",
+ "panel_dir": "C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\C--Users-USER--claude-spares-spare-RlaWzA\\c38f3c7c-e8d6-4b67-b634-bcf5bc1d53e2\\scratchpad\\rainbow_panels",
+ "panels": {
+  "S01": "panel-01",
+  "S02": "panel-02",
+  "S03": "panel-03",
+  "S04": "panel-03",
+  "S05": "panel-04",
+  "S06": "panel-05",
+  "S07": "panel-05",
+  "S08": "panel-06",
+  "S09": "panel-06",
+  "S10": "panel-07"
+ },
+ "voices": {
+  "小明": "七歲小男孩，稚嫩的童聲，音調很高，天真活潑",
+  "小美": "開朗溫柔的十歲女孩，聲音甜美",
+  "旁白": "溫柔親切的年輕女性旁白，語速平穩",
+  "林博士": "六十多歲的台灣男教授，標準台灣華語口音，沉穩親切，語速慢"
+ },
+ "ref_text": "大家好，今天天氣真好，我們一起去森林裡看看吧！",
+ "ref_transcript": {
+  "小明": "哇！一隻小小的卵，竟然可以變成這麼美麗的蝴蝶！",
+  "林博士": "不要只看大小，要比較同樣體積裡有多少質量。"
+ },
+ "t2s": true,
+ "pronounce": {},
+ "shots": [
+  ["S01", 12, "frames/S01.png"],
+  ["S02", 12, "frames/S02.png"],
+  ["S03", 12, "frames/S03.png"],
+  ["S04", 12, "frames/S04.png"],
+  ["S05", 12, "frames/S05.png"],
+  ["S06", 12, "frames/S06.png"],
+  ["S07", 12, "S06"],
+  ["S08", 12, "frames/S08.png"],
+  ["S09", 12, "frames/S09.png"],
+  ["S10", 12, "frames/S10.png"]
+ ],
+ "speakers": ["小明", "小美", "林博士"],
+ "tagline": null,
+ "last_frames": [],
+ "prompt_format": "official",
+ "no_text_rule_en": "No text of any kind may appear in the picture: no letters, labels, numbers, formulas, signs or icons.",
+ "style_en": "bright Japanese children's science anime, saturated colors, a sunny forest clearing after rain with an outdoor wooden table, soft sunlight; every rainbow has red on the outer edge and violet on the inner edge",
+ "characters_en": "Xiao Ming (小明) = a boy with a khaki explorer hat with a green leaf badge, short brown hair, a green vest and a blue backpack; Xiao Mei (小美) = a girl with brown twin ponytails, a pink jacket and a red plaid skirt; Ah Chai (阿柴) = an orange-and-white corgi with a green leaf bandana; Dr. Lin (林博士) = a kind old scientist with white hair and beard, round glasses, a khaki explorer hat, a white lab coat and a green tie",
+ "names_en": {
+  "小明": "Xiao Ming",
+  "小美": "Xiao Mei",
+  "阿柴": "Ah Chai",
+  "林博士": "Dr. Lin"
+ }
+}
