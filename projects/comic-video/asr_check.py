@@ -1,11 +1,12 @@
 """用常駐的 Breeze ASR（100.108.74.45:8013）轉寫 wav，核對 TTS 有沒有講對。
 
-用法：python asr_check.py audio/S04_09_旁白.wav ...   （不帶參數 = 核對 lines.json 全部台詞）
+用法：python asr_check.py <篇目> [wav...]   （不帶 wav = 核對 <篇目>/audio/lines.json 全部台詞）
 """
-import json, sys, time, urllib.request, uuid
+import json, time, urllib.request, uuid
 from pathlib import Path
 
-HERE = Path(__file__).parent
+import comic
+
 BASE = "http://100.108.74.45:8013"
 
 
@@ -28,9 +29,10 @@ def transcribe(wav):
 
 
 if __name__ == "__main__":
-    if sys.argv[1:]:
-        for p in sys.argv[1:]:
+    cfg, d, wavs = comic.load()
+    if wavs:
+        for p in wavs:
             print(f"{Path(p).name}: {transcribe(Path(p))}", flush=True)
     else:
-        for ln in json.loads((HERE / "audio" / "lines.json").read_text(encoding="utf-8")):
-            print(f"{ln['file']}\n  原文：{ln['text']}\n  ASR ：{transcribe(HERE / 'audio' / ln['file'])}", flush=True)
+        for ln in json.loads((d / "audio" / "lines.json").read_text(encoding="utf-8")):
+            print(f"{ln['file']}\n  原文：{ln['text']}\n  ASR ：{transcribe(d / 'audio' / ln['file'])}", flush=True)
