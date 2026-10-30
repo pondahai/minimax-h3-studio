@@ -1,7 +1,0 @@
-For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
-
-integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene with saturated colors and soft lighting, featuring Battery and Bulb standing on a grassy hill with five Charge Kids running on a circular grey wire track. At 00:00.000, Battery stands on the left waving and speaking with an animated expression, while the Charge Kids begin to run along the wire track one by one. Battery (S1) says, <d>[Chinese] 大家往前走！我來推動你們！</d> At 00:04.000, The Charge Kids run past Bulb on the right, causing Bulb to glow increasingly bright yellow and spread its arms wide. Bulb (S2) says, <d>[Chinese] 謝謝你們！我把電能變成光和熱！</d> At 00:08.000, The Charge Kids complete the circle and run back to Battery, continuing their loop under a gentle overhead camera angle. A narrator says in an off-screen voiceover, <d>[Chinese] 電池、導線、燈泡，再回到電池，就是電路。</d> The on-screen characters' lips remain closed.
-
-overall_soundscape: Soft rustling of the grass and light footsteps as the Charge Kids run, accompanied by a gentle mechanical hum from Battery and a warm crackling light effect from Bulb.
-
-non_diegetic_music: N/A
