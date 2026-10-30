@@ -1,12 +1,12 @@
 [
  {
-  "file": "S01_00_旁白.wav",
+  "file": "S01_00_小宇.wav",
   "sid": "S01",
   "start": 0,
   "end": 3,
-  "who": "旁白",
-  "text": "讓我們用一個簡單的故事，",
-  "audio_sec": 2.24
+  "who": "小宇",
+  "text": "跟我一起認識電吧！",
+  "audio_sec": 1.6
  },
  {
   "file": "S01_03_小宇.wav",
@@ -18,22 +18,22 @@
   "audio_sec": 2.08
  },
  {
-  "file": "S01_06_旁白.wav",
+  "file": "S01_06_小宇.wav",
   "sid": "S01",
   "start": 6,
   "end": 9,
-  "who": "旁白",
-  "text": "認識電壓、電流、電阻和功率。",
-  "audio_sec": 3.68
+  "who": "小宇",
+  "text": "電壓、電流、電阻、功率！",
+  "audio_sec": 2.08
  },
  {
-  "file": "S01_09_旁白.wav",
+  "file": "S01_09_小宇.wav",
   "sid": "S01",
   "start": 9,
   "end": 12,
-  "who": "旁白",
-  "text": "實驗只用乾電池和小燈泡喔。",
-  "audio_sec": 3.04
+  "who": "小宇",
+  "text": "只用乾電池和小燈泡喔！",
+  "audio_sec": 2.08
  },
  {
   "file": "S02_00_電池.wav",
@@ -54,13 +54,13 @@
   "audio_sec": 3.04
  },
  {
-  "file": "S02_08_旁白.wav",
+  "file": "S02_08_電池.wav",
   "sid": "S02",
   "start": 8,
   "end": 12,
-  "who": "旁白",
-  "text": "電池、導線、燈泡，再回到電池，就是電路。",
-  "audio_sec": 4.16
+  "who": "電池",
+  "text": "繞一圈回到我這裡，就是電路！",
+  "audio_sec": 2.08
  },
  {
   "file": "S03_00_電池.wav",
@@ -72,22 +72,22 @@
   "audio_sec": 2.72
  },
  {
-  "file": "S03_04_旁白.wav",
+  "file": "S03_04_電池.wav",
   "sid": "S03",
   "start": 4,
   "end": 8,
-  "who": "旁白",
+  "who": "電池",
   "text": "電壓就像水管裡的水壓，",
-  "audio_sec": 2.56
+  "audio_sec": 2.4
  },
  {
-  "file": "S03_08_旁白.wav",
+  "file": "S03_08_電池.wav",
   "sid": "S03",
   "start": 8,
   "end": 12,
-  "who": "旁白",
-  "text": "水壓越大，水越有力量往前流。",
-  "audio_sec": 3.52
+  "who": "電池",
+  "text": "壓力越大，水越有力往前流！",
+  "audio_sec": 2.56
  },
  {
   "file": "S04_00_小宇.wav",
@@ -99,22 +99,22 @@
   "audio_sec": 2.08
  },
  {
-  "file": "S04_03_旁白.wav",
+  "file": "S04_03_小宇.wav",
   "sid": "S04",
   "start": 3,
   "end": 5,
-  "who": "旁白",
-  "text": "USB 大約五伏特，",
-  "audio_sec": 2.08
+  "who": "小宇",
+  "text": "USB 是五伏特，",
+  "audio_sec": 1.76
  },
  {
-  "file": "S04_05_旁白.wav",
+  "file": "S04_05_小宇.wav",
   "sid": "S04",
   "start": 5,
   "end": 8,
-  "who": "旁白",
-  "text": "家裡的插座是一百一十伏特。",
-  "audio_sec": 2.72
+  "who": "小宇",
+  "text": "插座是一百一十伏特。",
+  "audio_sec": 2.4
  },
  {
   "file": "S04_08_小宇.wav",
@@ -135,22 +135,22 @@
   "audio_sec": 4.32
  },
  {
-  "file": "S05_04_旁白.wav",
+  "file": "S05_04_電荷小朋友.wav",
   "sid": "S05",
   "start": 4,
   "end": 8,
-  "who": "旁白",
+  "who": "電荷小朋友",
   "text": "電流是每秒通過的電荷量，",
-  "audio_sec": 2.56
+  "audio_sec": 3.84
  },
  {
-  "file": "S05_08_旁白.wav",
+  "file": "S05_08_電荷小朋友.wav",
   "sid": "S05",
   "start": 8,
   "end": 12,
-  "who": "旁白",
-  "text": "單位是安培。電流越大，流過的電荷越多。",
-  "audio_sec": 4.48
+  "who": "電荷小朋友",
+  "text": "單位是安培！我們越多，電流越大！",
+  "audio_sec": 4.8
  },
  {
   "file": "S06_00_電荷小朋友.wav",
@@ -162,22 +162,22 @@
   "audio_sec": 4.48
  },
  {
-  "file": "S06_04_旁白.wav",
+  "file": "S06_04_電荷小朋友.wav",
   "sid": "S06",
   "start": 4,
   "end": 8,
-  "who": "旁白",
-  "text": "電阻會阻礙電流，電阻越大，電流越小。",
-  "audio_sec": 4.32
+  "who": "電荷小朋友",
+  "text": "電阻越大，電流越小！",
+  "audio_sec": 3.68
  },
  {
-  "file": "S06_08_旁白.wav",
+  "file": "S06_08_燈泡.wav",
   "sid": "S06",
   "start": 8,
   "end": 12,
-  "who": "旁白",
-  "text": "燈絲就是電阻，電能在這裡變成光和熱。",
-  "audio_sec": 4.0
+  "who": "燈泡",
+  "text": "我的燈絲是電阻，把電能變成光和熱！",
+  "audio_sec": 3.52
  },
  {
   "file": "S07_00_旁白.wav",
@@ -234,13 +234,13 @@
   "audio_sec": 1.76
  },
  {
-  "file": "S08_04_旁白.wav",
+  "file": "S08_04_小宇.wav",
   "sid": "S08",
   "start": 4,
   "end": 7,
-  "who": "旁白",
-  "text": "電流是每秒流過多少電荷，",
-  "audio_sec": 2.4
+  "who": "小宇",
+  "text": "電流是每秒多少電荷，",
+  "audio_sec": 1.92
  },
  {
   "file": "S08_07_小宇.wav",
@@ -252,40 +252,40 @@
   "audio_sec": 1.6
  },
  {
-  "file": "S08_09_旁白.wav",
+  "file": "S08_09_小宇.wav",
   "sid": "S08",
   "start": 9,
   "end": 12,
-  "who": "旁白",
-  "text": "功率是每秒轉換多少能量。",
-  "audio_sec": 2.56
+  "who": "小宇",
+  "text": "功率是每秒轉換的能量！",
+  "audio_sec": 2.08
  },
  {
-  "file": "S09_00_旁白.wav",
+  "file": "S09_00_電池.wav",
   "sid": "S09",
   "start": 0,
   "end": 4,
-  "who": "旁白",
+  "who": "電池",
   "text": "電壓乘上電流，就等於功率。",
-  "audio_sec": 2.88
+  "audio_sec": 2.08
  },
  {
-  "file": "S09_04_旁白.wav",
+  "file": "S09_04_電池.wav",
   "sid": "S09",
   "start": 4,
   "end": 8,
-  "who": "旁白",
+  "who": "電池",
   "text": "例如十伏特乘兩安培，",
-  "audio_sec": 3.04
+  "audio_sec": 2.24
  },
  {
-  "file": "S09_08_旁白.wav",
+  "file": "S09_08_燈泡.wav",
   "sid": "S09",
   "start": 8,
   "end": 12,
-  "who": "旁白",
-  "text": "就是二十瓦特。",
-  "audio_sec": 1.6
+  "who": "燈泡",
+  "text": "就是二十瓦特！",
+  "audio_sec": 1.44
  },
  {
   "file": "S10_00_旁白.wav",
@@ -324,66 +324,66 @@
   "audio_sec": 3.2
  },
  {
-  "file": "S11_00_旁白.wav",
+  "file": "S11_00_電荷小朋友.wav",
   "sid": "S11",
   "start": 0,
   "end": 4,
-  "who": "旁白",
-  "text": "電不是水，水管只是幫助我們理解。",
-  "audio_sec": 3.5
+  "who": "電荷小朋友",
+  "text": "電不是水，水管只是比喻喔！",
+  "audio_sec": 4.48
  },
  {
-  "file": "S11_04_旁白.wav",
+  "file": "S11_04_電荷小朋友.wav",
   "sid": "S11",
   "start": 4,
   "end": 8,
-  "who": "旁白",
-  "text": "導線裡本來就有電荷，",
-  "audio_sec": 2.24
+  "who": "電荷小朋友",
+  "text": "我們本來就在導線裡，",
+  "audio_sec": 3.04
  },
  {
-  "file": "S11_08_旁白.wav",
+  "file": "S11_08_電池.wav",
   "sid": "S11",
   "start": 8,
   "end": 12,
-  "who": "旁白",
-  "text": "接通後，它們才往同一個方向移動。",
-  "audio_sec": 3.36
+  "who": "電池",
+  "text": "接通了，大家往同一個方向走！",
+  "audio_sec": 2.72
  },
  {
   "file": "S12_00_小宇.wav",
   "sid": "S12",
   "start": 0,
-  "end": 3,
+  "end": 2,
   "who": "小宇",
   "text": "電池不要拆開喔！",
-  "audio_sec": 1.44
+  "audio_sec": 1.6
  },
  {
-  "file": "S12_03_小宇.wav",
+  "file": "S12_02_小宇.wav",
   "sid": "S12",
-  "start": 3,
-  "end": 8,
+  "start": 2,
+  "end": 7,
   "who": "小宇",
   "text": "不要用導線把正負極直接接在一起！",
   "audio_sec": 3.2
  },
  {
-  "file": "S12_08_旁白.wav",
+  "file": "S12_07_小宇.wav",
   "sid": "S12",
-  "start": 8,
-  "end": 10,
-  "who": "旁白",
-  "text": "那樣會短路，很危險。",
-  "audio_sec": 2.24
+  "start": 7,
+  "end": 9,
+  "who": "小宇",
+  "text": "會短路，很危險！",
+  "audio_sec": 1.92
  },
  {
-  "file": "S12_10_旁白.wav",
+  "file": "S12_09_小宇.wav",
   "sid": "S12",
-  "start": 10,
+  "start": 9,
   "end": 12,
-  "who": "旁白",
+  "who": "小宇",
   "text": "電，讓世界更有能量！",
-  "audio_sec": 2.4
+  "audio_sec": 2.08
  }
 ]
