@@ -9,7 +9,7 @@
 
 第四篇：2026-10-30，《聲音是怎麼傳播的？》（7 格）→ 12 段 144 秒，[`sound/`](../projects/comic-video/sound/)（2026-10-30 驗收）；8002 逐格初稿＋人工修、角色立繪參考、保留 H3 原生音效（`sfx.sh`）、台詞對齊 H3 嘴型（`lipsync_measure.py`）
 
-第五篇：2026-10-30，《為什麼會有四季？》（7 格，網站 header＋panel-01～06）→ 12 段 144 秒，[`seasons/`](../projects/comic-video/seasons/)（進行中）；8002 初稿第一次附每格人工備註（`panel_notes`）
+第五篇：2026-10-30，《為什麼會有四季？》（7 格，網站 header＋panel-01～06）→ 12 段 144 秒，[`seasons/`](../projects/comic-video/seasons/)（成片 2026-10-30，待驗收）；8002 初稿第一次附每格人工備註（`panel_notes`）、用選定首幀擴寫
 
 ## 成品
 
@@ -206,6 +206,7 @@
 - 跑 1 首、ASR 檢查（轉不出文字，只回 `<|7.55|>` 之類的時間戳＝乾淨）→ 給使用者聽；有人聲再換 seed。選定的存成 `music/bgm.wav`
 
 ### 8. 合成 → `python3 mux.py <篇目>`
+- 先把 H3 成品 `out/SXX.mp4` 複製到 `video/`（mux 只讀 `video/`；《四季》忘了這步，ffmpeg 報 Error opening input）。還沒選配樂時 mux 照樣產出無配樂版，可直接拿 `mixed/SXX.mp4` 給使用者試聽
 - H3 原生音軌**不直接用**（它會照 `<d>` 唸台詞、自己編說話聲）
 - **實驗音效（《聲音》起）**：TTS 做不出鼓聲、敲桌、撥橡皮筋。H3 原生音軌裡的音效是和畫面一起生成的，時間點本來就對齊，所以用 Demucs 去掉人聲後保留：
   1. H3 全部跑完後，Spark 上 `bash sfx.sh <篇目> [段...]`：照 `shots` 抽原生音軌 → `demucs-sfx` 映像檔跑 `sfx_sep.py` → `sfx/SXX_novocals.wav`；已有的段跳過，H3 在跑時會拒絕啟動。12 段約 1 分鐘
