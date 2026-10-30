@@ -2,7 +2,8 @@
 
 用法：python draft_storyboard.py <篇目>
 一次只送一格（panel_dir 的 panel-01.png、panel-02.png…，網站原圖一格一張），附上該格角色（config 的 panel_cast）
-和前面已寫好的段落摘要；每格寫完用 check_storyboard.py 的規則驗收，有問題把清單回饋給 8002 重寫，最多 REVISE 輪。
+和前面已寫好的段落摘要；config 有 panel_notes 時，把該格的人工備註（科學更正、安全句、段數）一起送，備註優先於通則。
+每格寫完用 check_storyboard.py 的規則驗收，有問題把清單回饋給 8002 重寫，最多 REVISE 輪。
 仍沒過的問題寫進檔尾「## 未解決」，交給人看。
 第一版（7 格一次送）的結果見 docs/comic-to-video-workflow.md。
 """
@@ -36,6 +37,7 @@ SYSTEM = """你是兒童科普動畫的分鏡師。輸入是一篇分格漫畫�
 8. 角色比這一格少時，在畫面欄寫明「（畫面只有某某）」或「（畫面沒有人物）」。
 9. 場景寫在每一列裡（例如戶外木桌、山坡草地）。
 10. 圖中若有科學錯誤或不安全的做法（例如直視太陽、玻璃杯給小孩拿），在台詞或畫面改正。
+11. 若有「人工備註」，一定要照做，和上面規則衝突時以備註為準（包括段數）。
 只輸出這一格的分鏡段落（### 開頭），不要其他說明。"""
 
 
@@ -71,12 +73,15 @@ def draft(cfg):
     raw = []
     for n, p in enumerate(panels(cfg), 1):
         start = len(re.findall(r"^### S\d+", done, re.M)) + 1
-        cast = cfg.get("panel_cast", {}).get(str(n), [])
+        cast = cfg.get("panel_cast", {}).get(str(n))
+        cast = "依圖" if cast is None else "、".join(cast) or "沒有角色（畫面沒有人物）"
+        note = cfg.get("panel_notes", {}).get(str(n))
+        note = f"\n人工備註（一定要照做）：\n{note}" if note else ""
         img = "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()
         messages = [
-            {"role": "system", "content": SYSTEM.format(characters=cfg["characters"], cast="、".join(cast) or "依圖")},
+            {"role": "system", "content": SYSTEM.format(characters=cfg["characters"], cast=cast)},
             {"role": "user", "content": [
-                {"type": "text", "text": f"篇名：《{cfg['title']}》。{summary(done)}\n請寫第 {n} 格，段號從 S{start:02d} 開始。"},
+                {"type": "text", "text": f"篇名：《{cfg['title']}》。{summary(done)}\n請寫第 {n} 格，段號從 S{start:02d} 開始。{note}"},
                 {"type": "image_url", "image_url": {"url": img}}]},
         ]
         for rnd in range(REVISE + 1):
