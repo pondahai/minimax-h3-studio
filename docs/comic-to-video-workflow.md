@@ -59,6 +59,7 @@
 | Spark venv | `~/dgx-voxcpm-eval/.venv` | VoxCPM2 TTS |
 | Spark 主機 | `~/breeze-asr-hub`（whisper-cli CUDA，Breeze-25/26 模型） | `asr_spark.sh` 按需轉寫，不常駐 |
 | Jetson | Breeze ASR（常駐 :8013） | 配音核對備援 |
+| Spark 腳本 | `pipeline.sh`（2026-10-30 新增） | 離線排隊：H3＋配樂＋sfx／對嘴／mux 一次跑完 |
 | 本機 Windows | Python 3.12＋Pillow | `draft_storyboard.py`、`check_*.py`、`expand.py`、`tts.py`、`asr_check.py`、`qwen_frame.py`、`review.py`、切圖 |
 | 本機 Windows | **沒有 ffmpeg** | 影音處理一律在 Spark 做，成品用 scp 拉回 |
 
@@ -187,6 +188,10 @@
 - **角色立繪**（《聲音》起）：先做 `frame_prompts/chars.txt`（純色草地背景、全員並排全身、手上沒道具）→ `frames/chars.png`，之後各段的角色參考都用它。用前一篇的場景首幀當參考做立繪時，3 個 seed 有 1 個整張照抄原場景（《彩虹》S01 的彩虹天空），另 2 個是乾淨立繪但畫風較扁平；挑有完整服裝細節（林博士綠領帶）的那張
   - 立繪本身也會被照抄：12 段裡有 6 段至少一個 seed 把整排立繪角色貼進來（純色背景、多出林博士、兩隻阿柴）。**只有路人、沒有系列角色的段落（《聲音》S04）不要給立繪**，只給原圖，並寫明「沒有戴帽子、沒有背包、沒有狗、沒有老人」
 - **《四季》起**：立繪只畫這篇會出場的角色（只有小明、小美），用前一篇的 `chars.png` 當參考，3 個 seed 都乾淨；照抄立繪的段落從《聲音》的 6/12 降到 3/12（S01、S03、S05 各一個 seed，多出另一個角色）
+- **《電池》起：每個角色一張獨立立繪**（`frame_prompts/char_<角色>.txt` → `frames/char_<角色>.png`），各段首幀只給該段出場角色的立繪，避免整排立繪被照抄、多出角色。先試的全員一張 `chars` 有兩個問題：人類小孩被畫成和擬人化電池一樣的細線腳（要寫明「正常比例的人類小孩、長褲、運動鞋」）；一張 seed 在電池上畫了「+」號
+  - **角色立繪一律用純白素色背景**（沒有地面、草地、天空）：草地背景的立繪會被照抄到首幀的地面，室內桌面、地板變成泥土加草叢紋理，prompt 寫「不要照抄背景」「木頭桌面」也擋不住。用草地版立繪當參考重畫白底版時，seed1 仍帶草叢（qwen_frame.py 的 seed1 特別容易照抄參考圖），選 seed2、seed3
+    - 白底立繪的副作用：室內段桌面、地板都正常了，但**戶外／卡通段的背景也跟著變成一片白**（草地世界消失，seed2 還有雜訊點）。卡通段的 prompt 要把場景寫具體（草地、天空、遠山），或卡通段沿用場景版參考；《電池》卡通段沿用草地版立繪做的首幀，室內段用白底版
+  - 首幀結果（12 段，草地版立繪）：沒有一張多出角色（《聲音》6/12、《四季》3/12）；但實景室內段（S01、S04、S08、S12）seed1 都把立繪的草地紋理照抄成泥土地板 → 室內段 prompt 要寫明「木地板／木頭桌面」，並排除這類 seed
 - **原圖有擬人化星球（有臉）時，太空、風景段不給任何參考圖**，只靠文字 prompt＋「寫實的地球與太陽，沒有臉」：7 段 21 張只有 1 張太陽隱約像有五官；`qwen_frame.py` 參考圖可以是零張
 - 首幀常把「還沒開始的動作」畫成已完成（《四季》S08 寫手電筒還沒開，3 張都已亮著）：改分鏡 0 秒去配合首幀，比重做快
 - 挑 seed 時特別看時間軸衝突：動作的結果不能已經在首幀出現（木塊已浮在水裡、油層已倒好）
@@ -207,7 +212,11 @@
 '` 指令找不到；`comic-video/.gitattributes` 已固定 `.sh` 為 LF，啟動前仍先 `bash -n` 檢查語法
 - Spark 上的目錄比照 repo：`~/h3-bench/comic-video/`（共用腳本＋`bench.py`）、`~/h3-bench/comic-video/<篇目>/`。《密度》已搬到新位置（第一批 11 段是重整前用舊腳本跑的）；《蝴蝶》還在 `~/h3-bench/butterfly/`
 - 重跑某段：把舊檔移到 `out/archive/<段>_v1.mp4`、`run/<段>_v1/`，更新 prompt／首幀／`config.json` 後 `bash run_series.sh <篇目> <段>`（其他已存在的段會跳過）
-- `run_series.sh`：整批依序跑，已有的段會跳過；失敗就停
+- `run_series.sh`：整批依序跑，已有的段會跳過；失敗就停（exit 1）。環境變數 `ONLY=S05` 只跑那一段
+- **離線排隊（《電池》起）**：`pipeline.sh <篇目>` 在 Spark 上一次跑完 H3 與後處理，本機可以關機。素材（config、storyboard、prompts、`frames/SXX.png`、`audio/` 台詞與 `lines.json`）先 tar 經 ssh 傳上去，再 `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（一定要 `< /dev/null`，否則 ssh 掛住不回來）
+  - 流程：互斥檢查（停 Qwen／TTS，H3 或 Demucs 在跑就 ABORT）→ music1（`asr_spark.sh` 檢查人聲，自動設成 `bgm.wav`）→ 各段 `ONLY=SXX run_series.sh`，失敗重試 1 次、仍失敗就跳過（失敗的 run 目錄改名 `SXX_fail1`）→ `out/` 複製到 `video/` → `sfx.sh` → `lipsync_measure.py` → `mux.py` 出 `mixed/` 試聽版；不做全片、字幕、分享版
+  - 進度看 `<篇目>/pipeline.status`（每階段一行，最後一行 `DONE` 或 `ABORT`）；細節在 `series.log`、`post.log`
+  - 跑完不重開其他服務、不推播；使用者回來後由 Claude 讀 status 接續
 - 在 Spark 上排隊等前一批跑完：`pgrep -f`／`pkill -f` 會比對到自己所在的 `bash -c` 或 ssh 指令（字串裡就有那個關鍵字），等待迴圈永遠不結束、或把自己的 ssh 砍掉。關鍵字寫成 `"[r]un_series.sh rainbow"` 這種形式避開；本機監看用 `timeout` 包住每次 ssh，長時間工作一律在 Spark 上 `setsid nohup … &` 啟動
 - `run_jobs.sh`：單獨重跑指定段或其他工作，格式 `名稱 prompt檔 seed 秒數 首幀|-`
 - 每段完成後抽幾格檢查（接縫、文字、角色外觀）
