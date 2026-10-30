@@ -147,7 +147,8 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 | `voices`、`ref_text`、`ref_transcript` | 角色音色描述、參考音逐字稿（prompt 模式克隆用） |
 | `t2s`、`pronounce` | 送 TTS 前轉簡體、仍唸錯時的同音字替換 |
 | `shots` | `[段, 秒數, 首幀來源]`；首幀來源 `-`＝t2va、圖檔路徑＝用該圖、段名＝續接該段末幀 |
-| `panel_cast` | 原圖每格出現的角色（`check_storyboard.py` 用） |
+| `panel_cast` | 原圖每格出現的角色（`check_storyboard.py` 用；空陣列＝沒有角色） |
+| `panel_notes` | 每格人工備註（段數、場景、原作更正、科學補充、安全句），`draft_storyboard.py` 連同原圖送 8002 |
 | `speakers`、`tagline` | 字幕標名字的角色（旁白不標）、片尾標語（可為 null） |
 
 ## 新增一篇
