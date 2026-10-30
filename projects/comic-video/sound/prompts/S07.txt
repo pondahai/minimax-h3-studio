@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene in a lush garden, featuring Xiao Ming wearing his explorer hat and backpack, framed in a medium shot. At 00:00.000, Xiao Ming stands in the garden, placing his hand behind his ear in a listening pose and turning his head slightly toward the trees while his mouth moves as he speaks. Xiao Ming (S1) says, <d>[Chinese] 在空氣中，我們用耳朵聽聲音。</d> At 00:04.000, The camera focuses on a tree branch where a bird flaps its wings and flies upward, causing the leaves to rustle and sway gently in the wind. A narrator says in an off-screen voiceover, <d>[Chinese] 氣體傳聲，通常最慢。</d> The on-screen characters' lips remain closed. At 00:08.000, Xiao Ming turns back to the camera, raising his hand to wave goodbye as the bird disappears into the sky, with the camera slowly pulling back to widen the view. A narrator says in an off-screen voiceover, <d>[Chinese] 固體最快，液體其次，氣體最慢。</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: The soft rustling of leaves in the breeze, the light flap of bird wings, and the distant chirping of a bird calling.
+
+non_diegetic_music: N/A

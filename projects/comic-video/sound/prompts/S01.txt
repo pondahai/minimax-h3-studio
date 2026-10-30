@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a sun-drenched forest path with saturated greens and blues. Xiao Ming stands in the center foreground calling out to Xiao Mei, who is positioned slightly further back to the right, while Ah Chai the corgi sits between them. At 00:00.000, Xiao Ming cups his hands around his mouth and shouts forward with a wide, enthusiastic smile, while Ah Chai perks up his ears and tilts his head up towards Xiao Ming. Xiao Ming (S1) says, <d>[Chinese] 嗨！你聽到我的聲音嗎？</d> At 00:04.000, Xiao Mei turns her head over her shoulder to look back at Xiao Ming, placing one hand behind her ear in a listening gesture while nodding her head happily. Xiao Mei (S2) says, <d>[Chinese] 聽到了！聲音怎麼傳過來的？</d> At 00:08.000, Xiao Ming runs forward to join Xiao Mei, and both children raise their fists in a determined gesture while Ah Chai happily circles around their legs wagging his tail. A narrator says in an off-screen voiceover, <d>[Chinese] 聲音看不見，卻真的存在。一起找秘密吧！</d> The on-screen characters' lips remain closed. Xiao Ming and Xiao Mei stand side-by-side raising their fists in unison while Ah Chai circles their ankles with his tail wagging.
+
+overall_soundscape: The rustling of leaves and the chirping of birds fill the air, accompanied by the light footsteps of children running on a dirt path and the rhythmic thumping of a corgi's tail.
+
+non_diegetic_music: N/A
