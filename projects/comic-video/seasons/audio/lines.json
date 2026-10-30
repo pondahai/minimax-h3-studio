@@ -1,0 +1,335 @@
+[
+ {
+  "file": "S01_00_小明.wav",
+  "sid": "S01",
+  "start": 0,
+  "end": 4,
+  "who": "小明",
+  "text": "為什麼有時候很熱，有時候很冷？",
+  "audio_sec": 4.32
+ },
+ {
+  "file": "S01_04_小明.wav",
+  "sid": "S01",
+  "start": 4,
+  "end": 8,
+  "who": "小明",
+  "text": "為什麼會有春夏秋冬呢？",
+  "audio_sec": 2.72
+ },
+ {
+  "file": "S01_08_旁白.wav",
+  "sid": "S01",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "秘密就藏在地球的大擺動裡！",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S02_00_旁白.wav",
+  "sid": "S02",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "地球不是直直站著，",
+  "audio_sec": 1.76
+ },
+ {
+  "file": "S02_04_旁白.wav",
+  "sid": "S02",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "而是稍微傾斜，大約二十三點五度。",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S02_08_旁白.wav",
+  "sid": "S02",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "繞太陽時，傾斜的方向大致不變。",
+  "audio_sec": 4.16
+ },
+ {
+  "file": "S03_00_小美.wav",
+  "sid": "S03",
+  "start": 0,
+  "end": 4,
+  "who": "小美",
+  "text": "就像一直拿著傾斜的雨傘，",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S03_04_小美.wav",
+  "sid": "S03",
+  "start": 4,
+  "end": 8,
+  "who": "小美",
+  "text": "繞著大樹走圈圈！",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S03_08_旁白.wav",
+  "sid": "S03",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "傘斜的方向，從頭到尾都沒變。",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S04_00_旁白.wav",
+  "sid": "S04",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "地球繞著太陽轉一圈，",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S04_04_旁白.wav",
+  "sid": "S04",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "大約要三百六十五天，",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S04_08_旁白.wav",
+  "sid": "S04",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "也就是一年，地軸一直斜向同一邊。",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S05_00_小美.wav",
+  "sid": "S05",
+  "start": 0,
+  "end": 4,
+  "who": "小美",
+  "text": "地球一邊繞太陽，一邊保持傾斜，",
+  "audio_sec": 5.44
+ },
+ {
+  "file": "S05_04_小美.wav",
+  "sid": "S05",
+  "start": 4,
+  "end": 8,
+  "who": "小美",
+  "text": "所以不同時間、不同地區，",
+  "audio_sec": 4.0
+ },
+ {
+  "file": "S05_08_小美.wav",
+  "sid": "S05",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "會接收到不同的陽光！",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S06_00_旁白.wav",
+  "sid": "S06",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "夏天，北半球朝向太陽，",
+  "audio_sec": 2.72
+ },
+ {
+  "file": "S06_04_旁白.wav",
+  "sid": "S06",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "太陽升得高，光線比較直接，",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S06_08_旁白.wav",
+  "sid": "S06",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "白天比較長，接收的能量多，所以比較熱。",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S07_00_旁白.wav",
+  "sid": "S07",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "冬天，北半球背向太陽，太陽升得低，",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S07_04_旁白.wav",
+  "sid": "S07",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "光線斜、白天短，能量少，比較冷。",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S07_08_旁白.wav",
+  "sid": "S07",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "春天和秋天介於中間，比較溫和。",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S08_00_旁白.wav",
+  "sid": "S08",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "手電筒是太陽，地球儀是地球。",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S08_04_小明.wav",
+  "sid": "S08",
+  "start": 4,
+  "end": 8,
+  "who": "小明",
+  "text": "光線直直照，比較集中，會比較熱！",
+  "audio_sec": 5.28
+ },
+ {
+  "file": "S08_08_旁白.wav",
+  "sid": "S08",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "手電筒不要照別人或自己的眼睛喔！",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S09_00_小明.wav",
+  "sid": "S09",
+  "start": 0,
+  "end": 4,
+  "who": "小明",
+  "text": "光線斜斜照，",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S09_04_小明.wav",
+  "sid": "S09",
+  "start": 4,
+  "end": 8,
+  "who": "小明",
+  "text": "分散到更大的面積，",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S09_08_小明.wav",
+  "sid": "S09",
+  "start": 8,
+  "end": 12,
+  "who": "小明",
+  "text": "比較不容易變熱！",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S10_00_旁白.wav",
+  "sid": "S10",
+  "start": 0,
+  "end": 3,
+  "who": "旁白",
+  "text": "春天變暖，開花了。",
+  "audio_sec": 2.72
+ },
+ {
+  "file": "S10_03_旁白.wav",
+  "sid": "S10",
+  "start": 3,
+  "end": 6,
+  "who": "旁白",
+  "text": "夏天炎熱，白天最長。",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S10_06_旁白.wav",
+  "sid": "S10",
+  "start": 6,
+  "end": 9,
+  "who": "旁白",
+  "text": "秋天轉涼，樹葉變色。",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S10_09_旁白.wav",
+  "sid": "S10",
+  "start": 9,
+  "end": 12,
+  "who": "旁白",
+  "text": "冬天寒冷，有些地方下雪。",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S11_00_旁白.wav",
+  "sid": "S11",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "夏天是因為離太陽比較近嗎？",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S11_04_旁白.wav",
+  "sid": "S11",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "不是！一年中距離只差約百分之三。",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S11_08_旁白.wav",
+  "sid": "S11",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "北半球冬天時，地球反而比較近。",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S12_00_旁白.wav",
+  "sid": "S12",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "南半球的季節剛好相反。",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S12_04_旁白.wav",
+  "sid": "S12",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "地軸傾斜，加上繞太陽公轉，",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S12_08_旁白.wav",
+  "sid": "S12",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "才有了春、夏、秋、冬！",
+  "audio_sec": 3.2
+ }
+]
