@@ -7,6 +7,8 @@
 
 第三篇：2026-10-29～30，《彩虹為什麼會出現？》（7 格）→ 10 段 120 秒，[`rainbow/`](../projects/comic-video/rainbow/)（2026-10-30 驗收）；這篇開始試讓 8002 寫分鏡、加了分鏡檢查程式
 
+第四篇：2026-10-30，《聲音是怎麼傳播的？》（7 格）→ 12 段 144 秒，[`sound/`](../projects/comic-video/sound/)（2026-10-30 驗收）；8002 逐格初稿＋人工修、角色立繪參考、保留 H3 原生音效（`sfx.sh`）、台詞對齊 H3 嘴型（`lipsync_measure.py`）
+
 ## 成品
 
 | 檔案 | 內容 |
@@ -38,6 +40,25 @@
 | Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`） | 生成首幀 |
 | MiniMax H3 | Spark `~/h3-bench`（docker image `h3-bench`） | 生成影片／配樂 |
 | Breeze ASR（常駐） | Jetson `100.108.74.45:8013`，SSH 帳號 `nvidia` | 核對 TTS 有沒有唸對 |
+
+### 環境與工具清單（2026-10-30 盤點）
+
+| 位置 | 工具 | 狀態／用途 |
+|---|---|---|
+| Spark 主機 | ffmpeg 6.1.1（apt，原本就有） | 抽音軌、合成、字幕、`sfx.sh` 響度 |
+| Spark 主機 | python3（系統版，**沒有 numpy／torch**） | `mux.py`、`subs.py`、`run_series.sh` 讀 config；要 numpy 的腳本改在容器跑 |
+| Spark docker | `h3-bench` | H3 影片／配樂 |
+| Spark docker | `qwen-image-comfyui` 容器 | Qwen-Image 首幀（用時 `docker start`，用完 `docker stop`） |
+| Spark docker | `nvcr.io/nvidia/pytorch:25.11-py3` | `demucs-sfx` 的基底（沒有 torchaudio） |
+| Spark docker | `demucs-sfx`（2026-10-30 新增，19.6 GB，`Dockerfile.sfx`） | `sfx.sh` 去人聲、`lipsync_measure.py` 量開口；內含 demucs 4.0.1 與 htdemucs 權重 |
+| Spark 快取 | `~/.cache/torch/hub`（81 MB，htdemucs 權重） | 手動試跑時下載；映像檔裡已另有一份，可刪 |
+| Spark 殘留 | `~/.cache/demucs-pip`（7.9 MB）、`comic-video/sound/sfx/stub/` | 第一次試裝的殘留，root 擁有，要 `sudo rm` 才能刪；不影響流程 |
+| Spark venv | `~/dgx-voxcpm-eval/.venv` | VoxCPM2 TTS |
+| Jetson | Breeze ASR（常駐 :8013） | 配音核對 |
+| 本機 Windows | Python 3.12＋Pillow | `draft_storyboard.py`、`check_*.py`、`expand.py`、`tts.py`、`asr_check.py`、`qwen_frame.py`、`review.py`、切圖 |
+| 本機 Windows | **沒有 ffmpeg** | 影音處理一律在 Spark 做，成品用 scp 拉回 |
+
+新增工具時要更新這張表。
 
 **記憶體互斥**：TTS、Qwen-Image、H3 三者一次只開一個；跑 H3 時 Spark 上只留 8002（停掉 `qwen3.8-nvfp4`、`qwen-image-comfyui`、`qwen-gradio-ui`）。實測 H3 跑時系統用量約 71 GB／121 GB，沒有用到 swap。
 
@@ -88,6 +109,14 @@
 - 檢查程式抓不到的：科學是否正確、安全提醒、玻璃杯、加戲、台詞是不是圖上原文。這些仍要人看
 - 判斷：8002 已能出可用的初稿（約 1.5 分鐘），人改初稿比從頭寫快；分鏡改為「8002 逐格初稿 → 檢查程式 → 人工修」還差安全與科學把關，下一篇再試
 
+**《聲音》（2026-10-30，第四次，`sound/storyboard_8002_review.md`）**：同一支腳本，10 段 120 秒；人只審科學、安全、加戲
+- 檢查程式重寫 2 輪後仍有 25 項沒過，**多數是回饋了也沒改**（「畫面有字」、黑板寫字、`「` 引號、動作太少），和《彩虹》觀察一致
+- 科學：照抄原作有瑕疵的比喻（傳球）還畫成球飛過空中，和「空氣不會跑遠」矛盾；一格有三個情境時擠成一段、漏掉主旨（固體最快…）；說話者和聽者顛倒 → **原作比喻要人先判斷對錯，8002 不會質疑原圖**
+- 安全：規則 10 寫了仍沒加「打孔請大人協助」，因為它乾脆跳過打孔步驟 → 安全提醒要明列在該格的提示裡，不能只靠通則
+- 加戲：路人角色換成主角、阿柴說「汪」、結尾自編角色入場；「預設一格一段」讓資訊多的格（第 4 格三情境）被壓縮
+- 能接手：分格對應、段落結構、從圖抓台詞原文、段數控制。不能接手：科學判斷、比喻改寫、安全提醒、續接判斷、畫面不放字
+- 判斷：仍是「8002 初稿 → 人工修」，人工修改量比《彩虹》第三次大；下一步可試在 `draft_storyboard.py` 加每格的人工備註（科學更正、安全句、該格段數）一起送
+
 ### 3. 擴寫（8002）→ `python expand.py <篇目>` → `prompts/SXX.txt`
 - 風格、角色外觀、不放字規則寫在 `config.json`（`style`、`characters`、`no_text_rule`），system prompt 其餘部分全篇共用
 - **`style`／`style_en` 只寫畫風、色調、光線，不寫場景道具**：《彩虹》把「戶外木桌」寫進 `style_en`，8002 就把木桌塞進微距水滴、山坡、草地噴水等每一段。場景寫在各段分鏡裡（《密度》每段都在木桌旁，所以當時沒出事）
@@ -108,6 +137,7 @@
   6. 前後段外觀是否連續（例如毛毛蟲顏色、蛹的顏色）
   7. 人工看道具有沒有被換掉（《彩虹》分鏡寫塑膠杯，8002 寫成 glass；程式抓不到）
 - 有問題直接人工改 prompt 檔
+- 路人角色要寫外觀（《聲音》S04 分鏡寫「路人小朋友」，8002 寫成 "faceless children"）；道具名稱要對（紅色大鼓被寫成 snare drum）
 
 ### 4. 配音（TTS）→ `python tts.py <篇目>`
 1. 啟動 TTS：`cd ~/dgx-voxcpm-eval && source .venv/bin/activate && nohup python chinese_tts_server.py &`
@@ -129,6 +159,8 @@
 - 《蝴蝶》只在需要重做的段落用（S10）；《密度》起改為**所有獨立段都先做首幀**：道具、圖解多的漫畫用 t2va 容易亂，也順便解決獨立段畫風不一致
 - 續接段仍用前段末幀；首幀構圖要和該段 0 秒的分鏡一致（例：分鏡寫「走進畫面」，首幀卻已站好，就改分鏡與 prompt）
 - **角色參考圖會被整張照抄**：《彩虹》用《密度》S01 首幀（小明舉海綿和石頭）當角色參考，6 段裡有 5 段的 seed2 原樣畫出海綿和石頭，S10 用《密度》S11 當參考，seed2 也照抄木桌和道具。挑 seed 時先排除照抄的；角色參考最好用道具少、只有角色的畫面（可以先做一張角色立繪）
+- **角色立繪**（《聲音》起）：先做 `frame_prompts/chars.txt`（純色草地背景、全員並排全身、手上沒道具）→ `frames/chars.png`，之後各段的角色參考都用它。用前一篇的場景首幀當參考做立繪時，3 個 seed 有 1 個整張照抄原場景（《彩虹》S01 的彩虹天空），另 2 個是乾淨立繪但畫風較扁平；挑有完整服裝細節（林博士綠領帶）的那張
+  - 立繪本身也會被照抄：12 段裡有 6 段至少一個 seed 把整排立繪角色貼進來（純色背景、多出林博士、兩隻阿柴）。**只有路人、沒有系列角色的段落（《聲音》S04）不要給立繪**，只給原圖，並寫明「沒有戴帽子、沒有背包、沒有狗、沒有老人」
 - 挑 seed 時特別看時間軸衝突：動作的結果不能已經在首幀出現（木塊已浮在水裡、油層已倒好）
 - 每段一個 prompt：`frame_prompts/<名稱>.txt`，輸出 `frames/<名稱>_seedN.png`；參考圖＝原漫畫分格＋前一篇影片抽出的角色畫面
 - 參考圖：原漫畫分格＋影片中已生成的角色畫面（讓畫風和角色對齊影片）
@@ -159,7 +191,19 @@
 - 跑 1 首、ASR 檢查（轉不出文字，只回 `<|7.55|>` 之類的時間戳＝乾淨）→ 給使用者聽；有人聲再換 seed。選定的存成 `music/bgm.wav`
 
 ### 8. 合成 → `python3 mux.py <篇目>`
-- H3 原生音軌**全部靜音**（它會自己編出非中文的說話聲）
+- H3 原生音軌**不直接用**（它會照 `<d>` 唸台詞、自己編說話聲）
+- **實驗音效（《聲音》起）**：TTS 做不出鼓聲、敲桌、撥橡皮筋。H3 原生音軌裡的音效是和畫面一起生成的，時間點本來就對齊，所以用 Demucs 去掉人聲後保留：
+  1. H3 全部跑完後，Spark 上 `bash sfx.sh <篇目> [段...]`：照 `shots` 抽原生音軌 → `demucs-sfx` 映像檔跑 `sfx_sep.py` → `sfx/SXX_novocals.wav`；已有的段跳過，H3 在跑時會拒絕啟動。12 段約 1 分鐘
+     - 映像檔只要建一次：`docker build -t demucs-sfx -f Dockerfile.sfx .`（約 20 GB，含 htdemucs 權重）
+     - 最後列出每段音效響度，低於 −45 LUFS 標「可能沒生成音效」。《聲音》被標的 7 段都是對話／旁白段，本來就沒有實驗音效；實驗段（敲鼓 −11.5、敲桌 −22、橡皮筋 −36）都有
+     - Demucs 分離有隨機位移，重跑結果不會逐位元相同，響度一樣
+  2. `mux.py` 偵測到 `sfx/SXX_novocals.wav` 就用它當底（`SFX_VOLUME` 0.6），沒有就照舊靜音
+- **對嘴（《聲音》起）**：H3 角色的嘴型跟著 H3 自己唸的台詞走，常比分鏡起秒晚 1–2.7 秒開口（前面有動作的句子最晚），唸得也比 TTS 快；TTS 放在起秒就會「聲音先到、嘴巴後動」
+  1. `sfx.sh` 跑完後：`docker run --rm -u $(id -u):$(id -g) -v $PWD:/c -w /c --entrypoint python demucs-sfx lipsync_measure.py <篇目>` → 從 `sfx/SXX_vocals.wav` 找出每句角色台詞的 H3 開口／閉口，印對照表並寫 `sfx/lipsync.json`（旁白不列）
+  2. `mux.py` 讀到 `lipsync.json` 就把角色台詞起點移到 H3 開口（差 < 0.3 秒不動），並以 H3 那句的長度為目標加速（上限照舊 1.35，段尾 1.5）；講不完的尾巴在閉嘴後講完
+  - 《聲音》16 句對齊後，段尾兩句（S06_08、S08_08）用到 1.5 倍上限，要聽是不是太趕
+  - 先挑幾段疊回影片給使用者試聽再全片套用；《聲音》使用者直接試聽，沒跑 ASR
+  - Demucs 裝法的坑：pip 不加 `--no-deps` 會重抓幾 GB 的 torch；4.1 版要 `sphn`，ARM 沒有 wheel；4.0.1 要 torchaudio，容器沒有 → 自己寫腳本呼叫 `apply_model`，給 openunmix 一個空的 torchaudio 模組
 - 每句台詞先量響度、統一到 −20 LUFS（`LINE_LUFS`）再混音，避免某個角色偏小聲
 - 台詞放在分鏡起秒；前句沒講完就順延，講不完用 atempo 加速（一般上限 1.35，段尾最後一句上限 1.5）
 - 時段太緊的句子，優先在 `lines.json` 把起秒提前到沒有人說話的空檔，而不是硬加速

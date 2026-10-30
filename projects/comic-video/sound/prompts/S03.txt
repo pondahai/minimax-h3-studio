@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene focused on a large red drum in soft sunlight, with a close-up composition on the drumhead. At 00:00.000, A drumstick descends and strikes the drumhead, causing the surface to ripple and vibrate rapidly with visible concentric waves. A narrator says in an off-screen voiceover, <d>[Chinese] 物體振動，就會產生聲音。</d> The on-screen characters' lips remain closed. At 00:04.000, Fine sand scattered on the drumhead begins to jump and dance frantically as the vibrations push each grain upward and back down. A narrator says in an off-screen voiceover, <d>[Chinese] 振動會推動周圍的空氣。</d> The on-screen characters' lips remain closed. At 00:08.000, The camera pans smoothly to the right, revealing dust motes dancing in the sunbeams, rippling back and forth in rhythm with the sound. A narrator says in an off-screen voiceover, <d>[Chinese] 空氣一個推一個，形成聲波。</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: The crisp, resonant thud of the drumstick striking the skin, followed by a continuous rustling of sand and the soft, airy whisper of vibrating dust.
+
+non_diegetic_music: N/A

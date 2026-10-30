@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a vibrant green forest meadow with saturated colors and soft sunlight. Xiao Ming and Xiao Mei are positioned in a medium two-shot, holding red and blue paper cups connected by a taut cotton string. At 00:00.000, Xiao Ming holds a red paper cup to his mouth, his mouth moving animatedly as he speaks, while Xiao Mei holds a blue cup to her ear, her expression focused and attentive. Xiao Ming (S1) says, <d>[Chinese] 你聽到我說的話了嗎？</d> At 00:04.000, Xiao Mei's eyes widen with delight and her mouth moves as she exclaims in surprise; she shifts the blue cup from her ear to her mouth, while Xiao Ming switches his red cup from his mouth to his ear. Xiao Mei (S2) says, <d>[Chinese] 哇！真的聽到了！</d> At 00:08.000, The camera pans horizontally along the taut cotton string, tracking the motion from the blue cup on the right to the red cup on the left, emphasizing the physical connection between the characters. A narrator says in an off-screen voiceover, <d>[Chinese] 杯底振動沿著棉線傳過去。</d> The on-screen characters' lips remain closed. The camera settles on a close-up of the red cup against Xiao Ming's ear, highlighting the vibration.
+
+overall_soundscape: The gentle rustle of leaves in the forest breeze and the soft crunch of grass underfoot. A faint, rhythmic humming sound resonates along the taut cotton string.
+
+non_diegetic_music: N/A

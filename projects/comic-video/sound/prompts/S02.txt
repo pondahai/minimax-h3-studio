@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft sunlight, a young boy named Xiao Ming wearing a khaki explorer hat stands at a wooden table in a forest clearing, preparing to demonstrate how a drum works. At 00:00.000, Xiao Ming raises two wooden drumsticks high above his head with a determined expression, then forcefully strikes the large red drum on the table, causing the drum skin to compress visibly under the impact. At 00:04.000, Xiao Ming rhythmically beats the drum with both sticks, then turns his head to look directly at the camera while speaking, his mouth moving and his expression animated and enthusiastic. Xiao Ming (S1) says, <d>[Chinese] 我敲鼓時，鼓面會振動！</d> At 00:08.000, Xiao Ming stops drumming and extends his right index finger toward the drum, pointing at the drum skin that continues to vibrate, his expression shifting to one of excited explanation. Xiao Ming (S1) says, <d>[Chinese] 然後就發出聲音了！</d> Xiao Ming points at the vibrating drum skin with a bright, encouraging smile.
+
+overall_soundscape: The crisp sound of wooden sticks hitting the drum skin resonates through the clearing, followed by the sharp snap of Xiao Ming's finger pointing. A gentle forest breeze rustles the leaves in the background.
+
+non_diegetic_music: N/A

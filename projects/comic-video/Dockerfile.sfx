@@ -1,0 +1,13 @@
+# sfx.sh 用的 Demucs 映像檔：docker build -t demucs-sfx -f Dockerfile.sfx .（在 Spark 的 ~/h3-bench/comic-video/）
+# 基底容器沒有 torchaudio，ARM 也裝不了 demucs 4.1 要的 sphn，所以用 4.0.1＋自己的 sfx_sep.py 呼叫 apply_model；
+# openunmix 會 import torchaudio，分離用不到，放一個空模組。--no-deps 避免 pip 重抓幾 GB 的 torch。
+FROM nvcr.io/nvidia/pytorch:25.11-py3
+RUN pip install -q --no-deps demucs==4.0.1 dora-search julius lameenc openunmix einops omegaconf \
+        antlr4-python3-runtime==4.9.3 treetable retrying submitit cloudpickle \
+ && mkdir -p /opt/stub/torchaudio && touch /opt/stub/torchaudio/__init__.py
+ENV PYTHONPATH=/opt/stub
+COPY sfx_sep.py /opt/sfx_sep.py
+# 先把 htdemucs 權重抓進映像檔，之後離線也能跑
+RUN python -c "from demucs.pretrained import get_model; get_model('htdemucs')"
+WORKDIR /w
+ENTRYPOINT ["python", "/opt/sfx_sep.py"]

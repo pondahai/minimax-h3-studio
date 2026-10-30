@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene with saturated colors and soft sunlight. Xiao Mei, a girl with brown twin ponytails wearing a pink jacket and red plaid skirt, is positioned on the right side of the frame. At 00:00.000, Xiao Mei bends forward at the waist to look closely into a large transparent aquarium on the left, her expression curious. A narrator says in an off-screen voiceover, <d>[Chinese] 液體也能傳聲，速度其次。</d> The on-screen characters' lips remain closed. At 00:04.000, Two small fish inside the aquarium swim towards each other and wiggle their tails gently, creating water ripples. Xiao Mei (S1) says, <d>[Chinese] 水下的聲音也能傳很遠，</d> At 00:08.000, Xiao Mei turns her head to face the camera with a bright smile and points her index finger towards the aquarium. Xiao Mei (S1) says, <d>[Chinese] 所以魚能互相溝通！</d> Xiao Mei maintains her joyful expression while pointing at the aquarium.
+
+overall_soundscape: Gentle rustling of leaves in the breeze, soft bubbling sounds from the water, and the faint splash of fish tails.
+
+non_diegetic_music: N/A

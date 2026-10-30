@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft sunlight, a medium shot focuses on Xiao Mei standing in an outdoor grassy area. She is wearing her signature pink jacket and red plaid skirt, looking at the camera with a curious expression. At 00:00.000, Xiao Mei tilts her head slightly with her mouth closed, gently placing her palm flat against her throat while blinking her eyes slowly. A narrator says in an off-screen voiceover, <d>[Chinese] 實驗一：手放喉嚨，先不說話。</d> The on-screen characters' lips remain closed. At 00:04.000, Xiao Mei's mouth opens wide to emit a long vowel, and her palm begins to vibrate visibly against her throat, causing her eyes to widen in pleasant surprise. Xiao Mei (S1) says, <d>[Chinese] 啊——</d> At 00:08.000, Xiao Mei lowers her hand from her throat and turns to the camera, speaking with an animated and excited expression. Xiao Mei (S1) says, <d>[Chinese] 說話時，聲帶在振動喔！</d>
+
+overall_soundscape: The gentle rustle of grass under Xiao Mei's feet and the distant chirping of summer insects provide a calm backdrop.
+
+non_diegetic_music: N/A

@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft sunlight, Xiao Ming stands beside a long wooden table outdoors, preparing to demonstrate sound transmission through solids. At 00:00.000, Xiao Ming walks to the edge of the long wooden table, bends down, and presses his ear against the surface with his eyes closed, while a classmate stands at the opposite end. A narrator says in an off-screen voiceover, <d>[Chinese] 聲音也能在固體裡傳播。</d> The on-screen characters' lips remain closed. At 00:04.000, The classmate at the other end taps the table with their knuckles, and Xiao Ming's eyes snap open with surprise and delight. Xiao Ming (S1) says, <d>[Chinese] 貼著桌子，聽得好清楚！</d> At 00:08.000, Xiao Ming lifts his head, grinning broadly, and gives a thumbs-up gesture to the classmate across the table. A narrator says in an off-screen voiceover, <d>[Chinese] 固體傳聲通常最快。</d> The on-screen characters' lips remain closed. Xiao Ming holds his thumbs-up pose with a beaming smile, bathed in warm sunlight.
+
+overall_soundscape: A light breeze rustles the leaves on Xiao Ming's hat, the thud of knuckles tapping against wood, and the faint chirping of distant birds.
+
+non_diegetic_music: N/A
