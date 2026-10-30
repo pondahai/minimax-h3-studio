@@ -29,7 +29,7 @@ SYSTEM = """你是兒童科普動畫的分鏡師。輸入是一篇分格漫畫�
 規則：
 1. 每段最長 12 秒，每列 3–5 秒、一個主要事件。時間軸首尾相接：下一列的起秒等於上一列的迄秒，寫成 0–4、4–8、8–12，不要寫 0–4、5–8、9–12；最後一列結束在段長。
 2. 每一列都要有看得見的動作（角色動作、道具變化或鏡頭運動），不能只寫站著、固定。
-3. 聲音欄寫「角色：「台詞」」或「旁白：「…」」或「—」，一列最多一句。小明、小美是小孩，一列台詞不超過 3.5 字／秒（4 秒最多 14 字）；旁白、林博士不超過 4 字／秒。
+3. 聲音欄寫「角色：「台詞」」或「旁白：「…」」或「—」，一列最多一句。{children}是小孩，一列台詞不超過 3.5 字／秒（4 秒最多 14 字）；旁白、林博士不超過 4 字／秒。
 4. 台詞以這一格的對話框與說明文字為準，可以精簡、拆到不同列；科學重點不能漏。標題、標籤、說明框改成旁白。
 5. 畫面不能出現任何文字、標籤、圖表、箭頭、編號、對話框、照片、筆記；圖中的示意圖改成實景畫面或旁白說明。
 6. 角色外觀：{characters}。阿柴不說話：圖中阿柴的台詞改給小明或小美。
@@ -79,7 +79,7 @@ def draft(cfg):
         note = f"\n人工備註（一定要照做）：\n{note}" if note else ""
         img = "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()
         messages = [
-            {"role": "system", "content": SYSTEM.format(characters=cfg["characters"], cast=cast)},
+            {"role": "system", "content": SYSTEM.format(characters=cfg["characters"], cast=cast, children="、".join(cfg.get("children", ["小明", "小美"])))},
             {"role": "user", "content": [
                 {"type": "text", "text": f"篇名：《{cfg['title']}》。{summary(done)}\n請寫第 {n} 格，段號從 S{start:02d} 開始。{note}"},
                 {"type": "image_url", "image_url": {"url": img}}]},

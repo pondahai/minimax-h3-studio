@@ -12,7 +12,7 @@ import comic
 MAX_SHOT = 12
 CPS = 4.0          # 一般語速（字／秒）
 CPS_CHILD = 3.5    # 童聲
-CHILDREN = ("小明", "小美")
+CHILDREN = ("小明", "小美")  # 預設；config 的 children 可覆寫
 MUTE = ("阿柴",)
 MOTION = re.compile(r"推|拉|移|搖|晃|轉|伸|舉|放|倒|沉|浮|跳|走|跑|揮|指|拿|抬|點頭|眨|閃|飄|流|落|升|噴|蹲|湊|拍|吹|浮現|出現|散|射|滴|動|攤|比|握|遮|追|靠|看|望|遞|叼|舔|拿")
 STILL = re.compile(r"固定|停留|靜止|站著$")
@@ -68,7 +68,7 @@ def check_shot(cfg, shot, prev):
             issues.append(f"{a}–{b} 秒 畫面可能有字：{TEXT_IN_PICTURE.search(vis)[0]}")
         said = lines(snd)
         n = sum(len(re.findall(r"[一-鿿]", t)) for _, t in said)
-        cps = CPS_CHILD if any(w in CHILDREN for w, _ in said) else CPS
+        cps = CPS_CHILD if any(w in cfg.get("children", CHILDREN) for w, _ in said) else CPS
         if said and span > 0 and n / span > cps:
             issues.append(f"{a}–{b} 秒 台詞 {n} 字／{span} 秒，超過 {cps} 字／秒")
         for who, _ in said:
