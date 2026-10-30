@@ -170,7 +170,13 @@
 - 跑 1 首、ASR 檢查（轉不出文字，只回 `<|7.55|>` 之類的時間戳＝乾淨）→ 給使用者聽；有人聲再換 seed。選定的存成 `music/bgm.wav`
 
 ### 8. 合成 → `python3 mux.py <篇目>`
-- H3 原生音軌**全部靜音**（它會自己編出非中文的說話聲）
+- H3 原生音軌**不直接用**（它會照 `<d>` 唸台詞、自己編說話聲）
+- **實驗音效（《聲音》起）**：TTS 做不出鼓聲、敲桌、撥橡皮筋。H3 原生音軌裡的音效是和畫面一起生成的，時間點本來就對齊，所以用 Demucs 去掉人聲後保留：
+  1. Spark 上 `ffmpeg -i out/SXX.mp4 -vn -ar 44100 sfx/SXX_h3.wav`
+  2. 在 pytorch 容器跑 `sfx_sep.py`（指令見檔頭）→ `sfx/SXX_novocals.wav`；12 段約 1 分鐘
+  3. `mux.py` 偵測到 `sfx/SXX_novocals.wav` 就用它當底（`SFX_VOLUME` 0.6），沒有就照舊靜音
+  - 先挑幾段疊回影片給使用者試聽再全片套用；《聲音》使用者直接試聽，沒跑 ASR
+  - Demucs 裝法的坑：pip 不加 `--no-deps` 會重抓幾 GB 的 torch；4.1 版要 `sphn`，ARM 沒有 wheel；4.0.1 要 torchaudio，容器沒有 → 自己寫腳本呼叫 `apply_model`，給 openunmix 一個空的 torchaudio 模組
 - 每句台詞先量響度、統一到 −20 LUFS（`LINE_LUFS`）再混音，避免某個角色偏小聲
 - 台詞放在分鏡起秒；前句沒講完就順延，講不完用 atempo 加速（一般上限 1.35，段尾最後一句上限 1.5）
 - 時段太緊的句子，優先在 `lines.json` 把起秒提前到沒有人說話的空檔，而不是硬加速
