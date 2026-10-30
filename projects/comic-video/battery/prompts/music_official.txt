@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Bright Japanese children's anime style. A static wide shot of a sunny green meadow under a blue sky with a few soft white clouds. Grass sways gently in a light breeze and the clouds drift slowly. No people, animals or objects appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A soft breeze rustles the grass, with faint distant birdsong.
+
+non_diegetic_music: A bright, curious instrumental piece led by glockenspiel and plucked ukulele over soft piano chords, with light shaker and woodblock keeping a bouncy beat, at a moderate tempo and soft, even dynamics.

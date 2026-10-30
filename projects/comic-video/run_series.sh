@@ -2,7 +2,7 @@
 # 在 Spark 上依 <篇目>/config.json 的 shots 依序生成各段（672×384），已有的段會跳過；失敗就停。
 # shots 第三欄是首幀來源：- ＝t2va；圖檔路徑（如 frames/S01.png）＝用該圖；段名＝續接該段末幀。
 # 有 frames/<段>_end.png 就當尾幀（官方 FL2VA，首尾幀）。
-# 用法：bash run_series.sh <篇目> [起始段，例如 S05]
+# 用法：bash run_series.sh <篇目> [起始段，例如 S05]；環境變數 ONLY=S05 只跑那一段（pipeline.sh 逐段重試用）
 # Spark 目錄：~/h3-bench/comic-video/（本目錄的腳本＋bench.py）、~/h3-bench/comic-video/<篇目>/
 set -u
 ROOT=$(cd "$(dirname "$0")" && pwd)
@@ -19,6 +19,7 @@ while [ $# -gt 0 ]; do
   sid=$1 dur=$2 src=$3; shift 3
   [ "$sid" = "$START" ] && started=1
   [ $started = 1 ] || continue
+  [ -n "${ONLY:-}" ] && [ "$sid" != "$ONLY" ] && continue
   [ -f "out/$sid.mp4" ] && { echo "$sid 已存在，跳過"; continue; }
   mkdir -p "run/$sid" out
   cp "prompts/$sid.txt" "run/$sid/prompt.txt"
@@ -49,9 +50,10 @@ while [ $# -gt 0 ]; do
   if [ $rc = 0 ] && [ -f "run/$sid/output.mp4" ]; then
     cp "run/$sid/output.mp4" "out/$sid.mp4"; echo "$(date -Is) $sid 完成"
   else
-    echo "$(date -Is) $sid 失敗 rc=$rc"; break
+    echo "$(date -Is) $sid 失敗 rc=$rc"; FAILED=1; break
   fi
   sleep 60  # 冷卻
 done
 kill $MEMPID
 echo "$(date -Is) 系列結束"
+exit ${FAILED:-0}

@@ -41,7 +41,8 @@
 | VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑） | 角色配音 |
 | Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`） | 生成首幀 |
 | MiniMax H3 | Spark `~/h3-bench`（docker image `h3-bench`） | 生成影片／配樂 |
-| Breeze ASR（常駐） | Jetson `100.108.74.45:8013`，SSH 帳號 `nvidia` | 核對 TTS 有沒有唸對 |
+| Breeze ASR（**預設**，按需） | Spark `~/breeze-asr-hub`（whisper.cpp CUDA＋`ggml-breeze-asr-26.bin`），由 `asr_spark.sh` 啟動 | 核對 TTS 有沒有唸對 |
+| Breeze ASR（備援，常駐） | Xavier `100.108.74.45:8013`，SSH 帳號 `nvidia` | Spark 資源檢查不通過時自動改用 |
 
 ### 環境與工具清單（2026-10-30 盤點）
 
@@ -56,7 +57,9 @@
 | Spark 快取 | `~/.cache/torch/hub`（81 MB，htdemucs 權重） | 手動試跑時下載；映像檔裡已另有一份，可刪 |
 | Spark 殘留 | `~/.cache/demucs-pip`（7.9 MB）、`comic-video/sound/sfx/stub/` | 第一次試裝的殘留，root 擁有，要 `sudo rm` 才能刪；不影響流程 |
 | Spark venv | `~/dgx-voxcpm-eval/.venv` | VoxCPM2 TTS |
-| Jetson | Breeze ASR（常駐 :8013） | 配音核對 |
+| Spark 主機 | `~/breeze-asr-hub`（whisper-cli CUDA，Breeze-25/26 模型） | `asr_spark.sh` 按需轉寫，不常駐 |
+| Jetson | Breeze ASR（常駐 :8013） | 配音核對備援 |
+| Spark 腳本 | `pipeline.sh`（2026-10-30 新增） | 離線排隊：H3＋配樂＋sfx／對嘴／mux 一次跑完 |
 | 本機 Windows | Python 3.12＋Pillow | `draft_storyboard.py`、`check_*.py`、`expand.py`、`tts.py`、`asr_check.py`、`qwen_frame.py`、`review.py`、切圖 |
 | 本機 Windows | **沒有 ffmpeg** | 影音處理一律在 Spark 做，成品用 scp 拉回 |
 
@@ -89,6 +92,7 @@
 - **每一列都要有動作，包括第一列**：《彩虹》S05 第一列只寫「小明站著望向彩虹」，8002 就寫成 "his posture still"，被檢查程式抓到
 - **寫明畫面裡有誰**：角色少於該格原圖時，在分鏡列裡寫「（畫面只有小明）」「（畫面沒有人物）」，否則 8002 會照圖把其他角色加進來
 - **說台詞的時段寫成口型＋肢體動作**：配音用 TTS（各段音色一致），畫面讓說話的角色嘴巴開合、配手勢表情，大致對上 TTS 台詞的時段；旁白時段角色不開口（2026-10-29 起，《密度》S08 開始套用）
+- **畫面上有角色的段，台詞全給那個角色講，旁白只留給沒有角色的段**（2026-10-30《電池》使用者回饋）：畫面只有小宇，卻一下小宇、一下大人旁白，聽起來像同一個人換聲音。寫 panel_notes 時就要把解說句分給畫面上的角色；兒童角色每秒 3.5 字以內，句子要縮短。《電池》第一版是做完 H3 才發現，使用者選擇只換配音、不重跑 H3（舊影片在原旁白時段角色嘴巴閉著）；所以這條要在寫 panel_notes 時就決定
 
 #### 試驗：8002 直接寫分鏡（`python draft_storyboard.py <篇目>` → `storyboard_8002.md`）
 目標是讓 8002 逐步接手人工分鏡、人只在旁檢查。《彩虹》第一次試（2026-10-29，7 格一次送、規則摘自本節，約 22 秒）：**格式正確，內容還不能用**
@@ -128,6 +132,12 @@
 - 一格拆多段時，`panel_cast` 是整格角色，「角色比原圖少」會誤報在沒有那個角色的段落，要人看
 - 判斷：分鏡改為「人寫備註 → 8002 逐格初稿 → 檢查程式 → 人工修（多為機械修改）」；人的工作從寫分鏡變成看圖寫備註
 
+**《電池＋燈泡》（2026-10-30，第六次，`battery/storyboard_8002_review.md`）**：9 格（header、panel-01～04、recap、formula、analogy、footer 都當格）→ 12 段
+- 主角不是系列角色（擬人化電池、燈泡、電荷小朋友＋主持人小宇）：config 加 `children`（童聲語速 3.5 字／秒的角色），`check_storyboard.py`、`draft_storyboard.py` 改讀這欄，沒有就照舊用小明、小美
+- footer 有小提醒（科學更正＋要加的安全句）時，當最後一格（改名 `panel-09`），不只當 `tagline`
+- 段數、場景、角色、安全句都照備註；沒有加戲。違規續接 2 處（同《四季》）
+- **備註的台詞要先算好語速**：這篇每段知識點多，備註台詞超量，8002 壓語速時直接刪掉科學重點（S11「導線裡本來就有電荷」、S08 四句變成看不懂的縮寫），人工修改量比《四季》多。寫備註時按 4 字／秒（童聲 3.5）算，12 秒旁白最多約 45 字，寫不下就在備註多拆一段
+
 ### 3. 擴寫（8002）→ `python expand.py <篇目>` → `prompts/SXX.txt`
 - 風格、角色外觀、不放字規則寫在 `config.json`（`style`、`characters`、`no_text_rule`），system prompt 其餘部分全篇共用
 - **`style`／`style_en` 只寫畫風、色調、光線，不寫場景道具**：《彩虹》把「戶外木桌」寫進 `style_en`，8002 就把木桌塞進微距水滴、山坡、草地噴水等每一段。場景寫在各段分鏡裡（《密度》每段都在木桌旁，所以當時沒出事）
@@ -157,7 +167,12 @@
    - 台灣腔的參考音，ASR 容易聽錯（質量→資料），要人工試聽判斷，不能只看 ASR
 3. 選定的音檔存成 `audio/ref_<角色>.wav`
 4. 每句台詞用參考音克隆。**用 prompt 模式**（`clone_mode=prompt`＋`prompt_text`＝參考音的逐字稿）；reference 模式在短句、並列詞上容易唸出非中文
-5. **ASR 核對**：`python asr_check.py <篇目>` 逐句轉寫，和原文比對。壞句每句重配 3 個版本，ASR 篩過後給使用者挑
+5. **ASR 核對**：`python asr_check.py <篇目>` 逐句轉寫，和原文比對。
+   - 預設在 Spark 按需跑（2026-10-30 起）：整批 tar 經 ssh 送 `~/h3-bench/comic-video/asr_spark.sh`，whisper-cli 一次載入模型、轉完就結束。啟動前檢查：H3 容器在跑、已有 whisper-cli、可用記憶體 < 8 GB（`ASR_MIN_FREE_GB`）任一成立就不跑，自動改用 Xavier :8013；TTS／ComfyUI 開著只提示
+   - 實測（《電池》48 句，同一顆 Breeze-26，模型 md5 相同）：Spark 59 秒、Xavier 576 秒，結果 46/48 逐字相同，其餘只差空格與同音字；`asr_check.py` 整批 51 句含傳輸 18.5 秒
+   - `ASR_HOST=xavier` 強制用 Xavier
+   - 改了 `asr_spark.sh` 要 scp 到 Spark 的 `~/h3-bench/comic-video/`
+   - 壞句每句重配 3 個版本，ASR 篩過後給使用者挑
 6. 判讀 ASR：
    - **漏字也算壞句**：S05「長大後，牠找到…」ASR 只轉出「他找到…」，前三個字其實唸成了日文，第一次核對時被當成 ASR 誤差放過
    - ASR 會認錯同音字（卵→段落、蛹→勇），這種代表發音正確；轉成不同音的字（蛹→有）才是可疑
@@ -174,6 +189,10 @@
 - **角色立繪**（《聲音》起）：先做 `frame_prompts/chars.txt`（純色草地背景、全員並排全身、手上沒道具）→ `frames/chars.png`，之後各段的角色參考都用它。用前一篇的場景首幀當參考做立繪時，3 個 seed 有 1 個整張照抄原場景（《彩虹》S01 的彩虹天空），另 2 個是乾淨立繪但畫風較扁平；挑有完整服裝細節（林博士綠領帶）的那張
   - 立繪本身也會被照抄：12 段裡有 6 段至少一個 seed 把整排立繪角色貼進來（純色背景、多出林博士、兩隻阿柴）。**只有路人、沒有系列角色的段落（《聲音》S04）不要給立繪**，只給原圖，並寫明「沒有戴帽子、沒有背包、沒有狗、沒有老人」
 - **《四季》起**：立繪只畫這篇會出場的角色（只有小明、小美），用前一篇的 `chars.png` 當參考，3 個 seed 都乾淨；照抄立繪的段落從《聲音》的 6/12 降到 3/12（S01、S03、S05 各一個 seed，多出另一個角色）
+- **《電池》起：每個角色一張獨立立繪**（`frame_prompts/char_<角色>.txt` → `frames/char_<角色>.png`），各段首幀只給該段出場角色的立繪，避免整排立繪被照抄、多出角色。先試的全員一張 `chars` 有兩個問題：人類小孩被畫成和擬人化電池一樣的細線腳（要寫明「正常比例的人類小孩、長褲、運動鞋」）；一張 seed 在電池上畫了「+」號
+  - **角色立繪一律用純白素色背景**（沒有地面、草地、天空）：草地背景的立繪會被照抄到首幀的地面，室內桌面、地板變成泥土加草叢紋理，prompt 寫「不要照抄背景」「木頭桌面」也擋不住。用草地版立繪當參考重畫白底版時，seed1 仍帶草叢（qwen_frame.py 的 seed1 特別容易照抄參考圖），選 seed2、seed3
+    - 白底立繪的副作用：室內段桌面、地板都正常了，但**戶外／卡通段的背景也跟著變成一片白**（草地世界消失，seed2 還有雜訊點）。卡通段的 prompt 要把場景寫具體（草地、天空、遠山），或卡通段沿用場景版參考；《電池》卡通段沿用草地版立繪做的首幀，室內段用白底版
+  - 首幀結果（12 段，草地版立繪）：沒有一張多出角色（《聲音》6/12、《四季》3/12）；但實景室內段（S01、S04、S08、S12）seed1 都把立繪的草地紋理照抄成泥土地板 → 室內段 prompt 要寫明「木地板／木頭桌面」，並排除這類 seed
 - **原圖有擬人化星球（有臉）時，太空、風景段不給任何參考圖**，只靠文字 prompt＋「寫實的地球與太陽，沒有臉」：7 段 21 張只有 1 張太陽隱約像有五官；`qwen_frame.py` 參考圖可以是零張
 - 首幀常把「還沒開始的動作」畫成已完成（《四季》S08 寫手電筒還沒開，3 張都已亮著）：改分鏡 0 秒去配合首幀，比重做快
 - 挑 seed 時特別看時間軸衝突：動作的結果不能已經在首幀出現（木塊已浮在水裡、油層已倒好）
@@ -194,7 +213,11 @@
 '` 指令找不到；`comic-video/.gitattributes` 已固定 `.sh` 為 LF，啟動前仍先 `bash -n` 檢查語法
 - Spark 上的目錄比照 repo：`~/h3-bench/comic-video/`（共用腳本＋`bench.py`）、`~/h3-bench/comic-video/<篇目>/`。《密度》已搬到新位置（第一批 11 段是重整前用舊腳本跑的）；《蝴蝶》還在 `~/h3-bench/butterfly/`
 - 重跑某段：把舊檔移到 `out/archive/<段>_v1.mp4`、`run/<段>_v1/`，更新 prompt／首幀／`config.json` 後 `bash run_series.sh <篇目> <段>`（其他已存在的段會跳過）
-- `run_series.sh`：整批依序跑，已有的段會跳過；失敗就停
+- `run_series.sh`：整批依序跑，已有的段會跳過；失敗就停（exit 1）。環境變數 `ONLY=S05` 只跑那一段
+- **離線排隊（《電池》起）**：`pipeline.sh <篇目>` 在 Spark 上一次跑完 H3 與後處理，本機可以關機。素材（config、storyboard、prompts、`frames/SXX.png`、`audio/` 台詞與 `lines.json`）先 tar 經 ssh 傳上去，再 `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（一定要 `< /dev/null`，否則 ssh 掛住不回來）
+  - 流程：互斥檢查（停 Qwen／TTS，H3 或 Demucs 在跑就 ABORT）→ music1（`asr_spark.sh` 檢查人聲，自動設成 `bgm.wav`）→ 各段 `ONLY=SXX run_series.sh`，失敗重試 1 次、仍失敗就跳過（失敗的 run 目錄改名 `SXX_fail1`）→ `out/` 複製到 `video/` → `sfx.sh` → `lipsync_measure.py` → `mux.py` 出 `mixed/` 試聽版；不做全片、字幕、分享版
+  - 進度看 `<篇目>/pipeline.status`（每階段一行，最後一行 `DONE` 或 `ABORT`）；細節在 `series.log`、`post.log`
+  - 跑完不重開其他服務、不推播；使用者回來後由 Claude 讀 status 接續
 - 在 Spark 上排隊等前一批跑完：`pgrep -f`／`pkill -f` 會比對到自己所在的 `bash -c` 或 ssh 指令（字串裡就有那個關鍵字），等待迴圈永遠不結束、或把自己的 ssh 砍掉。關鍵字寫成 `"[r]un_series.sh rainbow"` 這種形式避開；本機監看用 `timeout` 包住每次 ssh，長時間工作一律在 Spark 上 `setsid nohup … &` 啟動
 - `run_jobs.sh`：單獨重跑指定段或其他工作，格式 `名稱 prompt檔 seed 秒數 首幀|-`
 - 每段完成後抽幾格檢查（接縫、文字、角色外觀）
@@ -287,7 +310,7 @@ non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫
 |---|---|
 | 8002 擴寫 10 段 | 約 3 分鐘 |
 | TTS 25 句＋5 個參考音 | 約 3 分鐘 |
-| ASR 25 句 | 約 6 分鐘 |
+| ASR 25 句 | Xavier 約 6 分鐘；Spark 按需約 15 秒 |
 | H3 10 段（672×384） | 約 55 分鐘 |
 | Qwen-Image 首幀 3 張（turbo int8） | 約 1 分鐘（《密度》7 段×3 張約 10 分鐘，首張含載入約 1 分鐘） |
 | 合成＋壓字幕 | 約 2 分鐘 |

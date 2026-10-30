@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Bright Japanese children's science anime style with saturated colors and soft lighting; a wide shot inside a transparent cylindrical wire showing a line of Charge Kids running left to right. At 00:00.000, Charge Kids run in a line inside the tube, their small arms and legs moving in rhythm as they pass the camera. Charge Kids (S1) says, <d>[Chinese] 哇！好多人！我們每秒通過這裡！</d> At 00:04.000, Camera pushes in on the Charge Kids as they wave their tiny hands and smile, their blue bodies gleaming. A narrator says in an off-screen voiceover, <d>[Chinese] 電流是每秒通過的電荷量，</d> The on-screen characters' lips remain closed. At 00:08.000, Camera pulls back to reveal a crowded tube as Charge Kids run faster and pack tighter, their expressions showing excitement. A narrator says in an off-screen voiceover, <d>[Chinese] 單位是安培。電流越大，流過的電荷越多。</d> The on-screen characters' lips remain closed. The tube is packed with Charge Kids running in a dense, energetic stream.
+
+overall_soundscape: A continuous light rustling of tiny feet on the tube floor, a soft humming breeze, and faint rhythmic clacking.
+
+non_diegetic_music: N/A
