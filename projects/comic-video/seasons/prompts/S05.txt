@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene featuring Xiao Mei standing on a vibrant green hill under a soft blue sky, bathed in warm sunlight. She is positioned in the center-left, looking up towards the upper right, ready to demonstrate the concept of the Earth's tilt. At 00:00.000, Xiao Mei stands with her back to the sun, pointing her right index finger sharply upward with a focused expression; the camera remains steady in a medium shot. Xiao Mei (S1) says, <d>[Chinese] 地球一邊繞太陽，一邊保持傾斜，</d> At 00:04.000, Xiao Mei brings both hands together to form a large circle in front of her chest, then abruptly tilts her entire body to the side to demonstrate an angle; the camera holds the medium shot. Xiao Mei (S1) says, <d>[Chinese] 所以不同時間、不同地區，</d> At 00:08.000, Xiao Mei spins in a circle with arms wide open as the sunlight intensifies and sparkles across the grass; the camera slowly pushes in closer to her. Xiao Mei (S1) says, <d>[Chinese] 會接收到不同的陽光！</d> A close-up of Xiao Mei smiling with a sparkling background of bright sunlight.
+
+overall_soundscape: A gentle summer breeze rustling through the tall grass, accompanied by the soft chirping of distant birds and the crisp sound of Xiao Mei's sneakers shifting on the ground.
+
+non_diegetic_music: N/A

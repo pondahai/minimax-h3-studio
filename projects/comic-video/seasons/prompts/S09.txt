@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a cozy, dimly lit study bathed in warm, saturated Japanese children's anime colors, Xiao Ming sits at a wooden desk, illuminating a globe with a flashlight. The scene is composed with the boy on the left and the globe on the right, framed by soft shadows and a gentle glow. At 00:00.000, The camera holds a medium shot as Xiao Ming lowers his flashlight, angling the beam so the light pool on the globe stretches and fades while Xiao Ming’s mouth moves with an excited expression. Xiao Ming (S1) says, <d>[Chinese] 光線斜斜照，</d> At 00:04.000, The camera cuts to a close-up as Xiao Ming tilts the flashlight left and right, watching the light slide across the globe; his expression shifts to a thoughtful frown as he concentrates. Xiao Ming (S1) says, <d>[Chinese] 分散到更大的面積，</d> At 00:08.000, Returning to a medium shot, Xiao Ming smiles and nods, rapidly switching the flashlight between a direct and angled angle, causing the light spot on the globe to pulse from small to large. Xiao Ming (S1) says, <d>[Chinese] 比較不容易變熱！</d>
+
+overall_soundscape: The rhythmic clicking of the flashlight switch, the soft rustle of Xiao Ming's vest, and a faint hum of ambient room quietness.
+
+non_diegetic_music: N/A

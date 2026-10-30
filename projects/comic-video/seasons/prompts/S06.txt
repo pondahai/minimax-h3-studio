@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A vibrant summer park scene rendered in bright Japanese children's science anime style with saturated greens and blues under a blazing noon sun. The composition features a symmetrical avenue of lush trees framing a glowing green lawn, with no characters present in the opening shot. At 00:00.000, Sunlight floods the center of the frame, casting short, sharp shadows directly beneath the trees while the grass glows with intense heat. A narrator says in an off-screen voiceover, <d>[Chinese] 夏天，北半球朝向太陽，</d> The on-screen characters' lips remain closed. At 00:04.000, The camera slowly tilts upward to follow the sun's position, revealing shimmering heat waves distorting the air above the bright, saturated ground. A narrator says in an off-screen voiceover, <d>[Chinese] 太陽升得高，光線比較直接，</d> The on-screen characters' lips remain closed. At 00:08.000, Time accelerates as the sky shifts to a deeper azure, and the tree shadows stretch dramatically across the grass toward the foreground. A narrator says in an off-screen voiceover, <d>[Chinese] 白天比較長，接收的能量多，所以比較熱。</d> The on-screen characters' lips remain closed. The sun sits lower in the sky, casting long, distinct shadows across the lawn as the light turns golden.
+
+overall_soundscape: A continuous, rhythmic rustling of leaves in a warm breeze, punctuated by the faint chirping of cicadas and the crackle of dry grass.
+
+non_diegetic_music: N/A

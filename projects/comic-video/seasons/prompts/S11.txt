@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime style, featuring saturated colors and soft sunlight against a deep black space background. The scene is a wide shot of the realistic sun glowing on the left and the Earth rotating on the right, with no characters present. At 00:00.000, The Earth slowly drifts along its orbit while the sun pulses with a warm, golden glow, establishing the vast scale of the cosmos. A narrator says in an off-screen voiceover, <d>[Chinese] 夏天是因為離太陽比較近嗎？</d> The on-screen characters' lips remain closed. At 00:04.000, The camera pans smoothly from the sun to the Earth, causing the planet to rotate on its axis as the lighting shifts from the sun's glare to the Earth's shadow. A narrator says in an off-screen voiceover, <d>[Chinese] 不是！一年中距離只差約百分之三。</d> The on-screen characters' lips remain closed. At 00:08.000, The Earth moves closer to the sun, tilting to show the North Hemisphere in a softer, darker light, emphasizing the distance change. A narrator says in an off-screen voiceover, <d>[Chinese] 北半球冬天時，地球反而比較近。</d> The on-screen characters' lips remain closed. The Earth is positioned closer to the sun, casting the northern hemisphere into a distinct, darker shade.
+
+overall_soundscape: A low, resonant cosmic hum fills the space, punctuated by the rhythmic, soft rustle of solar wind and the faint, distant crackle of energy.
+
+non_diegetic_music: N/A

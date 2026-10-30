@@ -121,17 +121,17 @@
   ]
  ],
  "panels": {
-  "S01": "panel-01",
-  "S02": "panel-02a",
-  "S03": "panel-02b",
-  "S04": "panel-03a",
-  "S05": "panel-03b",
-  "S06": "panel-04a",
-  "S07": "panel-04b",
-  "S08": "panel-05a",
-  "S09": "panel-05b",
-  "S10": "panel-06",
-  "S11": "panel-07a",
-  "S12": "panel-07b"
+  "S01": "frame-S01",
+  "S02": "frame-S02",
+  "S03": "frame-S03",
+  "S04": "frame-S04",
+  "S05": "frame-S05",
+  "S06": "frame-S06",
+  "S07": "frame-S07",
+  "S08": "frame-S08",
+  "S09": "frame-S09",
+  "S10": "frame-S10",
+  "S11": "frame-S11",
+  "S12": "frame-S12"
  }
 }

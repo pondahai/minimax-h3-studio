@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in deep space, featuring a realistic Sun glowing in the center and Earth orbiting on the left with saturated blues and oranges. The composition focuses on the celestial bodies, establishing the vastness of the solar system. At 00:00.000, A wide shot captures the glowing orange Sun and the blue-green Earth, which slowly drifts from the left side toward the center, bathed in soft sunlight. A narrator says in an off-screen voiceover, <d>[Chinese] 地球繞著太陽轉一圈，</d> The on-screen characters' lips remain closed. At 00:04.000, Earth continues its orbit, sliding directly in front of the Sun with its tilted axis clearly visible, while the camera maintains a steady wide angle. A narrator says in an off-screen voiceover, <d>[Chinese] 大約要三百六十五天，</d> The on-screen characters' lips remain closed. At 00:08.000, Earth moves to the right side of the Sun, and the camera slowly pushes in closer to the planet, highlighting the rotation of the globe. A narrator says in an off-screen voiceover, <d>[Chinese] 也就是一年，地軸一直斜向同一邊。</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: A low, resonant hum of solar wind and a gentle, rhythmic whooshing as the planet rotates in the vacuum.
+
+non_diegetic_music: N/A

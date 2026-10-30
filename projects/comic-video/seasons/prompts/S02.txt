@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in space, featuring a realistic Earth and Sun with saturated colors and soft sunlight. The composition centers on the rotating Earth, with the Sun glowing on the right and stars scattered in the dark background. At 00:00.000, The camera holds a wide shot of the Earth rotating slowly in space, its axis visibly tilted to one side. A narrator says in an off-screen voiceover, <d>[Chinese] 地球不是直直站著，</d> The on-screen characters' lips remain closed. At 00:04.000, The camera performs a smooth orbit around the Earth, revealing the clear angle of the tilted axis as the planet continues to spin. A narrator says in an off-screen voiceover, <d>[Chinese] 而是稍微傾斜，大約二十三點五度。</d> The on-screen characters' lips remain closed. At 00:08.000, The camera pulls back slightly to show the Earth moving forward while maintaining its consistent tilted orientation. A narrator says in an off-screen voiceover, <d>[Chinese] 繞太陽時，傾斜的方向大致不變。</d> The on-screen characters' lips remain closed. The camera settles on a wide shot of the Earth moving through space with its axis remaining tilted.
+
+overall_soundscape: A low, ethereal hum of the vacuum of space, punctuated by the soft, rhythmic creaking of the Earth's rotation and the distant crackle of solar wind.
+
+non_diegetic_music: N/A

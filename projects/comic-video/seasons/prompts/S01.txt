@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene rendered in saturated colors with soft sunlight. Xiao Ming, a boy with a khaki explorer hat and green vest, stands alone in a lush green field under a deep blue night sky, pointing upwards in an expressive composition. At 00:00.000, Xiao Ming stands in a medium shot, looking up at the starry sky with a bright smile and pointing his right index finger toward the heavens. Xiao Ming (S1) says, <d>[Chinese] 為什麼有時候很熱，有時候很冷？</d> At 00:04.000, Xiao Ming turns his body to face the camera, shrugging with both hands out and tilting his head to the side with a puzzled expression while speaking. Xiao Ming (S1) says, <d>[Chinese] 為什麼會有春夏秋冬呢？</d> At 00:08.000, The camera slowly pulls back to a wider shot showing the full expanse of the starry sky and rolling hills, while Xiao Ming cranes his neck to gaze upward. A narrator says in an off-screen voiceover, <d>[Chinese] 秘密就藏在地球的大擺動裡！</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: A gentle breeze rustles the tall grass, the soft chirping of crickets fills the air, and a faint sound of wind blowing across the open field.
+
+non_diegetic_music: N/A
