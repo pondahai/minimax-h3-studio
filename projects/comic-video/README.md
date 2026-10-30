@@ -128,7 +128,7 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 | `tts.py <篇目> [角色...]` | 逐句配音 → `audio/`、`audio/lines.json`；帶角色只重配那些角色 | 本機 |
 | `asr_check.py <篇目> [wav...]` | Breeze ASR 轉寫配音、和原文比對 | 本機 |
 | `qwen_frame.py <篇目> <名稱> <seed數> <參考圖...>` | `frame_prompts/<名稱>.txt` → `frames/<名稱>_seedN.png` | 本機 |
-| `review.py <篇目>` | 分鏡審查頁 `review.html`（首幀候選＋時間軸＋台詞） | 本機 |
+| `review.py <篇目>` | 分鏡審查頁 `review.html`（首幀候選＋時間軸＋台詞；圖片內嵌，單檔可傳） | 本機 |
 | `run_series.sh <篇目> [起始段]` | 依 `shots` 依序生成全部分段；有 `frames/<段>_end.png` 就加尾幀（首尾幀） | Spark |
 | `run_jobs.sh <篇目> "<工作>"...` | 單獨重跑指定段或配樂 | Spark |
 | `sfx.sh <篇目> [段...]` | H3 跑完後去掉原生音軌的人聲、留下同步音效 → `sfx/SXX_novocals.wav`，列出各段音效響度（映像檔 `Dockerfile.sfx`，裡面跑 `sfx_sep.py`） | Spark |
