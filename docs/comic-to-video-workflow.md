@@ -41,7 +41,8 @@
 | VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑） | 角色配音 |
 | Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`） | 生成首幀 |
 | MiniMax H3 | Spark `~/h3-bench`（docker image `h3-bench`） | 生成影片／配樂 |
-| Breeze ASR（常駐） | Jetson `100.108.74.45:8013`，SSH 帳號 `nvidia` | 核對 TTS 有沒有唸對 |
+| Breeze ASR（**預設**，按需） | Spark `~/breeze-asr-hub`（whisper.cpp CUDA＋`ggml-breeze-asr-26.bin`），由 `asr_spark.sh` 啟動 | 核對 TTS 有沒有唸對 |
+| Breeze ASR（備援，常駐） | Xavier `100.108.74.45:8013`，SSH 帳號 `nvidia` | Spark 資源檢查不通過時自動改用 |
 
 ### 環境與工具清單（2026-10-30 盤點）
 
@@ -56,7 +57,8 @@
 | Spark 快取 | `~/.cache/torch/hub`（81 MB，htdemucs 權重） | 手動試跑時下載；映像檔裡已另有一份，可刪 |
 | Spark 殘留 | `~/.cache/demucs-pip`（7.9 MB）、`comic-video/sound/sfx/stub/` | 第一次試裝的殘留，root 擁有，要 `sudo rm` 才能刪；不影響流程 |
 | Spark venv | `~/dgx-voxcpm-eval/.venv` | VoxCPM2 TTS |
-| Jetson | Breeze ASR（常駐 :8013） | 配音核對 |
+| Spark 主機 | `~/breeze-asr-hub`（whisper-cli CUDA，Breeze-25/26 模型） | `asr_spark.sh` 按需轉寫，不常駐 |
+| Jetson | Breeze ASR（常駐 :8013） | 配音核對備援 |
 | 本機 Windows | Python 3.12＋Pillow | `draft_storyboard.py`、`check_*.py`、`expand.py`、`tts.py`、`asr_check.py`、`qwen_frame.py`、`review.py`、切圖 |
 | 本機 Windows | **沒有 ffmpeg** | 影音處理一律在 Spark 做，成品用 scp 拉回 |
 
@@ -163,7 +165,12 @@
    - 台灣腔的參考音，ASR 容易聽錯（質量→資料），要人工試聽判斷，不能只看 ASR
 3. 選定的音檔存成 `audio/ref_<角色>.wav`
 4. 每句台詞用參考音克隆。**用 prompt 模式**（`clone_mode=prompt`＋`prompt_text`＝參考音的逐字稿）；reference 模式在短句、並列詞上容易唸出非中文
-5. **ASR 核對**：`python asr_check.py <篇目>` 逐句轉寫，和原文比對。壞句每句重配 3 個版本，ASR 篩過後給使用者挑
+5. **ASR 核對**：`python asr_check.py <篇目>` 逐句轉寫，和原文比對。
+   - 預設在 Spark 按需跑（2026-10-30 起）：整批 tar 經 ssh 送 `~/h3-bench/comic-video/asr_spark.sh`，whisper-cli 一次載入模型、轉完就結束。啟動前檢查：H3 容器在跑、已有 whisper-cli、可用記憶體 < 8 GB（`ASR_MIN_FREE_GB`）任一成立就不跑，自動改用 Xavier :8013；TTS／ComfyUI 開著只提示
+   - 實測（《電池》48 句，同一顆 Breeze-26，模型 md5 相同）：Spark 59 秒、Xavier 576 秒，結果 46/48 逐字相同，其餘只差空格與同音字；`asr_check.py` 整批 51 句含傳輸 18.5 秒
+   - `ASR_HOST=xavier` 強制用 Xavier
+   - 改了 `asr_spark.sh` 要 scp 到 Spark 的 `~/h3-bench/comic-video/`
+   - 壞句每句重配 3 個版本，ASR 篩過後給使用者挑
 6. 判讀 ASR：
    - **漏字也算壞句**：S05「長大後，牠找到…」ASR 只轉出「他找到…」，前三個字其實唸成了日文，第一次核對時被當成 ASR 誤差放過
    - ASR 會認錯同音字（卵→段落、蛹→勇），這種代表發音正確；轉成不同音的字（蛹→有）才是可疑
@@ -293,7 +300,7 @@ non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫
 |---|---|
 | 8002 擴寫 10 段 | 約 3 分鐘 |
 | TTS 25 句＋5 個參考音 | 約 3 分鐘 |
-| ASR 25 句 | 約 6 分鐘 |
+| ASR 25 句 | Xavier 約 6 分鐘；Spark 按需約 15 秒 |
 | H3 10 段（672×384） | 約 55 分鐘 |
 | Qwen-Image 首幀 3 張（turbo int8） | 約 1 分鐘（《密度》7 段×3 張約 10 分鐘，首張含載入約 1 分鐘） |
 | 合成＋壓字幕 | 約 2 分鐘 |
