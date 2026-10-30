@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene with saturated colors and soft lighting. Captain Owl stands on the white wing of the anthropomorphic passenger jet Feifei against a blue sky, pointing to the wing while explaining aerodynamics. At 00:00.000, Captain Owl gestures with his wing towards the wing surface as a translucent white mist flows over the curved top and trails behind. The camera slowly pans along the wing. Captain Owl (S1) says, <d>[Chinese] 機翼往前飛，又微微仰起，</d> At 00:04.000, The mist flowing over the top of the wing accelerates into a blur, while a denser, thicker cloud of mist gathers beneath the wing surface. The camera slowly pushes in toward the wing. Captain Owl (S1) says, <d>[Chinese] 上方壓力變低，下方比較高，</d> At 00:08.000, The mist at the trailing edge of the wing flows sharply downwards, and the wing vibrates slightly under the pressure. Captain Owl makes a final emphatic gesture with his wing. Captain Owl (S1) says, <d>[Chinese] 空氣被往下推，就回推機翼！</d>
+
+overall_soundscape: A steady, gentle breeze whistling through the air, punctuated by the soft whooshing of air currents and a faint, rhythmic humming vibration from the wing.
+
+non_diegetic_music: N/A

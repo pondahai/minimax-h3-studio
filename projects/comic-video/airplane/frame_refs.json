@@ -1,0 +1,58 @@
+{
+ "S01": [
+  "frames/char_xiaoyu.png"
+ ],
+ "S01B": [
+  "frames/char_feifei.png"
+ ],
+ "S02": [
+  "frames/char_feifei.png"
+ ],
+ "S03": [
+  "frames/char_feifei.png"
+ ],
+ "S04": [
+  "frames/char_feifei.png"
+ ],
+ "S05": [
+  "frames/char_owl.png",
+  "frames/char_feifei.png"
+ ],
+ "S06": [
+  "frames/char_xiaoyu.png"
+ ],
+ "S06B": [
+  "frames/char_owl.png"
+ ],
+ "S07": [
+  "frames/char_feifei.png"
+ ],
+ "S08": [
+  "frames/char_feifei.png"
+ ],
+ "S09": [
+  "frames/char_owl.png"
+ ],
+ "S10": [
+  "frames/char_feifei.png"
+ ],
+ "S11": [
+  "frames/char_feifei.png"
+ ],
+ "S12": [
+  "frames/char_xiaoyu.png"
+ ],
+ "S12B": [
+  "frames/char_owl.png"
+ ],
+ "S13": [
+  "frames/char_feifei.png"
+ ],
+ "S14": [
+  "frames/char_xiaoyu.png"
+ ],
+ "S14B": [
+  "frames/char_owl.png",
+  "frames/char_feifei.png"
+ ]
+}

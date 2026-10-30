@@ -64,7 +64,7 @@ def lines(cfg, d):
     text = (d / "storyboard.md").read_text(encoding="utf-8")
     sid = None
     for row in text.splitlines():
-        if m := re.match(r"### (S\d+)", row):
+        if m := re.match(r"### (S\d+[A-Z]?)", row):
             sid = m.group(1)
         if sid and (m := re.match(r"^\| (\d+)–(\d+) \|.*\| (\S+?)：「(.+?)」 \|$", row)):
             start, end, who, said = int(m[1]), int(m[2]), m[3], m[4]

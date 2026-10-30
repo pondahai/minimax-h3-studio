@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene featuring Feifei, an anthropomorphic small white passenger jet with a blue tail fin and big eyes, standing on a sunny airport runway with a control tower in the background. The composition is a medium shot centered on the plane against a vibrant sky. At 00:00.000, Feifei stands stationary on the grey tarmac, tilting her head downward to inspect her large, heavy grey engines and landing gear, her expression turning slightly concerned as she looks at her weight. Feifei (S1) says, <d>[Chinese] 我這麼重，</d> At 00:04.000, Feifei lifts her head to gaze up at the bright blue sky, her large eyes widening with confusion and curiosity, while her mouth opens slightly as she speaks. Feifei (S1) says, <d>[Chinese] 怎麼飛得起來呢？</d> At 00:08.000, Feifei turns to face the camera, waving her white wings gently up and down with an enthusiastic and happy smile, her mouth moving animatedly as she speaks. Feifei (S1) says, <d>[Chinese] 一起找答案吧！</d>
+
+overall_soundscape: A warm summer breeze rustles the green grass in the foreground, accompanied by the distant, faint hum of a real airliner passing high in the sky.
+
+non_diegetic_music: N/A

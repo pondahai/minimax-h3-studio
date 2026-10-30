@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style, saturated green grass fills the foreground under a soft blue sky. Captain Owl, a round brown owl in a leather cap and goggles, stands center frame holding a plain white paper airplane. At 00:00.000, Captain Owl crouches low to the ground, using both wings to fold the tail fins of the white paper airplane upwards while speaking with a focused expression. Captain Owl (S1) says, <d>[Chinese] 尾巴往上折一點，</d> At 00:03.000, Captain Owl stands up, takes a step forward, and throws the paper airplane horizontally toward an open area, his wings extended in the follow-through motion. At 00:06.000, The plain white paper airplane tilts its nose upward, climbing higher into the air as it glides away from the camera. Captain Owl (S1) says, <d>[Chinese] 機頭抬起來了！</d> At 00:09.000, Captain Owl turns his body toward the lens and shakes his index finger side to side with a playful, admonishing expression. Captain Owl (S1) says, <d>[Chinese] 不要對人的臉和眼睛射！</d>
+
+overall_soundscape: A gentle summer breeze rustles the tall grass. The soft rustle of paper folds and the faint swoosh of the airplane cutting through the air.
+
+non_diegetic_music: N/A

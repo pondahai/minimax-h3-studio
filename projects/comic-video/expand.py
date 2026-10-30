@@ -96,9 +96,9 @@ def assemble(cfg, sid, block, parts):
 
 def shots(d):
     text = (d / "storyboard.md").read_text(encoding="utf-8")
-    for block in re.split(r"\n(?=### S\d+)", text)[1:]:
+    for block in re.split(r"\n(?=### S\d+[A-Z]?)", text)[1:]:
         block = block.split("\n**總長")[0].strip()
-        yield re.match(r"### (S\d+)", block).group(1), block
+        yield re.match(r"### (S\d+[A-Z]?)", block).group(1), block
 
 
 def expand(cfg, sid, block, tries=3):

@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene in a sun-drenched park with saturated green grass and soft lighting. Xiao Yu, a boy in a blue hoodie, is the sole character, positioned centrally with a plain white paper airplane on the ground before him. At 00:00.000, Xiao Yu crouches down to pick up the paper airplane, his body rising as he turns his head to track a real airliner flying across the sky, his eyes widening with focus. Xiao Yu (S1) says, <d>[Chinese] 玩紙飛機要在空曠地方，</d> At 00:04.000, Xiao Yu stands upright and waves his hand dismissively while pointing a finger toward the flat grass beside him, his mouth moving animatedly as he explains. Xiao Yu (S1) says, <d>[Chinese] 不要爬到高處丟喔！</d> At 00:08.000, Xiao Yu raises the paper airplane high toward the sky, beaming with a confident smile as the wind catches the paper and the camera tilts upward. Xiao Yu (S1) says, <d>[Chinese] 飛機不是魔法，是科學！</d>
+
+overall_soundscape: Soft grass rustling in the breeze, the distant hum of a jet engine passing overhead, and the crisp snap of paper catching the breeze.
+
+non_diegetic_music: N/A

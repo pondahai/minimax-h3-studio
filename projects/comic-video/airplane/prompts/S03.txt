@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene with saturated colors and soft lighting, featuring the anthropomorphic small white passenger jet Feifei flying alone in a clear blue sky above fluffy white clouds. At 00:00.000, Feifei glides smoothly above the clouds with a happy expression, his grey engines and white wings vibrating slightly as if maintaining steady flight. Feifei (S1) says, <d>[Chinese] 我同時受到四種力！</d> At 00:04.000, An invisible upward force gently lifts Feifei, causing his white wings to visibly bend upwards at the tips as he looks surprised and excited. Feifei (S1) says, <d>[Chinese] 機翼把我往上抬，是升力，</d> At 00:08.000, Feifei's white body dips downward slightly under gravity's pull before he rights himself, his big eyes widening and his mouth forming words as he speaks. Feifei (S1) says, <d>[Chinese] 地球把我往下拉，是重量。</d> Feifei stabilizes in the air with a determined expression after correcting his dip.
+
+overall_soundscape: A light breeze rustles through the clouds, the engines hum with a steady rhythmic vibration, and the air crackles with a faint magical energy as the invisible forces interact.
+
+non_diegetic_music: N/A

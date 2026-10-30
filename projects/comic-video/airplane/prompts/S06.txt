@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a sunlit living room with warm wood tones and soft lighting. Xiao Yu stands in the center, holding a plain white paper strip, surrounded by a cozy sofa and window. At 00:00.000, Xiao Yu holds a plain white paper strip vertically against his lower lip with both hands, nodding as he lifts the strip into place, ready to blow. Xiao Yu (S1) says, <d>[Chinese] 拿一張紙條，</d> At 00:03.000, Xiao Yu leans forward and blows hard at the top of the paper strip, causing the white paper to lift and float upwards while his cheeks puff out. At 00:06.000, Xiao Yu stops blowing and the paper strip drops back down and hangs from his hand, then he points a finger at the hanging paper with a cheerful expression. Xiao Yu (S1) says, <d>[Chinese] 剛剛紙條往上飄！</d> At 00:09.000, Xiao Yu uses his hand to trace a swooping downward arc in the air, illustrating the path of the airflow with a serious and explanatory expression. Xiao Yu (S1) says, <d>[Chinese] 氣流轉彎，上面壓力變低！</d>
+
+overall_soundscape: A gentle breeze rustles the curtains near the window, while the soft creak of the sofa cushions is heard as Xiao Yu shifts his weight.
+
+non_diegetic_music: N/A

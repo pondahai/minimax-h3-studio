@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A vibrant Japanese children's science anime scene featuring Feifei, an anthropomorphic small white passenger jet with a blue tail fin and two grey engines, flying solo against a bright blue sky over a green airport runway. The composition is dynamic, focusing on the aircraft's descent towards the tarmac. At 00:00.000, Feifei drifts downward in a wide shot, the grey engines visibly shrinking and dimming in intensity as she reduces thrust, her big eyes looking focused and calm. Feifei (S1) says, <d>[Chinese] 降落時，引擎減少推力，</d> At 00:04.000, Feifei's left wing fills the frame in a close-up, the grey flaps on the trailing edge smoothly extending downwards, her expression turning determined as she adjusts for slower flight. Feifei (S1) says, <d>[Chinese] 機翼後面往下彎，慢慢飛也有足夠升力，</d> At 00:08.000, Feifei is shown from a low angle near the ground, a small landing gear extending from her belly, her grey rear wheel gently touching the asphalt with a slight bounce, her face smiling in relief. Feifei (S1) says, <d>[Chinese] 放下起落架，安全著陸！</d> Feifei rests on the tarmac with her landing gear fully extended and engines quiet.
+
+overall_soundscape: The rhythmic hum of the engines fades into a low purr as air rushes past the wings, followed by the crisp sound of mechanical flaps sliding into place and a soft thud of rubber against the runway.
+
+non_diegetic_music: N/A

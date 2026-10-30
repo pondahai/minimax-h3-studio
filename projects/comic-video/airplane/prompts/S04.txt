@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene featuring a cheerful anthropomorphic white passenger jet with a blue tail, big eyes, and a smiling face, soaring through a vibrant blue sky filled with fluffy white clouds. At 00:00.000, The jet Feifei propels forward, its grey engines glowing with heat as white steam puffs out, while the background clouds streak rapidly backward to indicate speed. Feifei (S1) says, <d>[Chinese] 引擎往前推，是推力，</d> At 00:04.000, Feifei's nose dips slightly as it pushes through the air, causing the surrounding white clouds to spread apart to the left and right, revealing the blue sky behind them. Feifei (S1) says, <d>[Chinese] 空氣擋住我前進，</d> At 00:08.000, Feifei shakes its round body slightly while flying forward, its large eyes widening in excitement as it navigates through the dispersing clouds. Feifei (S1) says, <d>[Chinese] 這就是阻力！</d>
+
+overall_soundscape: The continuous, rhythmic hum of jet engines burning fuel. The sharp swish of air rushing past the metal wings. The soft, crackling sound of steam venting from the exhaust ports.
+
+non_diegetic_music: N/A

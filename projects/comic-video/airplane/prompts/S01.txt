@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene with saturated colors and soft lighting inside a cozy living room. Xiao Yu, a ten-year-old boy in a blue hoodie, stands in the center holding a plain white paper airplane, gazing out a large window at a real airliner in the blue sky. At 00:00.000, Xiao Yu, standing by the window, cranes his neck upward, his eyes widening in curiosity as he tracks the distant real airliner. The camera slowly pushes in on his profile against the bright window light. Xiao Yu (S1) says, <d>[Chinese] 飛機那麼重，</d> At 00:04.000, Xiao Yu remains looking up, his expression turning deeply puzzled with furrowed brows and a tilted head. The camera drifts slightly closer to his contemplative face illuminated by the sunlight. Xiao Yu (S1) says, <d>[Chinese] 怎麼飛得起來呢？</d> At 00:08.000, Xiao Yu pivots to face the camera, his expression shifting to a bright smile as he lifts the paper airplane high. The camera eases back while he gestures enthusiastically with the plane. Xiao Yu (S1) says, <d>[Chinese] 一起找答案吧！</d>
+
+overall_soundscape: A gentle breeze rustles the curtains near the window, accompanied by the faint, distant hum of the real airliner's engines drifting through the glass.
+
+non_diegetic_music: N/A
