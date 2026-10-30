@@ -6,11 +6,19 @@
  "no_text_rule": "不要在畫面中出現任何文字、標籤、公式、表格或圖示",
  "panel_dir": "C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\C--Users-USER--claude-spares-spare-ShP1rU\\80e5312e-c3e8-4cdc-9e73-452517d4065e\\scratchpad\\seasons_panels",
  "panel_cast": {
-  "1": ["小明"],
-  "2": ["小美"],
-  "3": ["小美"],
+  "1": [
+   "小明"
+  ],
+  "2": [
+   "小美"
+  ],
+  "3": [
+   "小美"
+  ],
   "4": [],
-  "5": ["小明"],
+  "5": [
+   "小明"
+  ],
   "6": [],
   "7": []
  },
@@ -34,7 +42,10 @@
  },
  "t2s": true,
  "pronounce": {},
- "speakers": ["小明", "小美"],
+ "speakers": [
+  "小明",
+  "小美"
+ ],
  "tagline": "同一顆太陽，因為地球的傾斜，讓世界有了不同的風景！",
  "last_frames": [],
  "prompt_format": "official",
@@ -46,5 +57,81 @@
   "小美": "Xiao Mei",
   "阿柴": "Ah Chai",
   "林博士": "Dr. Lin"
+ },
+ "shots": [
+  [
+   "S01",
+   12,
+   "frames/S01.png"
+  ],
+  [
+   "S02",
+   12,
+   "frames/S02.png"
+  ],
+  [
+   "S03",
+   12,
+   "frames/S03.png"
+  ],
+  [
+   "S04",
+   12,
+   "frames/S04.png"
+  ],
+  [
+   "S05",
+   12,
+   "frames/S05.png"
+  ],
+  [
+   "S06",
+   12,
+   "frames/S06.png"
+  ],
+  [
+   "S07",
+   12,
+   "frames/S07.png"
+  ],
+  [
+   "S08",
+   12,
+   "frames/S08.png"
+  ],
+  [
+   "S09",
+   12,
+   "frames/S09.png"
+  ],
+  [
+   "S10",
+   12,
+   "frames/S10.png"
+  ],
+  [
+   "S11",
+   12,
+   "frames/S11.png"
+  ],
+  [
+   "S12",
+   12,
+   "frames/S12.png"
+  ]
+ ],
+ "panels": {
+  "S01": "panel-01",
+  "S02": "panel-02a",
+  "S03": "panel-02b",
+  "S04": "panel-03a",
+  "S05": "panel-03b",
+  "S06": "panel-04a",
+  "S07": "panel-04b",
+  "S08": "panel-05a",
+  "S09": "panel-05b",
+  "S10": "panel-06",
+  "S11": "panel-07a",
+  "S12": "panel-07b"
  }
 }
