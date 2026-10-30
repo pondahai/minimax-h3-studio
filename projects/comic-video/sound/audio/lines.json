@@ -1,0 +1,317 @@
+[
+ {
+  "file": "S01_00_小明.wav",
+  "sid": "S01",
+  "start": 0,
+  "end": 4,
+  "who": "小明",
+  "text": "嗨！你聽到我的聲音嗎？",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S01_04_小美.wav",
+  "sid": "S01",
+  "start": 4,
+  "end": 8,
+  "who": "小美",
+  "text": "聽到了！聲音怎麼傳過來的？",
+  "audio_sec": 4.96
+ },
+ {
+  "file": "S01_08_旁白.wav",
+  "sid": "S01",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "聲音看不見，卻真的存在。一起找秘密吧！",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S02_04_小明.wav",
+  "sid": "S02",
+  "start": 4,
+  "end": 8,
+  "who": "小明",
+  "text": "我敲鼓時，鼓面會振動！",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S02_08_小明.wav",
+  "sid": "S02",
+  "start": 8,
+  "end": 12,
+  "who": "小明",
+  "text": "然後就發出聲音了！",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S03_00_旁白.wav",
+  "sid": "S03",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "物體振動，就會產生聲音。",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S03_04_旁白.wav",
+  "sid": "S03",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "振動會推動周圍的空氣。",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S03_08_旁白.wav",
+  "sid": "S03",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "空氣一個推一個，形成聲波。",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S04_00_旁白.wav",
+  "sid": "S04",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "空氣粒子會互相推擠，",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S04_04_旁白.wav",
+  "sid": "S04",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "擠在一起又分開，一波波傳下去。",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S04_08_旁白.wav",
+  "sid": "S04",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "能量傳得很遠，空氣卻沒跑遠。",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S05_00_旁白.wav",
+  "sid": "S05",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "聲音也能在固體裡傳播。",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S05_04_小明.wav",
+  "sid": "S05",
+  "start": 4,
+  "end": 8,
+  "who": "小明",
+  "text": "貼著桌子，聽得好清楚！",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S05_08_旁白.wav",
+  "sid": "S05",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "固體傳聲通常最快。",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S06_00_旁白.wav",
+  "sid": "S06",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "液體也能傳聲，速度其次。",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S06_04_小美.wav",
+  "sid": "S06",
+  "start": 4,
+  "end": 8,
+  "who": "小美",
+  "text": "水下的聲音也能傳很遠，",
+  "audio_sec": 4.48
+ },
+ {
+  "file": "S06_08_小美.wav",
+  "sid": "S06",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "所以魚能互相溝通！",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S07_00_小明.wav",
+  "sid": "S07",
+  "start": 0,
+  "end": 4,
+  "who": "小明",
+  "text": "在空氣中，我們用耳朵聽聲音。",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S07_04_旁白.wav",
+  "sid": "S07",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "氣體傳聲，通常最慢。",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S07_08_旁白.wav",
+  "sid": "S07",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "固體最快，液體其次，氣體最慢。",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S08_00_旁白.wav",
+  "sid": "S08",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "實驗一：手放喉嚨，先不說話。",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S08_04_小美.wav",
+  "sid": "S08",
+  "start": 4,
+  "end": 8,
+  "who": "小美",
+  "text": "啊——",
+  "audio_sec": 1.12
+ },
+ {
+  "file": "S08_08_小美.wav",
+  "sid": "S08",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "說話時，聲帶在振動喔！",
+  "audio_sec": 4.0
+ },
+ {
+  "file": "S09_00_旁白.wav",
+  "sid": "S09",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "實驗二：撥動盒子上的橡皮筋。",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S09_04_小明.wav",
+  "sid": "S09",
+  "start": 4,
+  "end": 8,
+  "who": "小明",
+  "text": "看得到它在振動，也聽到聲音！",
+  "audio_sec": 4.16
+ },
+ {
+  "file": "S09_08_旁白.wav",
+  "sid": "S09",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "振動越快，聲音通常越高。",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S10_00_旁白.wav",
+  "sid": "S10",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "杯底的小洞，要請大人幫忙打。",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S10_04_旁白.wav",
+  "sid": "S10",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "棉線穿過小洞，在杯內打結。",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S10_08_旁白.wav",
+  "sid": "S10",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "兩人各拿一杯，把線拉緊。",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S11_00_小明.wav",
+  "sid": "S11",
+  "start": 0,
+  "end": 4,
+  "who": "小明",
+  "text": "你聽到我說的話了嗎？",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S11_04_小美.wav",
+  "sid": "S11",
+  "start": 4,
+  "end": 8,
+  "who": "小美",
+  "text": "哇！真的聽到了！",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S11_08_旁白.wav",
+  "sid": "S11",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "杯底振動沿著棉線傳過去。",
+  "audio_sec": 2.72
+ },
+ {
+  "file": "S12_00_林博士.wav",
+  "sid": "S12",
+  "start": 0,
+  "end": 4,
+  "who": "林博士",
+  "text": "聲音來自物體的振動，",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S12_04_林博士.wav",
+  "sid": "S12",
+  "start": 4,
+  "end": 8,
+  "who": "林博士",
+  "text": "能在固體、液體、氣體中傳播，",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S12_08_林博士.wav",
+  "sid": "S12",
+  "start": 8,
+  "end": 12,
+  "who": "林博士",
+  "text": "但在真空裡，聲音傳不出去。",
+  "audio_sec": 2.4
+ }
+]
