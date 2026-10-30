@@ -9,7 +9,7 @@
 
 第四篇：2026-10-30，《聲音是怎麼傳播的？》（7 格）→ 12 段 144 秒，[`sound/`](../projects/comic-video/sound/)（2026-10-30 驗收）；8002 逐格初稿＋人工修、角色立繪參考、保留 H3 原生音效（`sfx.sh`）、台詞對齊 H3 嘴型（`lipsync_measure.py`）
 
-第五篇：2026-10-30，《為什麼會有四季？》（7 格，網站 header＋panel-01～06）→ 12 段 144 秒，[`seasons/`](../projects/comic-video/seasons/)（成片 2026-10-30，待驗收）；8002 初稿第一次附每格人工備註（`panel_notes`）、用選定首幀擴寫
+第五篇：2026-10-30，《為什麼會有四季？》（7 格，網站 header＋panel-01～06）→ 12 段 144 秒，[`seasons/`](../projects/comic-video/seasons/)（2026-10-30 驗收）；8002 初稿第一次附每格人工備註（`panel_notes`）、用選定首幀擴寫
 
 ## 成品
 
