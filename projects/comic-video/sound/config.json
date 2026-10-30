@@ -1,0 +1,69 @@
+{
+ "title": "聲音是怎麼傳播的？",
+ "source": "https://shezi.org.tw/science/sound-transmission/",
+ "style": "明亮日系兒童科普動畫風、色彩飽和、柔和陽光",
+ "characters": "小明＝卡其探險帽、棕短髮、綠背心、藍背包；小美＝棕色雙馬尾、粉紅外套、紅格子裙；阿柴＝橘白柯基、綠色葉子領巾；林博士＝白髮白鬍、圓眼鏡、白色實驗袍、綠領帶",
+ "no_text_rule": "不要在畫面中出現任何文字、標籤、公式、表格或圖示",
+ "panel_dir": "C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\C--Users-USER--claude-spares-spare-qz6wrX\\a56ae772-b308-40a4-bba9-053bbd145db3\\scratchpad\\sound_panels",
+ "panels": {},
+ "panel_cast": {
+  "1": [
+   "小明",
+   "小美",
+   "阿柴"
+  ],
+  "2": [
+   "小明"
+  ],
+  "3": [
+   "阿柴"
+  ],
+  "4": [
+   "小明",
+   "小美"
+  ],
+  "5": [
+   "小明",
+   "小美"
+  ],
+  "6": [
+   "小明",
+   "小美"
+  ],
+  "7": [
+   "林博士",
+   "阿柴"
+  ]
+ },
+ "voices": {
+  "小明": "七歲小男孩，稚嫩的童聲，音調很高，天真活潑",
+  "小美": "開朗溫柔的十歲女孩，聲音甜美",
+  "旁白": "溫柔親切的年輕女性旁白，語速平穩",
+  "林博士": "六十多歲的台灣男教授，標準台灣華語口音，沉穩親切，語速慢"
+ },
+ "ref_text": "大家好，今天天氣真好，我們一起去森林裡看看吧！",
+ "ref_transcript": {
+  "小明": "哇！一隻小小的卵，竟然可以變成這麼美麗的蝴蝶！",
+  "林博士": "不要只看大小，要比較同樣體積裡有多少質量。"
+ },
+ "t2s": true,
+ "pronounce": {},
+ "shots": [],
+ "speakers": [
+  "小明",
+  "小美",
+  "林博士"
+ ],
+ "tagline": null,
+ "last_frames": [],
+ "prompt_format": "official",
+ "no_text_rule_en": "No text of any kind may appear in the picture: no letters, labels, numbers, formulas, signs or icons.",
+ "style_en": "bright Japanese children's science anime, saturated colors, soft sunlight",
+ "characters_en": "Xiao Ming (小明) = a boy with a khaki explorer hat with a green leaf badge, short brown hair, a green vest and a blue backpack; Xiao Mei (小美) = a girl with brown twin ponytails, a pink jacket and a red plaid skirt; Ah Chai (阿柴) = an orange-and-white corgi with a green leaf bandana; Dr. Lin (林博士) = a kind old scientist with white hair and beard, round glasses, a khaki explorer hat, a white lab coat and a green tie",
+ "names_en": {
+  "小明": "Xiao Ming",
+  "小美": "Xiao Mei",
+  "阿柴": "Ah Chai",
+  "林博士": "Dr. Lin"
+ }
+}
