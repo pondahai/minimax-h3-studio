@@ -1,7 +1,9 @@
-"""量 H3 角色實際開口時間（sfx/SXX_vocals.wav 的有聲區段），和 mux.py 排的 TTS 時間對照。
+"""量 H3 角色實際開口時間（sfx/SXX_vocals.wav 的有聲區段），和 mux.py 排的 TTS 時間對照；
+結果寫進 <篇目>/sfx/lipsync.json（{台詞檔名: [H3 開口, H3 閉口]}，旁白不列），mux.py 用來對齊台詞起點。
 
-用法（Spark，demucs-sfx 映像檔裡有 numpy/scipy）：
+用法（Spark，demucs-sfx 映像檔裡有 numpy/scipy；mux.py 在主機跑、沒有 numpy，所以分開）：
   docker run --rm -v $PWD:/c -w /c --entrypoint python demucs-sfx lipsync_measure.py <篇目> [段...]
+對照用的是不對齊時的排法（LIPSYNC=0），才不會被上一次的對齊結果影響。
 """
 import json, sys
 from pathlib import Path
@@ -48,6 +50,9 @@ if __name__ == "__main__":
     cfg = json.loads((d / "config.json").read_text(encoding="utf-8"))
     lines = json.loads((d / "audio" / "lines.json").read_text(encoding="utf-8"))
     dur = {s: t for s, t, _ in cfg["shots"]}
+    mux.LIPSYNC = {}
+    out = d / "sfx" / "lipsync.json"
+    found = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {}
     for sid in sids or list(dur):
         v = voiced(d / "sfx" / f"{sid}_vocals.wav")
         print(f"== {sid}  H3 有聲區段：" + "、".join(f"{a:.2f}–{b:.2f}" for a, b in v))
@@ -59,7 +64,10 @@ if __name__ == "__main__":
             if who == "旁白":
                 print(f"  {who:4} TTS {t:5.2f}–{end:5.2f}（旁白，畫面閉嘴）")
             elif best and min(best[1], end) > max(best[0], t) - 1.0:
+                found[ln["file"]] = [round(best[0], 2), round(best[1], 2)]
                 print(f"  {who:4} TTS {t:5.2f}–{end:5.2f}  H3 {best[0]:5.2f}–{best[1]:5.2f}  "
                       f"開口差 {t - best[0]:+.2f}s  長度 TTS {end - t:.2f} / H3 {best[1] - best[0]:.2f}")
             else:
                 print(f"  {who:4} TTS {t:5.2f}–{end:5.2f}  H3 找不到對應區段")
+    out.write_text(json.dumps(found, ensure_ascii=False, indent=1), encoding="utf-8")
+    print("寫入", out)

@@ -39,6 +39,25 @@
 | MiniMax H3 | Spark `~/h3-bench`（docker image `h3-bench`） | 生成影片／配樂 |
 | Breeze ASR（常駐） | Jetson `100.108.74.45:8013`，SSH 帳號 `nvidia` | 核對 TTS 有沒有唸對 |
 
+### 環境與工具清單（2026-10-30 盤點）
+
+| 位置 | 工具 | 狀態／用途 |
+|---|---|---|
+| Spark 主機 | ffmpeg 6.1.1（apt，原本就有） | 抽音軌、合成、字幕、`sfx.sh` 響度 |
+| Spark 主機 | python3（系統版，**沒有 numpy／torch**） | `mux.py`、`subs.py`、`run_series.sh` 讀 config；要 numpy 的腳本改在容器跑 |
+| Spark docker | `h3-bench` | H3 影片／配樂 |
+| Spark docker | `qwen-image-comfyui` 容器 | Qwen-Image 首幀（用時 `docker start`，用完 `docker stop`） |
+| Spark docker | `nvcr.io/nvidia/pytorch:25.11-py3` | `demucs-sfx` 的基底（沒有 torchaudio） |
+| Spark docker | `demucs-sfx`（2026-10-30 新增，19.6 GB，`Dockerfile.sfx`） | `sfx.sh` 去人聲、`lipsync_measure.py` 量開口；內含 demucs 4.0.1 與 htdemucs 權重 |
+| Spark 快取 | `~/.cache/torch/hub`（81 MB，htdemucs 權重） | 手動試跑時下載；映像檔裡已另有一份，可刪 |
+| Spark 殘留 | `~/.cache/demucs-pip`（7.9 MB）、`comic-video/sound/sfx/stub/` | 第一次試裝的殘留，root 擁有，要 `sudo rm` 才能刪；不影響流程 |
+| Spark venv | `~/dgx-voxcpm-eval/.venv` | VoxCPM2 TTS |
+| Jetson | Breeze ASR（常駐 :8013） | 配音核對 |
+| 本機 Windows | Python 3.12＋Pillow | `draft_storyboard.py`、`check_*.py`、`expand.py`、`tts.py`、`asr_check.py`、`qwen_frame.py`、`review.py`、切圖 |
+| 本機 Windows | **沒有 ffmpeg** | 影音處理一律在 Spark 做，成品用 scp 拉回 |
+
+新增工具時要更新這張表。
+
 **記憶體互斥**：TTS、Qwen-Image、H3 三者一次只開一個；跑 H3 時 Spark 上只留 8002（停掉 `qwen3.8-nvfp4`、`qwen-image-comfyui`、`qwen-gradio-ui`）。實測 H3 跑時系統用量約 71 GB／121 GB，沒有用到 swap。
 
 ## 流程（定案版）
@@ -177,6 +196,10 @@
      - 最後列出每段音效響度，低於 −45 LUFS 標「可能沒生成音效」。《聲音》被標的 7 段都是對話／旁白段，本來就沒有實驗音效；實驗段（敲鼓 −11.5、敲桌 −22、橡皮筋 −36）都有
      - Demucs 分離有隨機位移，重跑結果不會逐位元相同，響度一樣
   2. `mux.py` 偵測到 `sfx/SXX_novocals.wav` 就用它當底（`SFX_VOLUME` 0.6），沒有就照舊靜音
+- **對嘴（《聲音》起）**：H3 角色的嘴型跟著 H3 自己唸的台詞走，常比分鏡起秒晚 1–2.7 秒開口（前面有動作的句子最晚），唸得也比 TTS 快；TTS 放在起秒就會「聲音先到、嘴巴後動」
+  1. `sfx.sh` 跑完後：`docker run --rm -u $(id -u):$(id -g) -v $PWD:/c -w /c --entrypoint python demucs-sfx lipsync_measure.py <篇目>` → 從 `sfx/SXX_vocals.wav` 找出每句角色台詞的 H3 開口／閉口，印對照表並寫 `sfx/lipsync.json`（旁白不列）
+  2. `mux.py` 讀到 `lipsync.json` 就把角色台詞起點移到 H3 開口（差 < 0.3 秒不動），並以 H3 那句的長度為目標加速（上限照舊 1.35，段尾 1.5）；講不完的尾巴在閉嘴後講完
+  - 《聲音》16 句對齊後，段尾兩句（S06_08、S08_08）用到 1.5 倍上限，要聽是不是太趕
   - 先挑幾段疊回影片給使用者試聽再全片套用；《聲音》使用者直接試聽，沒跑 ASR
   - Demucs 裝法的坑：pip 不加 `--no-deps` 會重抓幾 GB 的 torch；4.1 版要 `sphn`，ARM 沒有 wheel；4.0.1 要 torchaudio，容器沒有 → 自己寫腳本呼叫 `apply_model`，給 openunmix 一個空的 torchaudio 模組
 - 每句台詞先量響度、統一到 −20 LUFS（`LINE_LUFS`）再混音，避免某個角色偏小聲

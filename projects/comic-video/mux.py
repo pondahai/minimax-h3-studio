@@ -17,13 +17,25 @@ LINE_LUFS = -20.0  # 每句台詞先量響度再拉到同一音量（林博士�
 MUSIC_CLIP, MUSIC_XFADE, MUSIC_VOLUME = 12.25, 1.5, 0.22
 
 
+LIPSYNC = {}  # sfx/lipsync.json：{台詞檔名: [H3 開口, 閉口]}（lipsync_measure.py 產生）；有就把角色台詞對齊 H3 的嘴型
+LIPSYNC_MIN = 0.3  # 開口差小於這個就不動
+
+
+def start_of(ln):
+    h3 = LIPSYNC.get(ln["file"])
+    return h3[0] if h3 and abs(h3[0] - ln["start"]) > LIPSYNC_MIN else ln["start"]
+
+
 def schedule(lines, seg_dur):
     plan, prev_end = [], 0.0
     for i, ln in enumerate(lines):
-        t = max(ln["start"], prev_end + GAP if plan else ln["start"])
+        t = max(start_of(ln), prev_end + GAP if plan else start_of(ln))
         last = i == len(lines) - 1
-        limit = seg_dur if last else lines[i + 1]["start"]
+        limit = seg_dur if last else max(start_of(lines[i + 1]), t + 0.5)
         room = max(limit - t, 0.5)
+        h3 = LIPSYNC.get(ln["file"])
+        if h3:  # 盡量貼近 H3 那句的長度；加速仍受上限，講不完的尾巴在閉嘴後講完
+            room = min(room, max(h3[1] - h3[0], 0.5))
         tempo = min(max(ln["audio_sec"] / room, 1.0), 1.5 if last else 1.35)
         prev_end = t + ln["audio_sec"] / tempo
         plan.append((ln, t, tempo))
@@ -82,6 +94,9 @@ if __name__ == "__main__":
     MIXED = d / "mixed"
     MIXED.mkdir(exist_ok=True)
     dur = comic.durations(cfg)
+    if (d / "sfx" / "lipsync.json").exists():
+        LIPSYNC.update(json.loads((d / "sfx" / "lipsync.json").read_text(encoding="utf-8")))
+        print(f"對齊 H3 嘴型：{len(LIPSYNC)} 句")
     report = json.loads((d / "audio" / "lines.json").read_text(encoding="utf-8"))
     sids = list(dur)
     for sid in sids:
