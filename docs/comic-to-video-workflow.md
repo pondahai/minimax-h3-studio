@@ -172,9 +172,11 @@
 ### 8. 合成 → `python3 mux.py <篇目>`
 - H3 原生音軌**不直接用**（它會照 `<d>` 唸台詞、自己編說話聲）
 - **實驗音效（《聲音》起）**：TTS 做不出鼓聲、敲桌、撥橡皮筋。H3 原生音軌裡的音效是和畫面一起生成的，時間點本來就對齊，所以用 Demucs 去掉人聲後保留：
-  1. Spark 上 `ffmpeg -i out/SXX.mp4 -vn -ar 44100 sfx/SXX_h3.wav`
-  2. 在 pytorch 容器跑 `sfx_sep.py`（指令見檔頭）→ `sfx/SXX_novocals.wav`；12 段約 1 分鐘
-  3. `mux.py` 偵測到 `sfx/SXX_novocals.wav` 就用它當底（`SFX_VOLUME` 0.6），沒有就照舊靜音
+  1. H3 全部跑完後，Spark 上 `bash sfx.sh <篇目> [段...]`：照 `shots` 抽原生音軌 → `demucs-sfx` 映像檔跑 `sfx_sep.py` → `sfx/SXX_novocals.wav`；已有的段跳過，H3 在跑時會拒絕啟動。12 段約 1 分鐘
+     - 映像檔只要建一次：`docker build -t demucs-sfx -f Dockerfile.sfx .`（約 20 GB，含 htdemucs 權重）
+     - 最後列出每段音效響度，低於 −45 LUFS 標「可能沒生成音效」。《聲音》被標的 7 段都是對話／旁白段，本來就沒有實驗音效；實驗段（敲鼓 −11.5、敲桌 −22、橡皮筋 −36）都有
+     - Demucs 分離有隨機位移，重跑結果不會逐位元相同，響度一樣
+  2. `mux.py` 偵測到 `sfx/SXX_novocals.wav` 就用它當底（`SFX_VOLUME` 0.6），沒有就照舊靜音
   - 先挑幾段疊回影片給使用者試聽再全片套用；《聲音》使用者直接試聽，沒跑 ASR
   - Demucs 裝法的坑：pip 不加 `--no-deps` 會重抓幾 GB 的 torch；4.1 版要 `sphn`，ARM 沒有 wheel；4.0.1 要 torchaudio，容器沒有 → 自己寫腳本呼叫 `apply_model`，給 openunmix 一個空的 torchaudio 模組
 - 每句台詞先量響度、統一到 −20 LUFS（`LINE_LUFS`）再混音，避免某個角色偏小聲

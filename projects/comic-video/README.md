@@ -50,7 +50,7 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 | `review.py <篇目>` | 分鏡審查頁 `review.html`（首幀候選＋時間軸＋台詞） | 本機 |
 | `run_series.sh <篇目> [起始段]` | 依 `shots` 依序生成全部分段；有 `frames/<段>_end.png` 就加尾幀（首尾幀） | Spark |
 | `run_jobs.sh <篇目> "<工作>"...` | 單獨重跑指定段或配樂 | Spark |
-| `sfx_sep.py <wav...>` | Demucs 去掉 H3 原生音軌的人聲 → `sfx/SXX_novocals.wav`（容器內跑，見檔頭） | Spark |
+| `sfx.sh <篇目> [段...]` | H3 跑完後去掉原生音軌的人聲、留下同步音效 → `sfx/SXX_novocals.wav`，列出各段音效響度（映像檔 `Dockerfile.sfx`，裡面跑 `sfx_sep.py`） | Spark |
 | `mux.py <篇目>` | 配音依時間軸混入、有 `sfx/SXX_novocals.wav` 就墊音效、配樂循環墊底 → `<篇目>_draft.mp4` | Spark（需 ffmpeg） |
 | `subs.py <篇目>` | 繁中字幕 `<篇目>.srt`＋壓字幕版 `<篇目>_sub.mp4` | Spark |
 
@@ -78,6 +78,6 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 5. 寫 `review.json`（建議 seed 與理由）→ `python review.py <篇目>` → 使用者選定 → 存成 `shots` 指定的首幀檔名
 6. 把本目錄腳本、`bench.py`（672×384）和 `<篇目>/` 放到 Spark `~/h3-bench/comic-video/`，停掉 8002 以外的服務 → `bash run_series.sh <篇目>`
 7. 配樂：`bash run_jobs.sh <篇目> "music1 prompts/music.txt 1 12 -" ...` → 挑選 → `music/bgm.wav`
-8. 各段影片放 `video/`、`audio/` 傳上 Spark → `python3 mux.py <篇目>` → `python3 subs.py <篇目>`
+8. Spark 上 `bash sfx.sh <篇目>`（實驗音效）→ 各段影片放 `video/`、`audio/` 傳上 Spark → `python3 mux.py <篇目>` → `python3 subs.py <篇目>`
 
 影片、wav、圖檔、`review.html` 不進 git，清單見 docs 筆記的「不進 git 的檔案」。
