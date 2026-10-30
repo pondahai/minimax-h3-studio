@@ -5,7 +5,20 @@
  "characters": "小明＝卡其探險帽、棕短髮、綠背心、藍背包；小美＝棕色雙馬尾、粉紅外套、紅格子裙；阿柴＝橘白柯基、綠色葉子領巾；林博士＝白髮白鬍、圓眼鏡、白色實驗袍、綠領帶",
  "no_text_rule": "不要在畫面中出現任何文字、標籤、公式、表格或圖示",
  "panel_dir": "C:\\Users\\USER\\AppData\\Local\\Temp\\claude\\C--Users-USER--claude-spares-spare-qz6wrX\\a56ae772-b308-40a4-bba9-053bbd145db3\\scratchpad\\sound_panels",
- "panels": {},
+ "panels": {
+  "S01": "panel-01",
+  "S02": "panel-02a",
+  "S03": "panel-02b",
+  "S04": "panel-03",
+  "S05": "panel-04a",
+  "S06": "panel-04b",
+  "S07": "panel-04c",
+  "S08": "panel-05a",
+  "S09": "panel-05b",
+  "S10": "panel-06a",
+  "S11": "panel-06b",
+  "S12": "panel-07"
+ },
  "panel_cast": {
   "1": [
    "小明",
@@ -48,13 +61,74 @@
  },
  "t2s": true,
  "pronounce": {},
- "shots": [],
+ "shots": [
+  [
+   "S01",
+   12,
+   "frames/S01.png"
+  ],
+  [
+   "S02",
+   12,
+   "frames/S02.png"
+  ],
+  [
+   "S03",
+   12,
+   "frames/S03.png"
+  ],
+  [
+   "S04",
+   12,
+   "frames/S04.png"
+  ],
+  [
+   "S05",
+   12,
+   "frames/S05.png"
+  ],
+  [
+   "S06",
+   12,
+   "frames/S06.png"
+  ],
+  [
+   "S07",
+   12,
+   "frames/S07.png"
+  ],
+  [
+   "S08",
+   12,
+   "frames/S08.png"
+  ],
+  [
+   "S09",
+   12,
+   "frames/S09.png"
+  ],
+  [
+   "S10",
+   12,
+   "frames/S10.png"
+  ],
+  [
+   "S11",
+   12,
+   "frames/S11.png"
+  ],
+  [
+   "S12",
+   12,
+   "frames/S12.png"
+  ]
+ ],
  "speakers": [
   "小明",
   "小美",
   "林博士"
  ],
- "tagline": null,
+ "tagline": "生活中處處都有聲音的科學！",
  "last_frames": [],
  "prompt_format": "official",
  "no_text_rule_en": "No text of any kind may appear in the picture: no letters, labels, numbers, formulas, signs or icons.",
