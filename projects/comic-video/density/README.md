@@ -1,9 +1,10 @@
 # 《密度是什麼？一樣大，不一定一樣重！》
 
-漫畫轉影片工作流的第二篇（製作中）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-workflow.md](../../../docs/comic-to-video-workflow.md)。
+漫畫轉影片工作流的第二篇（2026-10-29 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-workflow.md](../../../docs/comic-to-video-workflow.md)。
 
 - 來源：社子文教基金會「科學天地／自然小探險隊」[《密度是什麼？》](https://shezi.org.tw/science/density/)（7 格）
-- 規格：11 段約 130 秒、672×384 草稿等級；S01、S03、S05、S06、S07、S09、S11 用 Qwen-Image 首幀，S02、S04、S08、S10 續接前段末幀
+- 規格：11 段約 130 秒、672×384 草稿等級；S01、S03、S05～S09、S11 用 Qwen-Image 首幀，S02、S04、S10 續接前段末幀；S08、S10 另加 Qwen-Image 尾幀（首尾幀）
+- 這篇開始：H3 prompt 改用官方英文結構化格式（台詞放 `<d>`，對 TTS 嘴型）、送 TTS 前轉簡體、尾幀
 
 ## 這篇的檔案
 
@@ -12,8 +13,13 @@
 | `config.json` | 角色、聲音、分格對應、段落表（`shots`） |
 | `storyboard.md` | 分鏡（含原作勘誤） |
 | `prompts/`、`frame_prompts/` | 影片 prompt、首幀 prompt |
+| `frames/S08_end.png`、`frames/S10_end.png`（不進 git）＋ `frame_prompts/S08_end.txt`、`S10_end.txt` | 尾幀 |
+| `prompts/music_official.txt` | 配樂 prompt（官方格式） |
 | `review.json` | 分鏡審查的建議 seed 與理由（`review.py` 讀） |
-| `audio/lines.json` | 台詞、音檔、起秒、長度 |
+| `audio/lines.json`、`density.srt` | 台詞、音檔、起秒、長度；字幕 |
+| `prompts_legacy/` | 第一批中文自由格式 prompt（對照用，不要再用） |
+
+不進 git：成片、`frames/`、`music/`、`video/`、`mixed/`、音檔。
 
 ## 這篇的決定
 
@@ -21,3 +27,30 @@
 - 原作第 4 格石頭標「密度比水小」，應為比水大，台詞已改正
 - S08「湯匙」繁體送 TTS 唸不出來，轉簡體才正確 → 從這篇起送 TTS 一律轉簡體
 - 首幀選定：S01 seed2、S03 seed2、S05 seed2、S06 seed3、S07 seed2、S09 seed3、S11 seed2
+- 重配台詞：S08_04 用 simp1，S08_00 p2、S11_00 p1、S11_08 p1
+- 第一批用中文自由格式 prompt，H3 原聲亂編非中文人聲、配樂混人聲 → 全部改官方格式重跑 11 段；配樂用 music_off1（官方格式 seed 1）
+- S08 改成獨立段（首幀 seed3）；續接 S07 特寫時大水槽變小杯子
+- 第二版修正：S08 軟木塞、積木先浮後沉 → 尾幀 seed2 鎖住結果；S10 特寫拉遠後小明小美變大 → 首尾幀，尾幀 seed1；林博士 TTS −28.6 LUFS 太小聲 → mux 每句統一 −20 LUFS
+- 已知小瑕疵（使用者允收）：S04 小明頭頂被畫面上緣切到；S10 約 5 秒處從特寫直接切到中景
+
+## YouTube
+
+**標題**：密度是什麼？一樣大，不一定一樣重！｜兒童科學動畫｜科學天地
+
+**說明**（不放連結）：
+
+> 海綿這麼大，為什麼比小石頭還輕？大的東西一定比較重嗎？跟著小明、小美和柴犬阿柴，一起認識「密度」！
+>
+> 這支影片會學到：
+> ・密度＝相同體積裡有多少質量（密度＝質量 ÷ 體積）
+> ・一樣大的方塊，重量為什麼不一樣
+> ・浮沉實驗：軟木塞、積木浮起來，硬幣、湯匙、石頭沉下去
+> ・蜂蜜、水、油為什麼會分成三層
+>
+> 在家試試看：
+> 準備一個透明杯子，依序倒入蜂蜜、水、食用油，觀察它們分層；再找身邊的小東西，先猜猜會浮還是會沉，再放進水裡驗證！
+>
+> 原作漫畫：社子文教基金會「科學天地」《密度是什麼？一樣大，不一定一樣重！》
+> 本片由原作漫畫改編，畫面與配音由 AI 生成。
+>
+> #科學天地 #兒童科普 #密度 #浮力 #自然科學 #科學實驗
