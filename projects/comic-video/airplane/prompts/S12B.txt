@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft lighting, Xiao Yu and Captain Owl stand in a lush green meadow under a clear blue sky, centered in the frame. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Wide shot: Xiao Yu crouches on the grass holding a plain white paper airplane, while Captain Owl stands beside him, using one wing to point specifically at the airplane's tail. Captain Owl (S1) says slowly, <d>[Chinese] 尾巴往上折一點，</d> At 00:03.000, Xiao Yu stands up and smoothly throws the paper airplane forward toward the open space, his body leaning into the throw. At 00:06.000, The paper airplane tilts its nose upward and climbs into the air; Xiao Yu looks up excitedly and points his finger toward the ascending plane. Xiao Yu (S2) says slowly, <d>[Chinese] 機頭抬起來了！</d> At 00:09.000, Captain Owl turns directly toward the camera and shakes his wings up and down while speaking, his beak moving. Captain Owl (S1) says slowly, <d>[Chinese] 不要對人的臉和眼睛射！</d>
+
+overall_soundscape: Soft breeze rustling through the tall grass, birds chirping in the background, and the distinct paper crinkle of the airplane being folded and thrown.
+
+non_diegetic_music: N/A

@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene with saturated colors and soft lighting, featuring the anthropomorphic white passenger jet Feifei against a vibrant blue sky and fluffy white clouds. At 00:00.000, Feifei bursts out from behind a dense cloud, spinning playfully in the air with a wide, cheerful smile as the camera pans slightly to follow the motion. Feifei (S1) says, <d>[Chinese] 我是飛飛！</d> At 00:04.000, Feifei gently tilts its grey engines and wings to stabilize its flight, its eyes narrowing in concentration while maintaining a balanced, hovering posture. Feifei (S1) says, <d>[Chinese] 我不是違反地心引力，</d> At 00:08.000, Feifei continues to flutter its wings with confident, rhythmic movements, its expression glowing with pride as it glides smoothly forward. Feifei (S1) says, <d>[Chinese] 而是善用空氣的力量！</d>
+
+overall_soundscape: A soft, breezy wind whistles through the air, accompanied by the gentle rhythmic thrumming of jet engines and the muffled rustle of passing clouds.
+
+non_diegetic_music: N/A

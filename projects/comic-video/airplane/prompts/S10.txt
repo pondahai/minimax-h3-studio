@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft lighting, Feifei, a small anthropomorphic white passenger jet, flies confidently above a fluffy sea of clouds. The camera tracks alongside her from a side profile against a deep azure sky. At 00:00.000, Feifei maintains a steady horizontal flight path, her big eyes looking forward happily as the cloud layer beneath her drifts slowly backwards. Feifei (S1) says, <d>[Chinese] 升力和重量差不多，</d> At 00:04.000, Feifei’s wings tilt slightly to adjust her balance while her height remains constant; her expression stays cheerful and focused. Feifei (S1) says, <d>[Chinese] 我就保持高度；</d> At 00:08.000, Feifei’s grey engines glow with stable thrust, and the camera smoothly arcs around to face her head-on as she beams at the viewer. Feifei (S1) says, <d>[Chinese] 推力和阻力差不多，速度就穩定！</d>
+
+overall_soundscape: A constant, gentle hum of jet engines mixed with the soft rush of high-altitude wind. The air feels light and crisp, with no other physical sounds disturbing the steady flight.
+
+non_diegetic_music: N/A

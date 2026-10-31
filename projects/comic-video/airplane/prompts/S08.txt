@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene featuring Feifei, an anthropomorphic small white passenger jet with a blue tail fin and big eyes, stationed on a sunny airport runway. The composition is a medium shot centered on the aircraft, surrounded by vibrant green grass and a clear blue sky, illuminated by soft, saturated daylight. At 00:00.000, Feifei’s grey engines spin rapidly, emitting visible puffs of white heat and exhaust from the bottom, while she vibrates slightly with excitement, her mouth opening to shout her line. Feifei (S1) says, <d>[Chinese] 引擎全力運轉！</d> At 00:04.000, Feifei accelerates forward, kicking up a trail of dust, while the grass on either side of the runway bends flat under the force of the wind, and she grins with effort. Feifei (S1) says, <d>[Chinese] 越跑越快，</d> At 00:08.000, The camera tilts to a low angle tracking alongside the jet, capturing wisps of translucent white air flowing smoothly over the wings as Feifei looks ahead with a focused expression. Feifei (S1) says, <d>[Chinese] 流過機翼的空氣越來越多！</d>
+
+overall_soundscape: The continuous high-pitched whirring of jet engines accelerates in pitch, accompanied by the rhythmic thumping of tires on tarmac and the soft rustling of wind rushing past the landing gear.
+
+non_diegetic_music: N/A

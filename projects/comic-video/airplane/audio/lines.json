@@ -1,0 +1,488 @@
+[
+ {
+  "file": "S01_00_小宇.wav",
+  "sid": "S01",
+  "start": 0,
+  "end": 4,
+  "who": "小宇",
+  "text": "飛機那麼重，",
+  "audio_sec": 1.44
+ },
+ {
+  "file": "S01_04_小宇.wav",
+  "sid": "S01",
+  "start": 4,
+  "end": 8,
+  "who": "小宇",
+  "text": "怎麼飛得起來呢？",
+  "audio_sec": 1.44
+ },
+ {
+  "file": "S01_08_小宇.wav",
+  "sid": "S01",
+  "start": 8,
+  "end": 12,
+  "who": "小宇",
+  "text": "一起找答案吧！",
+  "audio_sec": 1.44
+ },
+ {
+  "file": "S01B_00_飛飛.wav",
+  "sid": "S01B",
+  "start": 0,
+  "end": 4,
+  "who": "飛飛",
+  "text": "我這麼重，",
+  "audio_sec": 1.92
+ },
+ {
+  "file": "S01B_04_飛飛.wav",
+  "sid": "S01B",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "怎麼飛得起來呢？",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S01B_08_飛飛.wav",
+  "sid": "S01B",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "一起找答案吧！",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S02_00_飛飛.wav",
+  "sid": "S02",
+  "start": 0,
+  "end": 4,
+  "who": "飛飛",
+  "text": "我是飛飛！",
+  "audio_sec": 1.76
+ },
+ {
+  "file": "S02_04_飛飛.wav",
+  "sid": "S02",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "我不是違反地心引力，",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S02_08_飛飛.wav",
+  "sid": "S02",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "而是善用空氣的力量！",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S03_00_飛飛.wav",
+  "sid": "S03",
+  "start": 0,
+  "end": 4,
+  "who": "飛飛",
+  "text": "我同時受到四種力！",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S03_04_飛飛.wav",
+  "sid": "S03",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "機翼把我往上抬，是升力，",
+  "audio_sec": 4.0
+ },
+ {
+  "file": "S03_08_飛飛.wav",
+  "sid": "S03",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "地球把我往下拉，是重量。",
+  "audio_sec": 4.0
+ },
+ {
+  "file": "S04_00_飛飛.wav",
+  "sid": "S04",
+  "start": 0,
+  "end": 4,
+  "who": "飛飛",
+  "text": "引擎往前推，是推力，",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S04_04_飛飛.wav",
+  "sid": "S04",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "空氣擋住我前進，",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S04_08_飛飛.wav",
+  "sid": "S04",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "這就是阻力！",
+  "audio_sec": 2.72
+ },
+ {
+  "file": "S05_00_貓頭鷹機長.wav",
+  "sid": "S05",
+  "start": 0,
+  "end": 4,
+  "who": "貓頭鷹機長",
+  "text": "機翼往前飛，又微微仰起，",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S05_04_貓頭鷹機長.wav",
+  "sid": "S05",
+  "start": 4,
+  "end": 8,
+  "who": "貓頭鷹機長",
+  "text": "上方壓力變低，下方比較高，",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S05_08_貓頭鷹機長.wav",
+  "sid": "S05",
+  "start": 8,
+  "end": 12,
+  "who": "貓頭鷹機長",
+  "text": "空氣被往下推，就回推機翼！",
+  "audio_sec": 2.72
+ },
+ {
+  "file": "S06_00_小宇.wav",
+  "sid": "S06",
+  "start": 0,
+  "end": 3,
+  "who": "小宇",
+  "text": "拿一張紙條，",
+  "audio_sec": 1.6
+ },
+ {
+  "file": "S06_06_小宇.wav",
+  "sid": "S06",
+  "start": 6,
+  "end": 9,
+  "who": "小宇",
+  "text": "剛剛紙條往上飄！",
+  "audio_sec": 1.92
+ },
+ {
+  "file": "S06_09_小宇.wav",
+  "sid": "S06",
+  "start": 9,
+  "end": 12,
+  "who": "小宇",
+  "text": "氣流轉彎，上面壓力變低！",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S06B_00_貓頭鷹機長.wav",
+  "sid": "S06B",
+  "start": 0,
+  "end": 3,
+  "who": "貓頭鷹機長",
+  "text": "小宇，對紙條上面吹氣，",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S06B_06_小宇.wav",
+  "sid": "S06B",
+  "start": 6,
+  "end": 9,
+  "who": "小宇",
+  "text": "剛剛紙條往上飄！",
+  "audio_sec": 1.92
+ },
+ {
+  "file": "S06B_09_貓頭鷹機長.wav",
+  "sid": "S06B",
+  "start": 9,
+  "end": 12,
+  "who": "貓頭鷹機長",
+  "text": "氣流轉彎，上面壓力變低！",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S07_00_飛飛.wav",
+  "sid": "S07",
+  "start": 0,
+  "end": 4,
+  "who": "飛飛",
+  "text": "引擎吸進大量空氣，",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S07_04_飛飛.wav",
+  "sid": "S07",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "往後加速噴出去，",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S07_08_飛飛.wav",
+  "sid": "S07",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "反推我往前，不是往上喔！",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S08_00_飛飛.wav",
+  "sid": "S08",
+  "start": 0,
+  "end": 4,
+  "who": "飛飛",
+  "text": "引擎全力運轉！",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S08_04_飛飛.wav",
+  "sid": "S08",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "越跑越快，",
+  "audio_sec": 1.76
+ },
+ {
+  "file": "S08_08_飛飛.wav",
+  "sid": "S08",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "流過機翼的空氣越來越多！",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S09_00_貓頭鷹機長.wav",
+  "sid": "S09",
+  "start": 0,
+  "end": 4,
+  "who": "貓頭鷹機長",
+  "text": "速度夠了，機頭抬起來！",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S09_04_飛飛.wav",
+  "sid": "S09",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "迎角變大，升力變大，",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S09_08_飛飛.wav",
+  "sid": "S09",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "升力比重量大，起飛了！",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S10_00_飛飛.wav",
+  "sid": "S10",
+  "start": 0,
+  "end": 4,
+  "who": "飛飛",
+  "text": "升力和重量差不多，",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S10_04_飛飛.wav",
+  "sid": "S10",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "我就保持高度；",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S10_08_飛飛.wav",
+  "sid": "S10",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "推力和阻力差不多，速度就穩定！",
+  "audio_sec": 4.16
+ },
+ {
+  "file": "S11_00_飛飛.wav",
+  "sid": "S11",
+  "start": 0,
+  "end": 4,
+  "who": "飛飛",
+  "text": "降落時，引擎減少推力，",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S11_04_飛飛.wav",
+  "sid": "S11",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "機翼後面往下彎，慢慢飛也有足夠升力，",
+  "audio_sec": 5.12
+ },
+ {
+  "file": "S11_08_飛飛.wav",
+  "sid": "S11",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "放下起落架，安全著陸！",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S12_00_小宇.wav",
+  "sid": "S12",
+  "start": 0,
+  "end": 3,
+  "who": "小宇",
+  "text": "尾巴往上折一點，",
+  "audio_sec": 1.76
+ },
+ {
+  "file": "S12_06_小宇.wav",
+  "sid": "S12",
+  "start": 6,
+  "end": 9,
+  "who": "小宇",
+  "text": "機頭抬起來了！",
+  "audio_sec": 1.44
+ },
+ {
+  "file": "S12_09_小宇.wav",
+  "sid": "S12",
+  "start": 9,
+  "end": 12,
+  "who": "小宇",
+  "text": "不要對人的臉和眼睛射！",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S12B_00_貓頭鷹機長.wav",
+  "sid": "S12B",
+  "start": 0,
+  "end": 3,
+  "who": "貓頭鷹機長",
+  "text": "尾巴往上折一點，",
+  "audio_sec": 1.44
+ },
+ {
+  "file": "S12B_06_小宇.wav",
+  "sid": "S12B",
+  "start": 6,
+  "end": 9,
+  "who": "小宇",
+  "text": "機頭抬起來了！",
+  "audio_sec": 1.6
+ },
+ {
+  "file": "S12B_09_貓頭鷹機長.wav",
+  "sid": "S12B",
+  "start": 9,
+  "end": 12,
+  "who": "貓頭鷹機長",
+  "text": "不要對人的臉和眼睛射！",
+  "audio_sec": 1.76
+ },
+ {
+  "file": "S13_00_飛飛.wav",
+  "sid": "S13",
+  "start": 0,
+  "end": 4,
+  "who": "飛飛",
+  "text": "引擎讓我向前，機翼產生升力，",
+  "audio_sec": 4.16
+ },
+ {
+  "file": "S13_04_飛飛.wav",
+  "sid": "S13",
+  "start": 4,
+  "end": 8,
+  "who": "飛飛",
+  "text": "重量往下拉，阻力擋前進，",
+  "audio_sec": 4.32
+ },
+ {
+  "file": "S13_08_飛飛.wav",
+  "sid": "S13",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "四種力平衡，我就能飛！",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S14_00_小宇.wav",
+  "sid": "S14",
+  "start": 0,
+  "end": 4,
+  "who": "小宇",
+  "text": "玩紙飛機要在空曠地方，",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S14_04_小宇.wav",
+  "sid": "S14",
+  "start": 4,
+  "end": 8,
+  "who": "小宇",
+  "text": "不要爬到高處丟喔！",
+  "audio_sec": 1.6
+ },
+ {
+  "file": "S14_08_小宇.wav",
+  "sid": "S14",
+  "start": 8,
+  "end": 12,
+  "who": "小宇",
+  "text": "飛機不是魔法，是科學！",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S14B_00_貓頭鷹機長.wav",
+  "sid": "S14B",
+  "start": 0,
+  "end": 4,
+  "who": "貓頭鷹機長",
+  "text": "玩紙飛機要在空曠地方，",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S14B_04_貓頭鷹機長.wav",
+  "sid": "S14B",
+  "start": 4,
+  "end": 8,
+  "who": "貓頭鷹機長",
+  "text": "不要爬到高處丟喔！",
+  "audio_sec": 1.44
+ },
+ {
+  "file": "S14B_08_飛飛.wav",
+  "sid": "S14B",
+  "start": 8,
+  "end": 12,
+  "who": "飛飛",
+  "text": "飛機不是魔法，是科學！",
+  "audio_sec": 3.36
+ }
+]

@@ -9,6 +9,8 @@
 
 第四篇：2026-10-30，《聲音是怎麼傳播的？》（7 格）→ 12 段 144 秒，[`sound/`](../projects/comic-video/sound/)（2026-10-30 驗收）；8002 逐格初稿＋人工修、角色立繪參考、保留 H3 原生音效（`sfx.sh`）、台詞對齊 H3 嘴型（`lipsync_measure.py`）
 
+第七篇：2026-10-31，《飛機是怎麼飛的？》（8 格）→ A 版（實景主持＋卡通）、B 版（全卡通）兩支，共用 10 段，[`airplane/`](../projects/comic-video/airplane/)（進行中）
+
 第五篇：2026-10-30，《為什麼會有四季？》（7 格，網站 header＋panel-01～06）→ 12 段 144 秒，[`seasons/`](../projects/comic-video/seasons/)（2026-10-30 驗收）；8002 初稿第一次附每格人工備註（`panel_notes`）、用選定首幀擴寫
 
 ## 成品
@@ -54,12 +56,14 @@
 | Spark docker | `qwen-image-comfyui` 容器 | Qwen-Image 首幀（用時 `docker start`，用完 `docker stop`） |
 | Spark docker | `nvcr.io/nvidia/pytorch:25.11-py3` | `demucs-sfx` 的基底（沒有 torchaudio） |
 | Spark docker | `demucs-sfx`（2026-10-30 新增，19.6 GB，`Dockerfile.sfx`） | `sfx.sh` 去人聲、`lipsync_measure.py` 量開口；內含 demucs 4.0.1 與 htdemucs 權重 |
+| Spark docker | `seed-vc`（2026-10-31 新增，`~/seed-vc-docker`，底為 nvcr pytorch 25.11） | 零樣本聲音轉換備案，尚未實測 |
 | Spark 快取 | `~/.cache/torch/hub`（81 MB，htdemucs 權重） | 手動試跑時下載；映像檔裡已另有一份，可刪 |
 | Spark 殘留 | `~/.cache/demucs-pip`（7.9 MB）、`comic-video/sound/sfx/stub/` | 第一次試裝的殘留，root 擁有，要 `sudo rm` 才能刪；不影響流程 |
 | Spark venv | `~/dgx-voxcpm-eval/.venv` | VoxCPM2 TTS |
 | Spark 主機 | `~/breeze-asr-hub`（whisper-cli CUDA，Breeze-25/26 模型） | `asr_spark.sh` 按需轉寫，不常駐 |
 | Jetson | Breeze ASR（常駐 :8013） | 配音核對備援 |
 | Spark 腳本 | `pipeline.sh`（2026-10-30 新增） | 離線排隊：H3＋配樂＋sfx／對嘴／mux 一次跑完 |
+| Spark 腳本 | `align_dtw.py`（2026-10-31 新增） | TTS 逐音節 DTW 對齊 H3 原聲，寫 `sfx/align.json` |
 | 本機 Windows | Python 3.12＋Pillow | `draft_storyboard.py`、`check_*.py`、`expand.py`、`tts.py`、`asr_check.py`、`qwen_frame.py`、`review.py`、切圖 |
 | 本機 Windows | **沒有 ffmpeg** | 影音處理一律在 Spark 做，成品用 scp 拉回 |
 
@@ -138,6 +142,13 @@
 - 段數、場景、角色、安全句都照備註；沒有加戲。違規續接 2 處（同《四季》）
 - **備註的台詞要先算好語速**：這篇每段知識點多，備註台詞超量，8002 壓語速時直接刪掉科學重點（S11「導線裡本來就有電荷」、S08 四句變成看不懂的縮寫），人工修改量比《四季》多。寫備註時按 4 字／秒（童聲 3.5）算，12 秒旁白最多約 45 字，寫不下就在備註多拆一段
 
+**《飛機》（2026-10-31，第七次，`airplane/storyboard_8002_review.md`）：同一篇做兩個版本**
+- 兩個造型方案（實景主持＋卡通、全卡通）的原理段都是卡通角色在講，可以共用；只有主持人段分版本。共用段的台詞一律給卡通角色，兩版才都能用
+- 段號：共用段 `S02`…，版本段 `S01`（A）／`S01B`（B）；config 的 `panel_shots`（`{"格號": ["S01", "S01B", "S02"]}`）指定每格的段號，`draft_storyboard.py` 照這個命名，`check_storyboard.py` 接受 `S01B` 這種段號
+- 備註逐列寫好台詞（含秒數），語速事先算過：段數、台詞全照做，沒有因壓語速刪掉科學重點，人工修改 36 處多為機械修改（見審查檔）
+- `panel_cast` 若填兩版聯集，版本段會誤報「角色比原圖少」，8002 也會被要求一直重寫；誤報的段落要人看
+- 8002 不會質疑實驗的物理：備註寫「吹氣讓紙條飄起」，它自己補了「放開嘴，紙條保持飄起」→ 實驗段要人看每一列的物理結果
+
 ### 3. 擴寫（8002）→ `python expand.py <篇目>` → `prompts/SXX.txt`
 - 風格、角色外觀、不放字規則寫在 `config.json`（`style`、`characters`、`no_text_rule`），system prompt 其餘部分全篇共用
 - **`style`／`style_en` 只寫畫風、色調、光線，不寫場景道具**：《彩虹》把「戶外木桌」寫進 `style_en`，8002 就把木桌塞進微距水滴、山坡、草地噴水等每一段。場景寫在各段分鏡裡（《密度》每段都在木桌旁，所以當時沒出事）
@@ -180,6 +191,7 @@
 7. **送 TTS 前一律轉簡體**（`config.json` 的 `t2s: true`，`tts.py` 用 OpenCC t2s；《蝴蝶》為 false 以保留當時做法）：VoxCPM2 對繁體字常唸錯，例如《密度》S08「硬幣、湯匙」繁體送三次都唸成怪音，換同音字、改說法也沒用，轉簡體「汤匙」一次就對。原稿、字幕、`lines.json` 保留繁體
 8. **多音字唸錯**（例：「變乾」的乾唸成乾坤的 qián）：VoxCPM2 不支援拼音標註，只能在送給 TTS 的文字裡換成同音、沒有歧義的字（乾→甘），字幕和 `lines.json` 保留正確的字；或改說法（變乾→乾燥）
 9. 台詞錯字（例：「一隻小小的卵」→「一顆」）要同步改 `storyboard.md`、`lines.json`，再重配那句
+9.5 **ASR 一直聽成不雅或歧義詞的術語，直接改台詞避開**（《飛機》2026-10-31）：「放下襟翼」6 版都被轉成「精液」，送 TTS 時換同音字「金翼」再配 3 版仍一樣，分不出是 ASR 還是真的唸錯，兒童片不冒險 → 改成「機翼後面往下彎」，畫面照拍襟翼放下
 10. 關閉 TTS 再進下一步
 
 ### 5. 首幀（Qwen-Image）→ `python qwen_frame.py <篇目> <名稱> 3 <參考圖...>`
@@ -201,6 +213,10 @@
 - 直接輸出 16:9（1344×768），negative prompt 排除文字；生成 3 個 seed 給使用者挑
 - 開 `qwen-image-comfyui` → 生成 → 關閉
 
+- **《飛機》：角色立繪的參考圖從原圖裁**（刊頭的卡通飛機、第 3 格角落的貓頭鷹），裁的時候避開對話框和說明文字；只有 120 px 大的貓頭鷹當參考，3 個 seed 也都畫對了
+- 「機長站在飛飛的機翼上」這種角色在另一個角色身上的構圖，3 個 seed 有 2 個畫成機長站在另一架完整的飛飛前面（像兩架飛機）→ 挑只有機翼的那張
+- 實驗段首幀要選「還沒開始」的樣子：吹紙條 3 張有 2 張紙條已經橫著（像在吹）
+
 ### 5.5 分鏡審查（使用者）→ `python review.py <篇目>` → `review.html`
 - 建議 seed 與理由寫在 `review.json`；首幀完成後產出審查頁：每段首幀候選（標建議 seed 與理由）＋時間軸、鏡頭、台詞；續接段註明接前段末幀
 - 使用者審查、選定首幀後才開始跑 H3
@@ -215,7 +231,7 @@
 - 重跑某段：把舊檔移到 `out/archive/<段>_v1.mp4`、`run/<段>_v1/`，更新 prompt／首幀／`config.json` 後 `bash run_series.sh <篇目> <段>`（其他已存在的段會跳過）
 - `run_series.sh`：整批依序跑，已有的段會跳過；失敗就停（exit 1）。環境變數 `ONLY=S05` 只跑那一段
 - **離線排隊（《電池》起）**：`pipeline.sh <篇目>` 在 Spark 上一次跑完 H3 與後處理，本機可以關機。素材（config、storyboard、prompts、`frames/SXX.png`、`audio/` 台詞與 `lines.json`）先 tar 經 ssh 傳上去，再 `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（一定要 `< /dev/null`，否則 ssh 掛住不回來）
-  - 流程：互斥檢查（停 Qwen／TTS，H3 或 Demucs 在跑就 ABORT）→ music1（`asr_spark.sh` 檢查人聲，自動設成 `bgm.wav`）→ 各段 `ONLY=SXX run_series.sh`，失敗重試 1 次、仍失敗就跳過（失敗的 run 目錄改名 `SXX_fail1`）→ `out/` 複製到 `video/` → `sfx.sh` → `lipsync_measure.py` → `mux.py` 出 `mixed/` 試聽版；不做全片、字幕、分享版
+  - 流程：互斥檢查（停 Qwen／TTS，H3 或 Demucs 在跑就 ABORT）→ music1（`asr_spark.sh` 檢查人聲，自動設成 `bgm.wav`）→ 各段 `ONLY=SXX run_series.sh`，失敗重試 1 次、仍失敗就跳過（失敗的 run 目錄改名 `SXX_fail1`）→ `out/` 複製到 `video/` → `sfx.sh` → `lipsync_measure.py` → `align_dtw.py` → `mux.py` 出 `mixed/` 試聽版；不做全片、字幕、分享版
   - 進度看 `<篇目>/pipeline.status`（每階段一行，最後一行 `DONE` 或 `ABORT`）；細節在 `series.log`、`post.log`
   - 跑完不重開其他服務、不推播；使用者回來後由 Claude 讀 status 接續
 - 在 Spark 上排隊等前一批跑完：`pgrep -f`／`pkill -f` 會比對到自己所在的 `bash -c` 或 ssh 指令（字串裡就有那個關鍵字），等待迴圈永遠不結束、或把自己的 ssh 砍掉。關鍵字寫成 `"[r]un_series.sh rainbow"` 這種形式避開；本機監看用 `timeout` 包住每次 ssh，長時間工作一律在 Spark 上 `setsid nohup … &` 啟動
@@ -242,11 +258,23 @@
   2. `mux.py` 讀到 `lipsync.json` 就把角色台詞起點移到 H3 開口（差 < 0.3 秒不動），並以 H3 那句的長度為目標加速（上限照舊 1.35，段尾 1.5）；講不完的尾巴在閉嘴後講完
   - 《聲音》16 句對齊後，段尾兩句（S06_08、S08_08）用到 1.5 倍上限，要聽是不是太趕
   - 先挑幾段疊回影片給使用者試聽再全片套用；《聲音》使用者直接試聽，沒跑 ASR
+  3. **逐音節對齊（《飛機》起）**：只對頭尾，句子中間節奏仍錯開。`align_dtw.py <篇目> [段...]`（demucs-sfx 容器，`pipeline.sh` 自動跑）把 TTS 和 H3 那句人聲各抽 MFCC（各自 CMVN）跑 DTW，每 0.25 秒一個錨點寫 `sfx/align.json`；`mux.py`／`subs.py` 讀到就照錨點逐段 atempo（每段變速比限 0.6–1.8），取代整句加速
+  - **H3 預設講很快**（《飛機》S05 機長一句 1.4–1.6 秒，TTS 要 2.2 秒），對齊後 TTS 被壓到上限、聽起來很趕 → `expand.py` 有角色台詞時自動加 `SLOW` 句（像耐心老師慢慢講、逗號停頓、每句佔滿時段）並寫 `says slowly`；S05 重跑後每句變 2.8–3.2 秒，連 ASR 都聽對「機翼」
+  - H3 原聲（`sfx/SXX_vocals.wav`）的 ASR 幾乎就是台詞，可以拿來檢查 H3 有沒有照台詞唸
+  - 《飛機》只有機長的段（S05 S06B S09 S12B S14B）加慢重跑並用 DTW；其他段 H3 沒重跑，`align.json` 只留這 5 段（快版 H3 用 DTW 會把 TTS 壓得更快）
+  - 試過零樣本聲音轉換（Seed-VC，H3 原聲換成角色音色，嘴型天生對準），映像 `seed-vc` 已建在 Spark，因 DTW＋慢慢講已夠用，沒有實測
   - Demucs 裝法的坑：pip 不加 `--no-deps` 會重抓幾 GB 的 torch；4.1 版要 `sphn`，ARM 沒有 wheel；4.0.1 要 torchaudio，容器沒有 → 自己寫腳本呼叫 `apply_model`，給 openunmix 一個空的 torchaudio 模組
 - 每句台詞先量響度、統一到 −20 LUFS（`LINE_LUFS`）再混音，避免某個角色偏小聲
 - 台詞放在分鏡起秒；前句沒講完就順延，講不完用 atempo 加速（一般上限 1.35，段尾最後一句上限 1.5）
 - 時段太緊的句子，優先在 `lines.json` 把起秒提前到沒有人說話的空檔，而不是硬加速
 - 配樂以 1.5 秒交叉淡化循環到片長，音量 0.22，頭淡入 1 秒、尾淡出 3 秒
+
+### 8.5 同一篇兩個版本（《飛機》起）
+- config 的 `cuts`：`{"A": [段...], "B": [段...]}`；`shots` 放兩版的聯集（共用段只跑一次 H3），`pipeline.sh` 照 `shots` 跑全部段落
+- 環境變數 `CUT=A`：`comic.load()` 只留那一版的段落並照 `cuts` 排序，`cfg["id"]` 變成 `airplane_A`，所以 `CUT=A python3 mux.py airplane`、`CUT=A python3 subs.py airplane` 輸出 `airplane_A_draft.mp4`、`airplane_A.srt`、`airplane_A_sub.mp4`；逐段處理的 H3、sfx、lipsync 不受影響
+- `pipeline.sh` 不設 `CUT` 時會把 18 段全部串成一支 `airplane_draft.mp4`，只是試聽用
+- 《飛機》結果：使用者採用 **B 版（全卡通）**。B 版的實驗段原本讓貓頭鷹機長自己做，驗收時改成「小宇示範、機長在旁說明」——卡通角色主持，但動手做實驗的要是小朋友（同年齡的人示範比較能同理、照著做）
+- 下一篇若只做一版：預設全卡通主持＋小朋友角色示範實驗；兩版成本約多 4 段 H3，只在主持方式真的拿不定時才做
 
 ### 9. 字幕 → `python3 subs.py <篇目>`
 - 依合成時實際排定的時間產生繁體中文 SRT；角色台詞標名字，旁白不標

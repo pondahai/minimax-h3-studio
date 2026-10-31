@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Bright Japanese children's science anime style with saturated green grass and soft sunlight. Xiao Yu, a ten-year-old boy with fluffy brown hair and a blue hoodie, crouches in the center of a park holding a plain white paper airplane. At 00:00.000, Camera close-up on Xiao Yu crouching; he lifts his hands and folds the tail flaps of the white paper airplane upwards while talking with a focused expression. Xiao Yu (S1) says, <d>[Chinese] 尾巴往上折一點，</d> At 00:03.000, Camera zooms out to a medium shot as Xiao Yu stands up, swings his arm forward, and launches the paper airplane gently forward toward the empty open field ahead, with nobody in front of him. At 00:06.000, Extreme close-up of the plain white paper airplane flying; its nose tilts upward as it climbs, and Xiao Yu's face appears in the background pointing at it while speaking. Xiao Yu (S1) says, <d>[Chinese] 機頭抬起來了！</d> At 00:09.000, Medium shot of Xiao Yu turning his body toward the camera, wagging his index finger with a playful expression while delivering his final instruction. Xiao Yu (S1) says, <d>[Chinese] 不要對人的臉和眼睛射！</d> Xiao Yu winks and playfully wags his finger at the viewer.
+
+overall_soundscape: The rustle of wind through the park trees, the soft thud of sneakers on grass, and the faint flutter of paper cutting through the air.
+
+non_diegetic_music: N/A

@@ -24,13 +24,13 @@ ROW = re.compile(r"^\| *(\d+)[–-](\d+) *\|(.*?)\|(.*?)\|(.*?)\|\s*$", re.M)
 def parse(text):
     """回傳 [(段, 格, 秒數, 續接段或 None, 區塊文字, [(起, 迄, 畫面, 鏡頭, 聲音)])]。"""
     out = []
-    for block in re.split(r"\n(?=### S\d+)", text)[1:]:
+    for block in re.split(r"\n(?=### S\d+[A-Z]?)", text)[1:]:
         block = block.split("\n**總長")[0].strip()
         head = block.splitlines()[0]
-        sid = re.match(r"### (S\d+)", head)[1]
+        sid = re.match(r"### (S\d+[A-Z]?)", head)[1]
         panel = (m := re.search(r"第 ?(\d+) ?格", head)) and int(m[1])
         dur = (m := re.search(r"(\d+) ?s\b", head)) and int(m[1])
-        cont = (m := re.search(r"⟶續 ?(S\d+)", head)) and m[1]
+        cont = (m := re.search(r"⟶續 ?(S\d+[A-Z]?)", head)) and m[1]
         # 「12–12 | （末幀：…）」這種只寫末幀的列不算時段
         rows = [(int(a), int(b), v.strip(), c.strip(), s.strip()) for a, b, v, c, s in ROW.findall(block)
                 if not (a == b and "末幀" in v)]

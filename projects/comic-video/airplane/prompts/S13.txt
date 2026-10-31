@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene with saturated colors and soft lighting, featuring the anthropomorphic small white passenger jet Feifei against a backdrop of a fluffy blue sky and distant green hills. The composition focuses on Feifei centered in the frame, showcasing her blue tail fin and grey engines. At 00:00.000, Feifei hovers in the sky, tilting her head to give a distinct wink to the camera with her big black eye while her mouth opens in a cheerful expression. Feifei (S1) says, <d>[Chinese] 引擎讓我向前，機翼產生升力，</d> At 00:04.000, Feifei executes a smooth barrel roll in the air, her grey engines spinning visibly as she showcases her wings and blue tail fin, her body rotating fluidly with the movement. Feifei (S1) says, <d>[Chinese] 重量往下拉，阻力擋前進，</d> At 00:08.000, Feifei dives forward through a cluster of white clouds, her wings flapping gently as she navigates the air, her expression focused and determined. Feifei (S1) says, <d>[Chinese] 四種力平衡，我就能飛！</d>
+
+overall_soundscape: A steady, rhythmic mechanical purring from Feifei's engines mixed with the soft, airy whoosh of wind rushing past the jet as she flies through the clouds.
+
+non_diegetic_music: N/A

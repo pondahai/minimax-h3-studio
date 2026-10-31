@@ -34,7 +34,7 @@ def embed(p):
 
 def section(d, block, src, rec, note):
     head = block.splitlines()[0][4:]
-    sid = head[:3]
+    sid = head.split()[0]
     rows = re.findall(r"^\| (\d+–\d+) \| (.+?) \| (.+?) \| (.+?) \|$", block, re.M)
     if src == "-":
         frame = '<p class="cont">無首幀：H3 直接生成（t2va）</p>'
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     cfg, d, _ = comic.load()
     rv = json.loads((d / "review.json").read_text(encoding="utf-8")) if (d / "review.json").exists() else {}
     src = {sid: s for sid, _, s in cfg["shots"]}
-    blocks = [b.split("\n**總長")[0] for b in re.split(r"\n(?=### S\d+)", (d / "storyboard.md").read_text(encoding="utf-8"))[1:]]
+    blocks = [b.split("\n**總長")[0] for b in re.split(r"\n(?=### S\d+[A-Z]?)", (d / "storyboard.md").read_text(encoding="utf-8"))[1:]]
     body = "".join(section(d, b, src[b[4:7]], rv.get("rec", {}).get(b[4:7]), rv.get("notes", {}).get(b[4:7])) for b in blocks)
     n_frame = sum(s.endswith(".png") for s in src.values())
     n_cont = sum(s in src for s in src.values())

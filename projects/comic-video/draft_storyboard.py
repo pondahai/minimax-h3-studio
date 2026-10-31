@@ -54,12 +54,14 @@ def ask(messages):
     return re.sub(r"^```(?:markdown)?|```$", "", text).strip()
 
 
-def renumber(text, start):
-    """8002 的段號不一定對：依序改成 S{start}、S{start+1}…，續接引用一起改。"""
-    old = re.findall(r"^### (S\d+)", text, re.M)
-    new = {o: f"S{start + i:02d}" for i, o in enumerate(old)}
-    text = re.sub(r"^### (S\d+)", lambda m: "### " + new[m[1]], text, flags=re.M)
-    return re.sub(r"⟶續 ?(S\d+)", lambda m: "⟶續 " + new.get(m[1], m[1]), text), len(old)
+def renumber(text, start, ids=None):
+    """8002 的段號不一定對：依序改成 S{start}、S{start+1}…（config 的 panel_shots 有指定就用指定的，
+    例如共用段＋版本段 S01、S01B），續接引用一起改。回傳 (文字, 這格的段號)。"""
+    old = re.findall(r"^### (S\d+[A-Z]?)", text, re.M)
+    names = [ids[i] if ids and i < len(ids) else f"S{start + i:02d}" for i in range(len(old))]
+    new = dict(zip(old, names))
+    text = re.sub(r"^### (S\d+[A-Z]?)", lambda m: "### " + new[m[1]], text, flags=re.M)
+    return re.sub(r"⟶續 ?(S\d+[A-Z]?)", lambda m: "⟶續 " + new.get(m[1], m[1]), text), names
 
 
 def summary(done):
@@ -73,6 +75,8 @@ def draft(cfg):
     raw = []
     for n, p in enumerate(panels(cfg), 1):
         start = len(re.findall(r"^### S\d+", done, re.M)) + 1
+        ids = cfg.get("panel_shots", {}).get(str(n))
+        first = ids[0] if ids else f"S{start:02d}"
         cast = cfg.get("panel_cast", {}).get(str(n))
         cast = "依圖" if cast is None else "、".join(cast) or "沒有角色（畫面沒有人物）"
         note = cfg.get("panel_notes", {}).get(str(n))
@@ -81,16 +85,15 @@ def draft(cfg):
         messages = [
             {"role": "system", "content": SYSTEM.format(characters=cfg["characters"], cast=cast, children="、".join(cfg.get("children", ["小明", "小美"])))},
             {"role": "user", "content": [
-                {"type": "text", "text": f"篇名：《{cfg['title']}》。{summary(done)}\n請寫第 {n} 格，段號從 S{start:02d} 開始。{note}"},
+                {"type": "text", "text": f"篇名：《{cfg['title']}》。{summary(done)}\n請寫第 {n} 格，段號從 {first} 開始。{note}"},
                 {"type": "image_url", "image_url": {"url": img}}]},
         ]
         for rnd in range(REVISE + 1):
-            part, count = renumber(ask(messages), start)
+            part, mine = renumber(ask(messages), start, ids)
             raw.append(f"<!-- 第 {n} 格 第 {rnd + 1} 次 -->\n{part}")
             # 連同前一段一起檢查，續接與跨格才查得到；只取這一格的段落結果
             results = check_text(cfg, done + "\n" + part)
-            mine = [f"S{start + i:02d}" for i in range(count)]
-            issues = {s: results.get(s, ["沒寫出這一段"]) for s in mine}
+            issues = {s: results.get(s, ["沒寫出這一段"]) for s in (ids or mine)}
             bad = {s: v for s, v in issues.items() if v}
             print(f"第 {n} 格 第 {rnd + 1} 次：{'OK' if not bad else bad}", flush=True)
             if not bad or rnd == REVISE:

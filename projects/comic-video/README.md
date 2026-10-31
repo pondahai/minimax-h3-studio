@@ -15,23 +15,28 @@
 | [`sound/`](sound/) | 聲音是怎麼傳播的？ | 完成（12 段 144 秒，含 H3 音效、對嘴） |
 | [`seasons/`](seasons/) | 為什麼會有四季？ | 完成（12 段 144 秒，8002 初稿附人工備註） |
 | [`battery/`](battery/) | 電池＋燈泡的冒險故事 | 完成（12 段 144 秒，pipeline.sh 離線排隊） |
+| [`airplane/`](airplane/) | 飛機是怎麼飛的？ | 完成（A、B 兩版各 14 段 168 秒，共用 10 段；採用 B 版全卡通） |
 
 ## 流程
 
 ```
-取材 → 分鏡（人工）→ 8002 擴寫＋檢查
-     → TTS 配音（角色聲音人工挑選；送 TTS 前轉簡體）→ ASR 核對＋人工試聽
-     → Qwen-Image 首幀（獨立段）→ 分鏡審查（review.html，使用者選定）
-     → H3 分段生成（續接段接前段末幀）→ H3 配樂 → 合成 → 字幕
+取材（原圖、panel_notes、安全句）→ 8002 分鏡初稿（draft_storyboard）→ 人工修＋check_storyboard
+     → 角色立繪（每角色一張、純白背景，使用者選）
+     → TTS 配音（角色聲音使用者先選；送 TTS 前轉簡體）→ ASR 核對＋人工試聽
+     → Qwen-Image 首幀（每段 3 seed）→ 分鏡審查（review.html，使用者選定）
+     → 8002 擴寫（官方格式、角色「慢慢講」）＋check_prompts
+     → Spark pipeline.sh 離線：配樂 → H3 各段 → 去人聲留音效 → 量開口 → DTW 逐音節對齊 → 試聽版
+     → 合成（CUT=A|B 可出多版）→ 字幕 → 分享版 → 使用者驗收 → README／YouTube 文案 → PR
 ```
 
-## 文字版工作流（彙整自四篇筆記）
+## 文字版工作流（彙整自七篇筆記）
 
 以下把 [docs 復盤筆記](../../docs/comic-to-video-workflow.md) 與各篇 README 的定案做法整理成一條可照做的流程；每步的原因與踩坑細節仍以 docs 為準。
 
 ### 0. 原則
 - **人決定、機器做**：角色聲音、首幀 seed、配樂、最終試聽都由使用者挑，不自動選定
-- **記憶體互斥**：TTS、Qwen-Image、H3 一次只開一個；跑 H3 時 Spark 只留 8002
+- **記憶體互斥**：TTS、Qwen-Image、H3、Demucs 一次只開一個；跑 H3 時 Spark 只留 8002
+- **主持與示範**（《飛機》起）：預設卡通角色主持、實驗由小朋友角色動手示範、主持角色在旁說明（同齡示範比較能同理）；主持方式拿不定時才用 `cuts` 做兩版給使用者選
 - **畫面不放任何文字**（招牌、標籤、標語、箭頭、示意圖），H3 會畫成亂碼；標語改用字幕
 - 草稿等級 672×384；本機 Windows 沒有 ffmpeg，影音處理一律在 Spark 做
 
@@ -55,11 +60,14 @@
 - 續接後要拉遠到角色、或角色中途才入鏡 → 加 Qwen 尾幀（首尾幀）；物理結果（浮／沉）也用尾幀鎖住
 - 光學題材寫明光源位置，動作也不能暗示光源方向
 - 阿柴不說話（原作台詞改給其他角色或旁白）
+- 容易被 TTS／ASR 唸錯或聽成不雅詞的術語（例：襟翼）直接改寫說法
 
 ### 3. 擴寫 → `python expand.py <篇目>` → `prompts/SXX.txt`
 - `config.json` 的 `style`／`style_en` **只寫畫風、色調、光線**，場景道具寫在各段分鏡
 - 一格拆成多段時先把原圖切成 `panel-0Xa`／`b`，切完確認沒帶到相鄰角色
 - 輸出 H3 官方格式（`prompt_format: official`），8002 只回 JSON、時間戳與 `<d>[Chinese] 台詞</d>` 由程式組；角色一律用 `names_en`
+- 有角色台詞的段自動加「慢慢講」句並寫 `says slowly`：H3 預設一句只講 1.5 秒，TTS 對不上嘴
+- 人工檢查 8002 有沒有把角色寫錯（《飛機》S09 把客機飛飛寫成 paper airplane，畫面就混進真實客機）
 - `python check_prompts.py <篇目>` → 再人工看：前後段外觀連續、道具有沒有被換（塑膠杯變 glass）；確認每段 `prompts/` 都有更新；有問題直接改 prompt 檔
 
 ### 4. 配音 → `python tts.py <篇目>`
@@ -71,7 +79,7 @@
 
 ### 5. 首幀 → `python qwen_frame.py <篇目> <段> 3 <參考圖...>`
 1. 啟動 `qwen-image-comfyui`（`:8188`）
-2. 先做角色立繪 `frame_prompts/chars.txt` → `frames/chars.png`（純色背景、全員全身、手上無道具），之後當角色參考
+2. 先做角色立繪：**每個角色一張** `frames/char_<角色>.png`（純白素色背景、全身、手上無道具），使用者選定後當參考；同系列角色沿用前一篇
 3. **所有獨立段都做首幀**（1344×768，3 個 seed）；續接段用前段末幀；需要的段做尾幀 `frames/SXX_end.png`（config `last_frames`）
 4. prompt 用中文、描述具體（「一半露出水面」而不是「浮在水面」）；只有路人的段不給立繪
 5. 挑 seed 時排除：照抄參考圖（道具、整排立繪角色）、動作結果已出現在首幀、和 0 秒分鏡構圖不符
@@ -81,7 +89,8 @@
 - 建議 seed 與理由寫進 `review.json` → 產生 `review.html`（首幀候選＋時間軸＋台詞）
 - **使用者選定**後，把選定 seed 複製成 `shots` 指定的首幀檔名，才開始跑 H3
 
-### 7. 影片 → Spark `bash run_series.sh <篇目>`
+### 7. 影片 → Spark `setsid nohup bash pipeline.sh <篇目> …`（離線一次跑完 7–10 步的試聽版）
+- `pipeline.sh`：互斥檢查 → music1 → 各段 H3（失敗重試 1 次）→ `sfx.sh` → `lipsync_measure.py` → `align_dtw.py` → `mux.py`；進度看 `pipeline.status`，`out/` 已有的段跳過
 - 腳本、`bench.py`、`<篇目>/` 放到 Spark `~/h3-bench/comic-video/`；先 `bash -n` 檢查語法；停掉 8002 以外的服務
 - 長時間工作用 `setsid nohup … &`；`pgrep`／`pkill` 關鍵字寫成 `"[r]un_series.sh <篇目>"`
 - 每段跑完抽幀檢查接縫、文字、角色外觀；重跑某段：舊檔移到 `out/archive/`、`run/<段>_v1/`，修 prompt／首幀後 `bash run_series.sh <篇目> <段>`
@@ -92,16 +101,18 @@
 
 ### 9. 音效與對嘴（Spark）
 1. `bash sfx.sh <篇目>`：去掉 H3 原生音軌的人聲 → `sfx/SXX_novocals.wav`，列出響度（< −45 LUFS 的對白段沒有音效是正常的）
-2. `lipsync_measure.py <篇目>`（在 `demucs-sfx` 容器裡跑）→ `sfx/lipsync.json`：角色台詞對齊 H3 開口
-3. 先挑幾段給使用者試聽再全片套用
+2. `lipsync_measure.py <篇目>`（在 `demucs-sfx` 容器裡跑）→ `sfx/lipsync.json`：H3 每句的開口、閉口
+3. `align_dtw.py <篇目> [段...]`（同容器）→ `sfx/align.json`：TTS 與 H3 原聲做 DTW，每 0.25 秒一個錨點，mux 逐段變速讓音節對上嘴型；H3 沒有「慢慢講」的舊段不要用（會把 TTS 壓得更快）
+4. 先挑幾段給使用者試聽再全片套用
 
 ### 10. 合成與字幕（Spark）
-1. `python3 mux.py <篇目>`：原生音軌只取去人聲後的音效；台詞統一 −20 LUFS、依時間軸（或 lipsync）放入，太緊優先在 `lines.json` 提前起秒；配樂循環墊底 → `<篇目>_draft.mp4`
+1. `python3 mux.py <篇目>`：原生音軌只取去人聲後的音效；台詞統一 −20 LUFS、依 `align.json`（逐音節）或 `lipsync.json`（整句）放入，太緊優先在 `lines.json` 提前起秒；配樂循環墊底 → `<篇目>_draft.mp4`
 2. `python3 subs.py <篇目>` → `<篇目>.srt`＋`<篇目>_sub.mp4`（角色標名、旁白不標、片尾標語置頂）
-3. scp 拉回本機、使用者驗收；分享版另以 CRF 27／AAC 96k 重編碼成 `<篇目>_share.mp4`
+3. 兩版時：`CUT=A python3 mux.py <篇目>`、`CUT=A python3 subs.py <篇目>`（B 同理）→ `<篇目>_A_draft.mp4`、`<篇目>_A.srt`
+4. scp 拉回本機、使用者驗收；分享版另以 CRF 27／AAC 96k 重編碼成 `<篇目>_share.mp4`
 
 ### 11. 收尾
-- 在該篇 README 記下：聲音來源、原作處理、選定 seed、重跑原因、配樂；需要時寫 YouTube 標題與說明（註明原作與 AI 生成）
+- 使用者驗收後才寫該篇 README（聲音來源、原作處理、選定 seed、重跑原因、配樂、採用哪一版、YouTube 標題與說明，註明原作與 AI 生成）、加進本頁篇目表，再開 PR；進行中的篇目不寫進根目錄 README
 - 新的坑與解法補進 docs 筆記；新增工具更新 docs 的工具清單
 - 影片、wav、圖檔、`review.html` 不進 git
 
@@ -113,9 +124,10 @@
 | VoxCPM2 TTS | Spark `:8792`（用時才啟動） | 配音 |
 | Qwen-Image ComfyUI | Spark `:8188`（用時才啟動） | 首幀 |
 | MiniMax H3 | Spark `~/h3-bench`（docker） | 影片、配樂 |
-| Breeze ASR | Jetson `100.108.74.45:8013` | 核對配音 |
+| Breeze ASR | Spark 按需（`asr_spark.sh`，預設）；Xavier `100.108.74.45:8013` 備援 | 核對配音、檢查配樂與 H3 原聲 |
+| Demucs | Spark docker `demucs-sfx` | 去人聲、量開口、DTW 對齊 |
 
-TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
+TTS、Qwen-Image、H3、Demucs 互斥（記憶體），一次只開一個。
 
 ## 共用腳本
 
@@ -135,7 +147,11 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 | `run_jobs.sh <篇目> "<工作>"...` | 單獨重跑指定段或配樂 | Spark |
 | `sfx.sh <篇目> [段...]` | H3 跑完後去掉原生音軌的人聲、留下同步音效 → `sfx/SXX_novocals.wav`，列出各段音效響度（映像檔 `Dockerfile.sfx`，裡面跑 `sfx_sep.py`） | Spark |
 | `mux.py <篇目>` | 配音依時間軸混入、有 `sfx/SXX_novocals.wav` 就墊音效、配樂循環墊底 → `<篇目>_draft.mp4` | Spark（需 ffmpeg） |
-| `subs.py <篇目>` | 繁中字幕 `<篇目>.srt`＋壓字幕版 `<篇目>_sub.mp4` | Spark |
+| `subs.py <篇目>` | 繁中字幕 `<篇目>.srt`＋壓字幕版 `<篇目>_sub.mp4`（有 `align.json` 的句子照 DTW 時間） | Spark |
+| `pipeline.sh <篇目>` | 離線排隊：配樂＋H3 各段＋sfx＋lipsync＋DTW 對齊＋試聽版 | Spark |
+| `lipsync_measure.py <篇目>` | 從 H3 原聲找每句開口、閉口 → `sfx/lipsync.json` | Spark（demucs-sfx） |
+| `align_dtw.py <篇目> [段...]` | TTS 逐音節 DTW 對齊 H3 原聲 → `sfx/align.json` | Spark（demucs-sfx） |
+| `asr_spark.sh` | Spark 按需 ASR（tar 經 ssh 送入） | Spark |
 
 `.sh` 由 `.gitattributes` 固定 LF 換行（CRLF 傳到 Spark 會跑不動）。
 
@@ -152,16 +168,18 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。
 | `panel_cast` | 原圖每格出現的角色（`check_storyboard.py` 用；空陣列＝沒有角色） |
 | `panel_notes` | 每格人工備註（段數、場景、原作更正、科學補充、安全句），`draft_storyboard.py` 連同原圖送 8002 |
 | `speakers`、`tagline` | 字幕標名字的角色（旁白不標）、片尾標語（可為 null） |
+| `names_en`、`children`、`prompt_format` | 角色英文名（官方格式用）、兒童角色、`official` |
+| `panel_shots`、`cuts` | 每格產生的段號（如 `S06`、`S06B`）、每個版本的段落順序（`CUT=A` 時用） |
 
 ## 新增一篇
 
 1. 建 `<篇目>/`，寫 `config.json`、`storyboard.md`（格式照現有篇目）；兩段共用一格的原圖先切塊
-2. `python expand.py <篇目>` → 檢查並修 `prompts/`
+2. 分鏡定稿後先做 3–5 步（配音、首幀、審查），選好首幀再 `python expand.py <篇目>`（8002 看選定首幀擴寫）→ `check_prompts.py` → 人工修 `prompts/`
 3. 啟動 TTS → 新角色候選、**由人挑選**存成 `audio/ref_<角色>.wav`（同系列角色直接複製前一篇的）→ `python tts.py <篇目>` → `python asr_check.py <篇目>` → 壞句重配、人工試聽 → 關 TTS
 4. 啟動 8188 → 每個獨立段 `python qwen_frame.py <篇目> <段> 3 <原漫畫分格> <角色參考圖>` → 關 8188
 5. 寫 `review.json`（建議 seed 與理由）→ `python review.py <篇目>` → 使用者選定 → 存成 `shots` 指定的首幀檔名
-6. 把本目錄腳本、`bench.py`（672×384）和 `<篇目>/` 放到 Spark `~/h3-bench/comic-video/`，停掉 8002 以外的服務 → `bash run_series.sh <篇目>`
-7. 配樂：`bash run_jobs.sh <篇目> "music1 prompts/music.txt 1 12 -" ...` → 挑選 → `music/bgm.wav`
-8. Spark 上 `bash sfx.sh <篇目>`（實驗音效）→ 各段影片放 `video/`、`audio/` 傳上 Spark → `python3 mux.py <篇目>` → `python3 subs.py <篇目>`
+6. 把本目錄腳本、`bench.py`（672×384）和 `<篇目>/` 放到 Spark `~/h3-bench/comic-video/` → `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（自動停 8002 以外的服務）
+7. 跑完看 `pipeline.status`：失敗段重跑、配樂若 ASR 聽到人聲要人聽
+8. `python3 mux.py <篇目>`（兩版加 `CUT=A|B`）→ `python3 subs.py <篇目>` → 分享版 → 拉回本機給使用者驗收
 
 影片、wav、圖檔、`review.html` 不進 git，清單見 docs 筆記的「不進 git 的檔案」。
