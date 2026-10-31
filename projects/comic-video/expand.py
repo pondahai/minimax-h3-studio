@@ -59,6 +59,10 @@ def system_prompt(cfg, n=0):
     return SYSTEM_OFFICIAL.format(style=cfg["style_en"], characters=cfg["characters_en"], no_text_rule=cfg["no_text_rule_en"], n=n)
 
 
+SLOW = ("Every character speaks slowly and calmly like a patient teacher talking to young children, "
+        "with a clear pause at each comma; each line fills most of its time slot.")
+
+
 def stamp(sec):
     return f"00:{int(sec):02d}.000"
 
@@ -81,8 +85,10 @@ def assemble(cfg, sid, block, parts):
             else:
                 speakers.setdefault(who, f"S{len(speakers) + 1}")
                 name = cfg.get("names_en", {}).get(who, who)
-                line += f" {name} ({speakers[who]}) says, <d>[Chinese] {said}</d>"
+                line += f" {name} ({speakers[who]}) says slowly, <d>[Chinese] {said}</d>"
         sentences.append(line)
+    if speakers:  # H3 預設講很快（一句 1.5 秒），TTS 對不上嘴；要它慢慢講，每句約佔滿時段
+        sentences.insert(1, SLOW)
     if sid in cfg.get("last_frames", []):  # 官方尾幀句：Picture 2 錨定在片長秒數
         sentences.append(f"<Picture 2> (from [Shot 1]) aligns with the {comic.durations(cfg)[sid]:.2f}-second mark of the target video.")
     if parts.get("final_frame"):

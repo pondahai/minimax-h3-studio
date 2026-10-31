@@ -19,6 +19,7 @@ MUSIC_CLIP, MUSIC_XFADE, MUSIC_VOLUME = 12.25, 1.5, 0.22
 
 LIPSYNC = {}  # sfx/lipsync.json：{台詞檔名: [H3 開口, 閉口]}（lipsync_measure.py 產生）；有就把角色台詞對齊 H3 的嘴型
 LIPSYNC_MIN = 0.3  # 開口差小於這個就不動
+ALIGN = {}  # sfx/align.json：{台詞檔名: [[TTS 秒, 影片秒], ...]}（align_dtw.py 產生）；有就照錨點逐段變速，取代上面整句對齊
 
 
 def start_of(ln):
@@ -65,9 +66,19 @@ def mix(d, sid, seg_dur, lines):
     for n, (ln, t, tempo) in enumerate(plan, start=first):
         wav = d / "audio" / ln["file"]
         cmd += ["-i", str(wav)]
-        filters.append(f"[{n}:a]aresample=48000,volume={gain_db(wav):.1f}dB,alimiter=limit=0.95,atempo={tempo:.3f},adelay={int(t * 1000)}:all=1[v{n}]")
+        pre = f"[{n}:a]aresample=48000,volume={gain_db(wav):.1f}dB,alimiter=limit=0.95"
+        if a := ALIGN.get(ln["file"]):  # 逐段變速，讓每個音節落在 H3 開口的位置
+            k = len(a) - 1
+            filters.append(f"{pre},asplit={k}" + "".join(f"[c{n}_{i}]" for i in range(k)))
+            for i in range(k):
+                (s0, v0), (s1, v1) = a[i], a[i + 1]
+                filters.append(f"[c{n}_{i}]atrim={s0}:{s1},asetpts=PTS-STARTPTS,atempo={(s1 - s0) / (v1 - v0):.3f}[w{n}_{i}]")
+            filters.append("".join(f"[w{n}_{i}]" for i in range(k)) + f"concat=n={k}:v=0:a=1,adelay={int(a[0][1] * 1000)}:all=1[v{n}]")
+            print(f"  {ln['file']} DTW 對齊 {a[0][1]:.2f}–{a[-1][1]:.2f}s，{k} 段")
+        else:
+            filters.append(f"{pre},atempo={tempo:.3f},adelay={int(t * 1000)}:all=1[v{n}]")
+            print(f"  {ln['file']} @ {t:.2f}s x{tempo:.2f} → 結束 {t + ln['audio_sec'] / tempo:.2f}s")
         labels.append(f"[v{n}]")
-        print(f"  {ln['file']} @ {t:.2f}s x{tempo:.2f} → 結束 {t + ln['audio_sec'] / tempo:.2f}s")
     filters.append(f"{''.join(labels)}amix=inputs={len(labels)}:normalize=0,atrim=0:{seg_dur}[a]")
     cmd += ["-filter_complex", ";".join(filters), "-map", "0:v", "-map", "[a]",
             "-c:v", "copy", "-c:a", "aac", "-b:a", "160k", "-t", str(seg_dur), str(dst)]
@@ -97,6 +108,9 @@ if __name__ == "__main__":
     if (d / "sfx" / "lipsync.json").exists():
         LIPSYNC.update(json.loads((d / "sfx" / "lipsync.json").read_text(encoding="utf-8")))
         print(f"對齊 H3 嘴型：{len(LIPSYNC)} 句")
+    if (d / "sfx" / "align.json").exists():
+        ALIGN.update(json.loads((d / "sfx" / "align.json").read_text(encoding="utf-8")))
+        print(f"DTW 逐段對齊：{len(ALIGN)} 句")
     report = json.loads((d / "audio" / "lines.json").read_text(encoding="utf-8"))
     sids = list(dur)
     for sid in sids:

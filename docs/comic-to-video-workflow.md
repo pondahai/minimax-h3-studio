@@ -56,12 +56,14 @@
 | Spark docker | `qwen-image-comfyui` 容器 | Qwen-Image 首幀（用時 `docker start`，用完 `docker stop`） |
 | Spark docker | `nvcr.io/nvidia/pytorch:25.11-py3` | `demucs-sfx` 的基底（沒有 torchaudio） |
 | Spark docker | `demucs-sfx`（2026-10-30 新增，19.6 GB，`Dockerfile.sfx`） | `sfx.sh` 去人聲、`lipsync_measure.py` 量開口；內含 demucs 4.0.1 與 htdemucs 權重 |
+| Spark docker | `seed-vc`（2026-10-31 新增，`~/seed-vc-docker`，底為 nvcr pytorch 25.11） | 零樣本聲音轉換備案，尚未實測 |
 | Spark 快取 | `~/.cache/torch/hub`（81 MB，htdemucs 權重） | 手動試跑時下載；映像檔裡已另有一份，可刪 |
 | Spark 殘留 | `~/.cache/demucs-pip`（7.9 MB）、`comic-video/sound/sfx/stub/` | 第一次試裝的殘留，root 擁有，要 `sudo rm` 才能刪；不影響流程 |
 | Spark venv | `~/dgx-voxcpm-eval/.venv` | VoxCPM2 TTS |
 | Spark 主機 | `~/breeze-asr-hub`（whisper-cli CUDA，Breeze-25/26 模型） | `asr_spark.sh` 按需轉寫，不常駐 |
 | Jetson | Breeze ASR（常駐 :8013） | 配音核對備援 |
 | Spark 腳本 | `pipeline.sh`（2026-10-30 新增） | 離線排隊：H3＋配樂＋sfx／對嘴／mux 一次跑完 |
+| Spark 腳本 | `align_dtw.py`（2026-10-31 新增） | TTS 逐音節 DTW 對齊 H3 原聲，寫 `sfx/align.json` |
 | 本機 Windows | Python 3.12＋Pillow | `draft_storyboard.py`、`check_*.py`、`expand.py`、`tts.py`、`asr_check.py`、`qwen_frame.py`、`review.py`、切圖 |
 | 本機 Windows | **沒有 ffmpeg** | 影音處理一律在 Spark 做，成品用 scp 拉回 |
 
@@ -229,7 +231,7 @@
 - 重跑某段：把舊檔移到 `out/archive/<段>_v1.mp4`、`run/<段>_v1/`，更新 prompt／首幀／`config.json` 後 `bash run_series.sh <篇目> <段>`（其他已存在的段會跳過）
 - `run_series.sh`：整批依序跑，已有的段會跳過；失敗就停（exit 1）。環境變數 `ONLY=S05` 只跑那一段
 - **離線排隊（《電池》起）**：`pipeline.sh <篇目>` 在 Spark 上一次跑完 H3 與後處理，本機可以關機。素材（config、storyboard、prompts、`frames/SXX.png`、`audio/` 台詞與 `lines.json`）先 tar 經 ssh 傳上去，再 `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（一定要 `< /dev/null`，否則 ssh 掛住不回來）
-  - 流程：互斥檢查（停 Qwen／TTS，H3 或 Demucs 在跑就 ABORT）→ music1（`asr_spark.sh` 檢查人聲，自動設成 `bgm.wav`）→ 各段 `ONLY=SXX run_series.sh`，失敗重試 1 次、仍失敗就跳過（失敗的 run 目錄改名 `SXX_fail1`）→ `out/` 複製到 `video/` → `sfx.sh` → `lipsync_measure.py` → `mux.py` 出 `mixed/` 試聽版；不做全片、字幕、分享版
+  - 流程：互斥檢查（停 Qwen／TTS，H3 或 Demucs 在跑就 ABORT）→ music1（`asr_spark.sh` 檢查人聲，自動設成 `bgm.wav`）→ 各段 `ONLY=SXX run_series.sh`，失敗重試 1 次、仍失敗就跳過（失敗的 run 目錄改名 `SXX_fail1`）→ `out/` 複製到 `video/` → `sfx.sh` → `lipsync_measure.py` → `align_dtw.py` → `mux.py` 出 `mixed/` 試聽版；不做全片、字幕、分享版
   - 進度看 `<篇目>/pipeline.status`（每階段一行，最後一行 `DONE` 或 `ABORT`）；細節在 `series.log`、`post.log`
   - 跑完不重開其他服務、不推播；使用者回來後由 Claude 讀 status 接續
 - 在 Spark 上排隊等前一批跑完：`pgrep -f`／`pkill -f` 會比對到自己所在的 `bash -c` 或 ssh 指令（字串裡就有那個關鍵字），等待迴圈永遠不結束、或把自己的 ssh 砍掉。關鍵字寫成 `"[r]un_series.sh rainbow"` 這種形式避開；本機監看用 `timeout` 包住每次 ssh，長時間工作一律在 Spark 上 `setsid nohup … &` 啟動
@@ -256,6 +258,11 @@
   2. `mux.py` 讀到 `lipsync.json` 就把角色台詞起點移到 H3 開口（差 < 0.3 秒不動），並以 H3 那句的長度為目標加速（上限照舊 1.35，段尾 1.5）；講不完的尾巴在閉嘴後講完
   - 《聲音》16 句對齊後，段尾兩句（S06_08、S08_08）用到 1.5 倍上限，要聽是不是太趕
   - 先挑幾段疊回影片給使用者試聽再全片套用；《聲音》使用者直接試聽，沒跑 ASR
+  3. **逐音節對齊（《飛機》起）**：只對頭尾，句子中間節奏仍錯開。`align_dtw.py <篇目> [段...]`（demucs-sfx 容器，`pipeline.sh` 自動跑）把 TTS 和 H3 那句人聲各抽 MFCC（各自 CMVN）跑 DTW，每 0.25 秒一個錨點寫 `sfx/align.json`；`mux.py`／`subs.py` 讀到就照錨點逐段 atempo（每段變速比限 0.6–1.8），取代整句加速
+  - **H3 預設講很快**（《飛機》S05 機長一句 1.4–1.6 秒，TTS 要 2.2 秒），對齊後 TTS 被壓到上限、聽起來很趕 → `expand.py` 有角色台詞時自動加 `SLOW` 句（像耐心老師慢慢講、逗號停頓、每句佔滿時段）並寫 `says slowly`；S05 重跑後每句變 2.8–3.2 秒，連 ASR 都聽對「機翼」
+  - H3 原聲（`sfx/SXX_vocals.wav`）的 ASR 幾乎就是台詞，可以拿來檢查 H3 有沒有照台詞唸
+  - 《飛機》只有機長的段（S05 S06B S09 S12B S14B）加慢重跑並用 DTW；其他段 H3 沒重跑，`align.json` 只留這 5 段（快版 H3 用 DTW 會把 TTS 壓得更快）
+  - 試過零樣本聲音轉換（Seed-VC，H3 原聲換成角色音色，嘴型天生對準），映像 `seed-vc` 已建在 Spark，因 DTW＋慢慢講已夠用，沒有實測
   - Demucs 裝法的坑：pip 不加 `--no-deps` 會重抓幾 GB 的 torch；4.1 版要 `sphn`，ARM 沒有 wheel；4.0.1 要 torchaudio，容器沒有 → 自己寫腳本呼叫 `apply_model`，給 openunmix 一個空的 torchaudio 模組
 - 每句台詞先量響度、統一到 −20 LUFS（`LINE_LUFS`）再混音，避免某個角色偏小聲
 - 台詞放在分鏡起秒；前句沒講完就順延，講不完用 atempo 加速（一般上限 1.35，段尾最後一句上限 1.5）

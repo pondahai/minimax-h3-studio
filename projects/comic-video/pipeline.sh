@@ -1,6 +1,6 @@
 #!/bin/bash
 # 在 Spark 上離線跑完一篇的 H3 與後處理，本機可以關機：配樂 music1 → 各段 H3（失敗重試 1 次，仍失敗就跳過）
-# → out/ 複製到 video/ → sfx.sh → lipsync_measure.py → mux.py（試聽版）。不做全片、字幕、分享版（等使用者試聽）。
+# → out/ 複製到 video/ → sfx.sh → lipsync_measure.py → align_dtw.py → mux.py（試聽版）。不做全片、字幕、分享版（等使用者試聽）。
 # 用法（Spark 上）：setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &
 # 進度：<篇目>/pipeline.status 每階段一行；跑完最後一行是 DONE（或 ABORT 原因）。
 set -u
@@ -58,5 +58,7 @@ say "out/ 已複製到 video/"
 bash "$ROOT/sfx.sh" "$NAME" >> post.log 2>&1 && say "sfx.sh 完成" || say "sfx.sh 失敗（看 post.log）"
 docker run --rm -u $(id -u):$(id -g) -v "$ROOT":/c -w /c --entrypoint python demucs-sfx lipsync_measure.py "$NAME" >> post.log 2>&1 \
   && say "lipsync_measure 完成" || say "lipsync_measure 失敗（看 post.log）"
+docker run --rm -u $(id -u):$(id -g) -v "$ROOT":/c -w /c --entrypoint python demucs-sfx align_dtw.py "$NAME" >> post.log 2>&1 \
+  && say "align_dtw 完成" || say "align_dtw 失敗（看 post.log）"
 python3 "$ROOT/mux.py" "$NAME" >> post.log 2>&1 && say "mux 完成（mixed/ 試聽版）" || say "mux 失敗（看 post.log）"
 say "DONE${failed:+（失敗段落：$failed）}"

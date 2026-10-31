@@ -6,7 +6,7 @@ config 的 speakers 是字幕要標名字的角色（旁白不標）；tagline�
 import json, subprocess
 
 import comic
-from mux import schedule
+from mux import schedule  # sfx/align.json 有的句子改用 DTW 錨點時間
 
 
 def ts(t):
@@ -16,10 +16,14 @@ def ts(t):
 
 def cues(cfg, d):
     report = json.loads((d / "audio" / "lines.json").read_text(encoding="utf-8"))
+    align = d / "sfx" / "align.json"
+    align = json.loads(align.read_text(encoding="utf-8")) if align.exists() else {}
     offset, out = 0.0, []
     for sid, seg in comic.durations(cfg).items():
         for ln, t, tempo in schedule([l for l in report if l["sid"] == sid], seg):
             end = min(t + ln["audio_sec"] / tempo, seg)
+            if a := align.get(ln["file"]):  # DTW 對齊的句子照錨點的影片時間
+                t, end = a[0][1], min(a[-1][1], seg)
             who = ln["who"] if ln["who"] in cfg["speakers"] else None
             text = ln["text"].rstrip("，")
             out.append((offset + t, offset + end, f"{who}：{text}" if who else text))
