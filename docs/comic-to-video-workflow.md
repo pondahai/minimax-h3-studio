@@ -273,6 +273,8 @@
 - config 的 `cuts`：`{"A": [段...], "B": [段...]}`；`shots` 放兩版的聯集（共用段只跑一次 H3），`pipeline.sh` 照 `shots` 跑全部段落
 - 環境變數 `CUT=A`：`comic.load()` 只留那一版的段落並照 `cuts` 排序，`cfg["id"]` 變成 `airplane_A`，所以 `CUT=A python3 mux.py airplane`、`CUT=A python3 subs.py airplane` 輸出 `airplane_A_draft.mp4`、`airplane_A.srt`、`airplane_A_sub.mp4`；逐段處理的 H3、sfx、lipsync 不受影響
 - `pipeline.sh` 不設 `CUT` 時會把 18 段全部串成一支 `airplane_draft.mp4`，只是試聽用
+- 《飛機》結果：使用者採用 **B 版（全卡通）**。B 版的實驗段原本讓貓頭鷹機長自己做，驗收時改成「小宇示範、機長在旁說明」——卡通角色主持，但動手做實驗的要是小朋友（同年齡的人示範比較能同理、照著做）
+- 下一篇若只做一版：預設全卡通主持＋小朋友角色示範實驗；兩版成本約多 4 段 H3，只在主持方式真的拿不定時才做
 
 ### 9. 字幕 → `python3 subs.py <篇目>`
 - 依合成時實際排定的時間產生繁體中文 SRT；角色台詞標名字，旁白不標
