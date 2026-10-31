@@ -194,17 +194,17 @@
   "start": 0,
   "end": 3,
   "who": "貓頭鷹機長",
-  "text": "拿一張紙條，",
-  "audio_sec": 1.28
+  "text": "小宇，對紙條上面吹氣，",
+  "audio_sec": 2.08
  },
  {
-  "file": "S06B_06_貓頭鷹機長.wav",
+  "file": "S06B_06_小宇.wav",
   "sid": "S06B",
   "start": 6,
   "end": 9,
-  "who": "貓頭鷹機長",
+  "who": "小宇",
   "text": "剛剛紙條往上飄！",
-  "audio_sec": 1.6
+  "audio_sec": 1.92
  },
  {
   "file": "S06B_09_貓頭鷹機長.wav",
@@ -387,13 +387,13 @@
   "audio_sec": 1.44
  },
  {
-  "file": "S12B_06_貓頭鷹機長.wav",
+  "file": "S12B_06_小宇.wav",
   "sid": "S12B",
   "start": 6,
   "end": 9,
-  "who": "貓頭鷹機長",
+  "who": "小宇",
   "text": "機頭抬起來了！",
-  "audio_sec": 1.44
+  "audio_sec": 1.6
  },
  {
   "file": "S12B_09_貓頭鷹機長.wav",
