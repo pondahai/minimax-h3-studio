@@ -1,0 +1,143 @@
+{
+  "title": "月食是什麼？",
+  "source": "待發布漫畫圖檔_20261031.zip（官網尚未上架）",
+  "style": "明亮日系兒童科普動畫風、色彩飽和、柔和陽光",
+  "characters": "小明＝卡其探險帽、棕短髮、綠背心、藍背包；小美＝棕色雙馬尾、粉紅外套、紅格子裙；阿柴＝橘白柯基、綠色葉子領巾；林博士＝白髮白鬍、圓眼鏡、白色實驗袍、綠領帶。地球、太陽是寫實的星球，沒有臉、不說話",
+  "no_text_rule": "不要在畫面中出現任何文字、標籤、公式、表格或圖示",
+  "panel_dir": "C:/Users/USER/AppData/Local/Temp/claude/C--Users-USER--claude-spares-spare-pDHHE0/af836765-316d-436e-8167-5b215a402354/scratchpad\\lunar_eclipse_panels",
+  "panel_cast": {
+    "1": [
+      "小明",
+      "小美",
+      "阿柴"
+    ],
+    "2": [
+      "小明"
+    ],
+    "3": [
+      "小美"
+    ],
+    "4": [],
+    "5": [
+      "小美",
+      "阿柴"
+    ],
+    "6": [],
+    "7": [
+      "小明"
+    ]
+  },
+  "panel_notes": {
+    "1": "寫 1 段。夜晚戶外草地，天上一輪暗紅色的月全食月亮；小明指著月亮，小美、阿柴抬頭看（看月亮不用戴眼鏡）。台詞：小明「哇！月亮變成紅色的了！」小美「這是什麼現象呢？」小明「這叫月食，是地球的影子遮住了月亮！」阿柴不說話。畫面不准出現任何文字、標籤、箭頭、示意圖。",
+    "2": "寫 1 段，畫面沒有人物。太空中寫實的太陽、地球、滿月排成一直線（沒有臉），月球慢慢移進地球後方的暗影。全部旁白：「滿月的時候，太陽、地球、月球幾乎排成一直線，」「地球擋住太陽的光，」「月球就走進地球的影子裡。」畫面不准出現任何文字、標籤、箭頭、示意圖。",
+    "3": "寫 1 段，畫面沒有人物。太空中地球背後拖著影子：中間最暗、外圍一圈較淡，月球從淡的外圍慢慢移進最暗的中央。全部旁白（原圖本影標成「較淡」是錯的，照這版）：「地球的影子有兩層：」「中間最暗的叫本影，太陽光幾乎完全被擋住；」「外圍比較淡的叫半影，還有一些陽光。」畫面不准出現任何文字、標籤、箭頭、示意圖。",
+    "4": "拆 2 段，不續接，畫面沒有人物，夜空中的月亮特寫。第一段：月亮整個進入本影、慢慢變成暗紅色；旁白「整個月球走進本影，就是月全食。」「陽光穿過地球的大氣，紅光被彎進影子裡，把月亮染紅。」第二段：先是月亮缺了一塊暗角，再切到整顆月亮只是微微變暗；旁白「只有一部分進入本影，月亮像被咬掉一塊，是月偏食；」「只經過半影，月亮只暗一點點，叫半影月食。」",
+    "5": "拆 2 段，不續接。第一段（畫面沒有人物）：太空中月球繞地球的軌道斜一點，滿月時月球從地球影子的上方經過、沒有變暗；旁白「月球的軌道斜了大約五度，」「所以大部分的滿月，月球會從地球影子的上面或下面經過。」不准畫軌道線、角度符號。第二段（畫面只有小美和阿柴）：夜晚草地，小美抬頭看普通的白色滿月，手比一平一斜；小美「所以不是每次滿月都有月食，」「要剛好排成一直線才會發生喔！」阿柴的台詞改給小美。",
+    "6": "拆 2 段，不續接，畫面沒有人物。第一段：日環食，黑色月球在太陽中央、外圈一圈火環；旁白「日食時，月球離地球比較遠，看起來比太陽小，」「遮不住整個太陽，就留下一圈光環。」第二段：太空中地球的影子遠大於月球，整個月球被罩在暗影裡、變成暗紅色；旁白「月食時，地球的本影比月球大得多，」「能把整個月球罩住，所以沒有月環食。」日環食畫面要和《日食》一致。",
+    "7": "拆 2 段，不續接，夜晚戶外草地，畫面只有小明（可以有阿柴，阿柴不說話）。第一段總結：小明指著月亮；小明「月食是地球擋住太陽光，」「月亮走進地球的影子，」「有月全食、月偏食和半影月食！」第二段觀測：小明拿起雙筒望遠鏡看月亮，再轉頭對鏡頭笑；小明「看月食很安全，用眼睛就能看，」「下次月食，記得和家人一起看喔！」"
+  },
+  "voices": {
+    "小明": "七歲小男孩，稚嫩的童聲，音調很高，天真活潑",
+    "小美": "開朗溫柔的十歲女孩，聲音甜美",
+    "旁白": "溫柔親切的年輕女性旁白，語速平穩"
+  },
+  "ref_text": "大家好，今天天氣真好，我們一起去森林裡看看吧！",
+  "ref_transcript": {
+    "小明": "哇！一隻小小的卵，竟然可以變成這麼美麗的蝴蝶！",
+    "林博士": "不要只看大小，要比較同樣體積裡有多少質量。"
+  },
+  "t2s": true,
+  "pronounce": {},
+  "prompt_format": "official",
+  "no_text_rule_en": "No text of any kind may appear in the picture: no letters, labels, numbers, formulas, signs or icons.",
+  "style_en": "bright Japanese children's science anime, saturated colors, soft sunlight",
+  "characters_en": "Xiao Ming (小明) = a boy with a khaki explorer hat with a green leaf badge, short brown hair, a green vest and a blue backpack; Xiao Mei (小美) = a girl with brown twin ponytails, a pink jacket and a red plaid skirt; Ah Chai (阿柴) = an orange-and-white corgi with a green leaf bandana; Dr. Lin (林博士) = a kind old scientist with white hair and beard, round glasses, a khaki explorer hat, a white lab coat and a green tie. The Earth and the Sun are realistic celestial bodies with no faces.",
+  "names_en": {
+    "小明": "Xiao Ming",
+    "小美": "Xiao Mei",
+    "阿柴": "Ah Chai",
+    "林博士": "Dr. Lin"
+  },
+  "speakers": [
+    "小明",
+    "小美"
+  ],
+  "tagline": "",
+  "last_frames": [],
+  "shots": [
+    [
+      "S01",
+      12,
+      "frames/S01.png"
+    ],
+    [
+      "S02",
+      12,
+      "frames/S02.png"
+    ],
+    [
+      "S03",
+      12,
+      "frames/S03.png"
+    ],
+    [
+      "S04",
+      12,
+      "frames/S04.png"
+    ],
+    [
+      "S05A",
+      6,
+      "frames/S05A.png"
+    ],
+    [
+      "S05B",
+      6,
+      "frames/S05B.png"
+    ],
+    [
+      "S06",
+      12,
+      "frames/S06.png"
+    ],
+    [
+      "S07",
+      12,
+      "frames/S07.png"
+    ],
+    [
+      "S08",
+      12,
+      "frames/S08.png"
+    ],
+    [
+      "S09",
+      12,
+      "frames/S09.png"
+    ],
+    [
+      "S10",
+      12,
+      "frames/S10.png"
+    ],
+    [
+      "S11",
+      12,
+      "frames/S11.png"
+    ]
+  ],
+  "panels": {
+    "S01": "frame-S01",
+    "S02": "frame-S02",
+    "S03": "frame-S03",
+    "S04": "frame-S04",
+    "S06": "frame-S06",
+    "S07": "frame-S07",
+    "S08": "frame-S08",
+    "S09": "frame-S09",
+    "S10": "frame-S10",
+    "S11": "frame-S11",
+    "S05A": "frame-S05A",
+    "S05B": "frame-S05B"
+  }
+}

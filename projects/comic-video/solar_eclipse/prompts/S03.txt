@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated greens and blues, Xiao Mei stands in a sunlit park facing a tall blue-glass building. The composition focuses on her back and the distant structure under a clear sky. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Mei stands with her back to the camera, extending her right arm straight out to aim her thumb at the tall building while closing one eye; the camera holds a steady medium shot as she speaks. Xiao Mei (S1) says slowly, <d>[Chinese] 太陽比月球大約四百倍，</d> At 00:04.000, The camera pushes in to a close-up as Xiao Mei slides her thumb laterally across the frame, perfectly aligning it to cover the entire building facade while she continues to speak. Xiao Mei (S1) says slowly, <d>[Chinese] 可是也遠了大約四百倍，</d> At 00:08.000, The camera pulls back to a medium shot as Xiao Mei lowers her arm, turns her body to face the lens, and grins while spreading both hands wide in a shrugging gesture. Xiao Mei (S1) says slowly, <d>[Chinese] 所以從地球看，它們差不多大！</d>
+
+overall_soundscape: A warm summer breeze rustles the tall grass around her feet, accompanied by the distant chirping of birds in the trees.
+
+non_diegetic_music: N/A

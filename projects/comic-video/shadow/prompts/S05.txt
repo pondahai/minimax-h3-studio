@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style, Xiao Ming, Xiao Mei, Ah Chai, and Dr. Lin stand around a wooden desk in a sunlit study. They are gathered around a small green toy dinosaur and a blank cardboard easel. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Ming slowly pushes his red flashlight closer to the green toy dinosaur while Ah Chai watches attentively from the side. At 00:01.000, Xiao Mei's mouth opens wide in excitement as the dinosaur's shadow on the cardboard easel visibly grows larger and wider. Xiao Mei (S1) says slowly, <d>[Chinese] 哇！影子比剛才大很多！</d> At 00:05.000, Dr. Lin uses both hands to trace a widening fan shape from the flashlight towards the cardboard, explaining the light scattering. Dr. Lin (S2) says slowly, <d>[Chinese] 手電筒越靠近玩具，擋住的光散得越開，</d> At 00:10.000, Dr. Lin points a finger at the large shadow on the cardboard while Xiao Ming and Xiao Mei nod in agreement. Dr. Lin (S2) says slowly, <d>[Chinese] 影子就越大。</d> Dr. Lin points at the enlarged shadow on the easel while the children watch.
+
+overall_soundscape: The soft hum of a flashlight bulb and the gentle rustle of Ah Chai's fur. Wooden creaks from the desk and the faint scratching of Dr. Lin's finger against the cardboard.
+
+non_diegetic_music: N/A

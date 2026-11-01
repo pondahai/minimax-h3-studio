@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime style with saturated colors and soft sunlight illuminates the scene, focusing entirely on the celestial bodies against a deep blue starry sky. The composition features a large, realistic white moon with detailed craters on the right and a smaller, reddish-brown moon overlapping it on the left, creating a striking contrast between the two celestial spheres. At 00:00.000, The camera remains a steady close-up on the sky, while the reddish-brown moon slowly glides to the right, its smooth, slightly blurred dark arc expanding to cover more of the white moon's surface, deepening the shadow effect. A narrator says in an off-screen voiceover, <d>[Chinese] 只有一部分進入本影，月亮像被咬掉彎彎的一塊，是月偏食；</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: A gentle cosmic wind whispers through the vacuum of space, accompanied by the faint, rhythmic crackle of distant starlight.
+
+non_diegetic_music: N/A

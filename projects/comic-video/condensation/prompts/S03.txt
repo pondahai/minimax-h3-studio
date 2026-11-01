@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style, Xiao Ming and Xiao Mei stand in a sunlit park. Xiao Ming holds a clear cup of ice water while Xiao Mei watches with an open expression. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Ming holds the cup steady at chest level as visible condensation droplets rapidly form and glisten on the exterior cup surface. Xiao Ming (S1) says slowly, <d>[Chinese] 杯子外面很冷，</d> At 00:03.000, Xiao Ming slides his finger down the cup's side, causing the water droplets to merge and slide downward in a continuous stream. Xiao Ming (S1) says slowly, <d>[Chinese] 水蒸氣一碰到，就變成小水滴了！</d> At 00:08.000, Xiao Mei nods enthusiastically and claps her hands together with a bright, surprised expression. Xiao Mei (S2) says slowly, <d>[Chinese] 所以水不是從杯子漏出來的！</d>
+
+overall_soundscape: A gentle breeze rustles the green leaves in the background. The faint, crisp sound of ice cubes shifting inside the cup is audible, followed by a crisp clap.
+
+non_diegetic_music: N/A

@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft sunlight, Xiao Ming, Xiao Mei, and Dr. Lin stand around a wooden desk in a cozy study, preparing their science project materials. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Ming places a red flashlight on the left side of the desk while Xiao Mei sets a green dinosaur toy in the center, both looking at the items with bright, curious expressions. Xiao Ming (S1) says slowly, <d>[Chinese] 我們需要手電筒、恐龍玩具，</d> At 00:04.000, Xiao Mei lifts a large white cardboard sheet and stands it upright on the right side of the desk, her ponytails swaying as she positions the material. Xiao Ming (S1) says slowly, <d>[Chinese] 還有一張白色紙板！</d> At 00:07.000, The camera zooms in on Dr. Lin, who raises his index finger with a serious expression to give a warning, his white beard and round glasses catching the sunlight. Dr. Lin (S2) says slowly, <d>[Chinese] 記得手電筒不要照別人或自己的眼睛喔。</d>
+
+overall_soundscape: A soft breeze rustles through the room, accompanied by the faint chirping of birds outside the window and the light clatter of the cardboard hitting the wooden surface.
+
+non_diegetic_music: N/A

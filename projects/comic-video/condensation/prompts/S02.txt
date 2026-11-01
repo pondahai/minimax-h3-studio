@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft sunlight, Dr. Lin, Xiao Ming, Xiao Mei, and Ah Chai stand on a sunny park path surrounded by lush green trees. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Dr. Lin walks in from the right, stopping before the group and raising his index finger to point at the surrounding air, while Xiao Ming and Ah Chai look on with open excitement. Dr. Lin (S1) says slowly, <d>[Chinese] 其實我們周圍的空氣裡，</d> At 00:04.000, Dr. Lin sweeps his arms in a wide circle and smiles warmly at Xiao Mei, while Ah Chai tilts his head to the side with curiosity. Dr. Lin (S1) says slowly, <d>[Chinese] 藏著看不見的水蒸氣喔！</d> At 00:08.000, Xiao Mei spreads her arms wide and looks left and right in confusion, her expression puzzled as she gestures to the empty air. Xiao Mei (S2) says slowly, <d>[Chinese] 真的嗎？可是我什麼都沒看到！</d>
+
+overall_soundscape: A gentle breeze rustles through the green leaves overhead. A distant bird chirps from the canopy. The soft crunch of footsteps on the dirt path.
+
+non_diegetic_music: N/A

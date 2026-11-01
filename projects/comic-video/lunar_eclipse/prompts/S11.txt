@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In the bright Japanese children's science anime style with saturated colors and soft sunlight, Xiao Ming and Ah Chai stand on a grassy field under a deep blue night sky with a large red moon. Xiao Ming wears his khaki explorer hat, green vest, and blue backpack, while Ah Chai sits beside him in his orange-and-white fur and green leaf bandana. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Ming lifts his black binoculars to his eyes, peering up at the red moon with an excited open-mouth expression, while Ah Chai looks up with wide eyes. Xiao Ming (S1) says slowly, <d>[Chinese] 看月食很安全，用眼睛就能看，</d> At 00:04.000, Xiao Ming lowers the binoculars and turns his head to face the camera with a warm smile, gesturing with his hands as he speaks. Xiao Ming (S1) says slowly, <d>[Chinese] 下次月食，記得和家人一起看喔！</d> At 00:08.000, Xiao Ming waves his hand cheerfully at the camera, and Ah Chai wags his tail back and forth with a happy expression.
+
+overall_soundscape: The gentle rustle of grass in the breeze and the distant chirping of crickets provide a peaceful nighttime atmosphere.
+
+non_diegetic_music: N/A

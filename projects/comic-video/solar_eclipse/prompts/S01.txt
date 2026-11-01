@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene with saturated colors and soft sunlight, set in a grassy park under a deepening twilight sky. Xiao Ming, Xiao Mei, and Ah Chai stand together in a mid-shot, all wearing dark eclipse glasses and gazing upward at a realistic solar eclipse. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Mei gasps and points upward with an open-mouthed expression of wonder as Xiao Ming and Ah Chai crick their necks to look at the darkening sun. Xiao Mei (S1) says slowly, <d>[Chinese] 哇！太陽變黑了！</d> At 00:03.000, Xiao Ming extends his arm to point at the celestial event, his mouth opening wide in a gasp of amazement while Ah Chai's ears perk up. Xiao Ming (S2) says slowly, <d>[Chinese] 這就是日食嗎？好神奇！</d> At 00:06.000, Xiao Mei pivots toward Xiao Ming, gesturing dynamically between the sky and the ground with both hands to explain the phenomenon, her expression serious and instructive. Xiao Mei (S1) says slowly, <d>[Chinese] 月球跑到太陽和地球中間，把陽光遮住了！</d>
+
+overall_soundscape: A gentle breeze rustles the grass, accompanied by the chirping of distant birds and the soft rustle of Ah Chai's tail wagging.
+
+non_diegetic_music: N/A

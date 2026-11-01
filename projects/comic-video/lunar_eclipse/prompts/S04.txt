@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime style with saturated colors and soft sunlight illuminates a deep blue night sky. A hyper-realistic moon fills the center of the frame, initially bright white and detailed with craters. At 00:00.000, The camera holds a tight close-up on the moon as a dark, smooth shadow slowly creeps from the left edge, gradually covering the bright white surface. A narrator says in an off-screen voiceover, <d>[Chinese] 整個月球走進本影，就是月全食。</d> The on-screen characters' lips remain closed. At 00:04.000, As the shadow completely covers the moon, the surface color slowly shifts from grey to a vibrant, saturated deep red, while the camera performs a slow, smooth push-in towards the glowing red sphere. A narrator says in an off-screen voiceover, <d>[Chinese] 陽光穿過地球的大氣，紅光被彎進影子裡，把月亮染紅。</d> The on-screen characters' lips remain closed. At 00:10.000, The camera pulls back to reveal the wider starry sky, where small white stars begin to twinkle and pulse rhythmically around the dark red moon. The deep red moon is fully eclipsed and centered in the frame, surrounded by twinkling stars in the dark blue cosmos.
+
+overall_soundscape: A soft, ethereal wind hums in the background. Occasional light, rhythmic crickets chirp. A subtle, low-frequency hum resonates as the light dims.
+
+non_diegetic_music: N/A

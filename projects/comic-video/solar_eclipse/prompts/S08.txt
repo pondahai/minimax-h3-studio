@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a sun-drenched green meadow, featuring Xiao Mei and Ah Chai positioned centrally in a medium shot. The atmosphere is cheerful and educational with saturated colors and soft sunlight filtering through the trees. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Mei stands with her hands raised, forming a flat circle with one hand and a slanted circle with the other to demonstrate the solar eclipse; her mouth moves animatedly as she speaks with a teaching expression. Xiao Mei (S1) says slowly, <d>[Chinese] 所以不是每個月都有日食，</d> At 00:04.000, Xiao Mei brings her hands together to form a straight line extending forward, emphasizing the alignment needed for the eclipse; her mouth continues moving as she explains the concept with a focused look. Xiao Mei (S1) says slowly, <d>[Chinese] 要剛好排成一直線才會發生喔！</d> At 00:08.000, Ah Chai tilts his head to the side, watching Xiao Mei with a curious expression; Xiao Mei crouches down to gently pat Ah Chai's head, her hand resting on his green leaf bandana.
+
+overall_soundscape: The gentle rustling of wind moving through the tall grass and bushes. Ah Chai's soft panting breaths and the sound of Xiao Mei's sneakers shifting on the grass as she crouches.
+
+non_diegetic_music: N/A

@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated greens and blues, Dr. Lin stands alone in a sunlit grassy field, pointing towards the sky. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Dr. Lin gestures upward with his right index finger, his expression animated as he speaks, while fluffy white clouds drift slowly across the blue sky. Dr. Lin (S1) says slowly, <d>[Chinese] 天上的雲，也是水蒸氣在高空遇冷，</d> At 00:04.000, Dr. Lin brings both hands inward in a scooping motion as if gathering something, his face focused and earnest while he continues speaking. Dr. Lin (S1) says slowly, <d>[Chinese] 凝結成小水滴形成的，</d> At 00:08.000, Dr. Lin turns his body toward the camera and raises his right hand in a confident thumbs-up gesture, beaming with excitement. Dr. Lin (S1) says slowly, <d>[Chinese] 這是水循環很重要的一環！</d> Dr. Lin holds his thumbs-up pose, looking proudly at the viewer.
+
+overall_soundscape: The gentle rustle of the breeze through the tall grass. The soft, distant sound of birds chirping in the trees. A light, airy whoosh as the clouds drift by.
+
+non_diegetic_music: N/A

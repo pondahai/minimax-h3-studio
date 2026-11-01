@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft sunlight, Xiao Ming, Xiao Mei, Ah Chai, and Dr. Lin are gathered around a wooden desk. A red flashlight illuminates a green plastic dinosaur toy and a white cardboard sheet standing on the table. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Ming lifts the small green dinosaur toy from the desk, his expression focused as he speaks, while the flashlight beam remains steady on the cardboard. Xiao Ming (S1) says slowly, <d>[Chinese] 同一個位置，先放小恐龍，</d> At 00:04.000, Xiao Ming places a larger green dinosaur toy in the same spot, causing the shadow on the cardboard to grow significantly; Xiao Mei and Ah Chai widen their eyes in amazement. Xiao Ming (S1) says slowly, <d>[Chinese] 再換成大恐龍！</d> At 00:07.000, Dr. Lin points a finger at the enlarged shadow on the cardboard, his mouth moving and expression serious as he explains the phenomenon, while the others watch attentively. Dr. Lin (S2) says slowly, <d>[Chinese] 物體越大，擋住的光越多，影子就越大。</d>
+
+overall_soundscape: The soft hum of the flashlight bulb and the plastic click of the toys being placed on the wooden desk.
+
+non_diegetic_music: N/A

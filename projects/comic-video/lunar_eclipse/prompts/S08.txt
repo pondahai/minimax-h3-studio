@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene, saturated colors and soft sunlight, featuring a realistic celestial eclipse in the sky. At 00:00.000, An establishing wide shot of a brilliant blue sky with fluffy white clouds, centered on a perfect solar eclipse where a realistic black moon sits exactly in front of the sun, leaving only a thin, glowing orange ring visible. A narrator says in an off-screen voiceover, <d>[Chinese] 日食時，月球離地球比較遠，</d> The on-screen characters' lips remain closed. At 00:04.000, The camera slowly zooms in towards the celestial bodies, focusing on the sharp, luminous ring of fire that remains evenly bright around the dark, faceless disk of the moon. A narrator says in an off-screen voiceover, <d>[Chinese] 看起來比太陽小，遮不住整個太陽，</d> The on-screen characters' lips remain closed. At 00:08.000, The fiery ring pulses with a gentle, shimmering light as the camera smoothly pulls back, widening the view to show the full scale of the glowing halo against the expansive sky. A narrator says in an off-screen voiceover, <d>[Chinese] 就留下一圈光環。</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: A crisp, high-altitude breeze rustles through the clouds. A distant, ethereal hum resonates from the sky, accompanied by the faint, crackling sound of solar wind.
+
+non_diegetic_music: N/A

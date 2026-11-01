@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft sunlight, Xiao Ming, Xiao Mei, Ah Chai, and Dr. Lin gather around a wooden table in a cozy study to investigate a toy dinosaur. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, A medium shot of the group as Xiao Ming pulls a red flashlight back from the green toy dinosaur; his mouth moves and his eyebrows raise in excitement while Xiao Mei and Ah Chai watch the shadow on the cardboard. Xiao Ming (S1) says slowly, <d>[Chinese] 我把手電筒移遠一點……</d> At 00:03.000, The medium shot captures the shadow on the cardboard shrinking as Xiao Mei leans in closer, her mouth moving and eyes widening in surprise while Xiao Ming beams with pride. Xiao Ming (S1) says slowly, <d>[Chinese] 影子變小了！</d> At 00:06.000, Dr. Lin gestures with his hand, pointing first at the tiny shadow and then at the toy dinosaur, his mouth moving and expression serious as he explains the science to the attentive group. Dr. Lin (S2) says slowly, <d>[Chinese] 手電筒離玩具越遠，影子越小，越接近玩具本身的大小。</d>
+
+overall_soundscape: The plastic click of Xiao Ming's flashlight being adjusted, the soft rustle of Ah Chai's tail wagging, and the distant sound of birds chirping outside the window.
+
+non_diegetic_music: N/A

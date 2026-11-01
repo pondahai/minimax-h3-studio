@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated colors and soft sunlight, the scene opens on the Earth and Moon floating in deep space with the Sun glowing on the left. The camera frames a wide view of the celestial bodies against the dark background. At 00:00.000, The Moon moves steadily along a visibly tilted orbit path around the Earth, drifting slightly upward relative to the planet's shadow while the camera holds a static wide shot. A narrator says in an off-screen voiceover, <d>[Chinese] 月球的軌道斜了大約五度，</d> The on-screen characters' lips remain closed. At 00:04.000, The Moon passes cleanly above the dark silhouette of Earth's shadow without dimming, and the camera pans smoothly to follow the Moon's trajectory across the frame. A narrator says in an off-screen voiceover, <d>[Chinese] 所以大部分滿月，月球會從影子上面或下面經過。</d> The on-screen characters' lips remain closed. At 00:10.000, The Moon continues its journey along the tilted path and the camera slowly pulls back to reveal a wider expanse of the starry sky.
+
+overall_soundscape: A gentle hum of celestial movement and the soft crackle of solar wind, with a subtle, rhythmic whooshing sound as the Moon glides through the vacuum.
+
+non_diegetic_music: N/A

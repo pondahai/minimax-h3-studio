@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime style showcases a massive, realistic white moon floating in a deep blue starry sky, with the camera positioned for a close-up view of the celestial body. At 00:00.000, The moon remains centered while a smooth, slightly blurred dark arc slowly creeps in from the left, gradually covering a portion of the bright white surface to create a crescent shape. A narrator says in an off-screen voiceover, <d>[Chinese] 只有一部分進入本影，月亮像被咬掉彎彎的一塊，是月偏食；</d> The on-screen characters' lips remain closed. At 00:06.000, The camera slowly pushes in on the full moon as soft, translucent clouds drift across the surface, causing the entire sphere to dim slightly in brightness without any edges disappearing. A narrator says in an off-screen voiceover, <d>[Chinese] 只經過半影，月亮只暗一點點，叫半影月食。</d> The on-screen characters' lips remain closed. The camera completes its slow push-in, framing the slightly dimmed full moon surrounded by drifting clouds.
+
+overall_soundscape: A soft, ethereal wind hums in the vacuum of space, accompanied by the faint, rhythmic creaking of shifting cosmic dust and the distant, hollow echo of celestial bodies.
+
+non_diegetic_music: N/A

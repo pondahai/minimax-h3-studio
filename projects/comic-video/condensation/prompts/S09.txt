@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene set in a sunny park with lush green foliage and soft sunlight. Dr. Lin crouches to eye-level with Xiao Ming and Xiao Mei, creating a warm, educational composition. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Dr. Lin crouches down to be at the same height as Xiao Ming and Xiao Mei, raising his right index finger with a questioning expression as he asks Xiao Ming and Xiao Mei a question. Dr. Lin (S1) says slowly, <d>[Chinese] 為什麼冷杯子比較容易出現水珠？</d> At 00:04.000, Dr. Lin gestures with his left hand toward the cup while circling the air beside it with his right hand; Xiao Ming and Xiao Mei watch him intently, listening to his explanation. Dr. Lin (S1) says slowly, <d>[Chinese] 因為杯子越冷，旁邊的空氣也越冷，</d> At 00:08.000, Dr. Lin's index finger moves downward from the air to point directly at the cup; Xiao Ming and Xiao Mei nod in agreement, showing understanding. Dr. Lin (S1) says slowly, <d>[Chinese] 水蒸氣遇冷變成水滴，黏在杯子外面。</d>
+
+overall_soundscape: Soft breeze rustling through the park trees, distant birds chirping, and the gentle clink of the plastic cup on the wooden table.
+
+non_diegetic_music: N/A
