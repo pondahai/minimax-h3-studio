@@ -540,6 +540,7 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
             "text_encoder": text_encoder,
             "first_frame_fit": first_frame_fit,
             "aspect": "portrait" if str(raw.get("aspect", "")).lower() == "portrait" else "landscape",
+            "resolution": "full" if str(raw.get("resolution", "")).lower() == "full" else "draft",
             "duration_seconds": duration,
             "seed": seed,
             "output_path": output,

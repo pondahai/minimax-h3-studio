@@ -508,7 +508,7 @@ def _job_settings(job: dict) -> dict:
         "aspect": job.get("aspect"),
         "text_encoder": job.get("text_encoder", "official"),
         "first_frame_fit": job.get("first_frame_fit"),
-        "resolution": job.get("resolution", "full"),
+        "resolution": job.get("resolution", "draft"),
         "requested_seconds": job.get("duration_seconds"),
         "reference_images": names(job.get("reference_images")),
         "reference_audios": names(job.get("reference_audios")),
