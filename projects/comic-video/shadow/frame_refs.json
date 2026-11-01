@@ -1,0 +1,52 @@
+{
+ "S01": [
+  "char_xiaoming",
+  "char_xiaomei",
+  "char_achai",
+  "char_lin"
+ ],
+ "S02": [
+  "char_xiaoming",
+  "char_xiaomei",
+  "char_lin"
+ ],
+ "S03": [
+  "char_xiaoming",
+  "char_xiaomei",
+  "char_achai"
+ ],
+ "S04": [
+  "char_xiaoming",
+  "char_xiaomei",
+  "char_achai",
+  "char_lin"
+ ],
+ "S05": [
+  "char_xiaoming",
+  "char_xiaomei",
+  "char_achai",
+  "char_lin"
+ ],
+ "S06": [
+  "char_xiaoming",
+  "char_xiaomei",
+  "char_achai",
+  "char_lin"
+ ],
+ "S07": [
+  "char_xiaoming",
+  "char_xiaomei",
+  "char_achai",
+  "char_lin"
+ ],
+ "S08": [
+  "char_xiaoming",
+  "char_xiaomei",
+  "char_achai"
+ ],
+ "S09": [
+  "char_xiaoming",
+  "char_xiaomei",
+  "char_lin"
+ ]
+}

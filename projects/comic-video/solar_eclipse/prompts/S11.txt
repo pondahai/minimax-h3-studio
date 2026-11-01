@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese children's science anime style with saturated greens and blues, Xiao Ming stands in a sunlit grassy field, holding black eclipse glasses to his chest with an open-mouthed expression. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Ming lifts the eclipse glasses to his eyes, his mouth moving as he speaks, while the camera holds a steady medium shot of his upper body. Xiao Ming (S1) says slowly, <d>[Chinese] 日食是月球擋住了太陽的光，</d> At 00:03.000, Xiao Ming lowers the glasses slightly and uses his right hand to gesture a small circle then a wide arc, his expression animated as he explains. Xiao Ming (S1) says slowly, <d>[Chinese] 月球雖小，看起來和太陽差不多大，</d> At 00:07.000, Xiao Ming raises his left hand and extends three fingers one by one, counting them off with a cheerful expression as the camera remains fixed. Xiao Ming (S1) says slowly, <d>[Chinese] 日食有全食、環食和偏食！</d>
+
+overall_soundscape: A warm breeze rustles the tall grass and sways the leaves on the distant trees, while soft cicadas hum in the background.
+
+non_diegetic_music: N/A

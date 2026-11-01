@@ -1,0 +1,139 @@
+{
+  "title": "冰水杯為什麼會「流汗」？",
+  "source": "待發布漫畫圖檔_20261031.zip（官網尚未上架）",
+  "style": "明亮日系兒童科普動畫風、色彩飽和、柔和陽光",
+  "characters": "小明＝卡其探險帽、棕短髮、綠背心、藍背包；小美＝棕色雙馬尾、粉紅外套、紅格子裙；阿柴＝橘白柯基、綠色葉子領巾；林博士＝白髮白鬍、圓眼鏡、白色實驗袍、綠領帶。地球、太陽是寫實的星球，沒有臉、不說話",
+  "no_text_rule": "不要在畫面中出現任何文字、標籤、公式、表格或圖示",
+  "panel_dir": "C:/Users/USER/AppData/Local/Temp/claude/C--Users-USER--claude-spares-spare-pDHHE0/af836765-316d-436e-8167-5b215a402354/scratchpad\\condensation_panels",
+  "panel_cast": {
+    "1": [
+      "小明",
+      "小美",
+      "阿柴"
+    ],
+    "2": [
+      "小明",
+      "小美",
+      "阿柴",
+      "林博士"
+    ],
+    "3": [
+      "小明",
+      "小美"
+    ],
+    "4": [
+      "小明",
+      "小美",
+      "林博士"
+    ],
+    "5": [
+      "小明",
+      "小美",
+      "阿柴"
+    ],
+    "6": [
+      "林博士"
+    ],
+    "7": [
+      "小明",
+      "阿柴"
+    ]
+  },
+  "panel_notes": {
+    "1": "寫 1 段。白天戶外公園，小明手拿透明塑膠杯（不是玻璃杯）裝冰水，杯子外面布滿小水珠，他的手是濕的；小美湊過來看，阿柴在旁。台詞：小明「哇！我的杯子怎麼濕了？」小美「杯子是不是破洞，」「裡面的水漏出來了？」阿柴不說話。畫面不准出現任何文字、標籤、箭頭、示意圖。",
+    "2": "寫 1 段。同一個公園，林博士（系列的林博士：白髮白鬍、圓眼鏡、白袍、綠領帶）走過來，指著周圍的空氣；小明、小美、阿柴看著他。台詞：林博士「其實我們周圍的空氣裡，」「藏著看不見的水蒸氣喔！」小美「真的嗎？可是我什麼都沒看到！」畫面不要畫出水蒸氣泡泡（水蒸氣是看不見的）。畫面不准出現任何文字、標籤、箭頭、示意圖。",
+    "3": "寫 1 段，畫面只有小明和小美。特寫透明塑膠杯外壁，小水珠在杯子外側一顆顆冒出、慢慢變大，不能看起來像從杯子裡滲出；再拉到小明、小美。台詞全給小朋友：小明「杯子外面很冷，」「空氣裡的水蒸氣一碰到，就變成小水滴了！」小美「所以水不是從杯子漏出來的！」",
+    "4": "寫 1 段。戶外木桌，桌上兩個一樣的透明塑膠杯；小明在左杯倒冰水、放冰塊，小美在右杯倒常溫水，林博士在旁說明（實驗由小朋友動手）。台詞：林博士「我們用兩個一樣的杯子，」「一杯冰水加冰塊，一杯常溫水，」「看看杯子外面有什麼不同。」杯子上不准有 A、B 標籤或任何字。",
+    "5": "寫 1 段，畫面有小明、小美、阿柴（沒有林博士）。同一張木桌，幾分鐘後：冰水杯外面布滿水珠，常溫水杯外面是乾的；小美湊近冰水杯，小明摸摸常溫水杯。台詞：小美「快看！冰水杯外面出現好多水珠！」小明「常溫水的杯子還是乾的！」小美「因為冰水讓杯子變冷了！」",
+    "6": "拆 2 段，不續接。第一段（畫面沒有人物）：清晨葉子上的露珠特寫，切到窗戶玻璃上的水滴；旁白「清晨葉子上的露珠、窗戶上的水滴，」「都是水蒸氣遇冷凝結成的。」第二段（畫面只有林博士）：戶外草地，林博士指著天上的白雲；林博士「天上的雲，也是水蒸氣在高空遇冷，」「凝結成小水滴形成的，」「這是水循環很重要的一環！」",
+    "7": "拆 2 段，不續接，戶外公園。第一段（畫面只有小明和阿柴）：小明舉起布滿水珠的冰水杯；小明「空氣裡有看不見的水蒸氣，」「碰到夠冷的杯子就變成水滴，」「水是從空氣來的，不是杯子漏的！」第二段（畫面有林博士、小明、小美）：林博士對著兩個小朋友提問再解答；林博士「為什麼冷杯子比較容易出現水珠？」「因為杯子越冷，空氣就越冷，」「水蒸氣一遇冷就變成水滴，黏在杯子外面。」"
+  },
+  "voices": {
+    "小明": "七歲小男孩，稚嫩的童聲，音調很高，天真活潑",
+    "小美": "開朗溫柔的十歲女孩，聲音甜美",
+    "旁白": "溫柔親切的年輕女性旁白，語速平穩",
+    "林博士": "六十多歲的台灣男教授，標準台灣華語口音，沉穩親切，語速慢"
+  },
+  "ref_text": "大家好，今天天氣真好，我們一起去森林裡看看吧！",
+  "ref_transcript": {
+    "小明": "哇！一隻小小的卵，竟然可以變成這麼美麗的蝴蝶！",
+    "林博士": "不要只看大小，要比較同樣體積裡有多少質量。"
+  },
+  "t2s": true,
+  "pronounce": {},
+  "prompt_format": "official",
+  "no_text_rule_en": "No text of any kind may appear in the picture: no letters, labels, numbers, formulas, signs or icons.",
+  "style_en": "bright Japanese children's science anime, saturated colors, soft sunlight",
+  "characters_en": "Xiao Ming (小明) = a boy with a khaki explorer hat with a green leaf badge, short brown hair, a green vest and a blue backpack; Xiao Mei (小美) = a girl with brown twin ponytails, a pink jacket and a red plaid skirt; Ah Chai (阿柴) = an orange-and-white corgi with a green leaf bandana; Dr. Lin (林博士) = a kind old scientist with white hair and beard, round glasses, a khaki explorer hat, a white lab coat and a green tie. The Earth and the Sun are realistic celestial bodies with no faces.",
+  "names_en": {
+    "小明": "Xiao Ming",
+    "小美": "Xiao Mei",
+    "阿柴": "Ah Chai",
+    "林博士": "Dr. Lin"
+  },
+  "speakers": [
+    "小明",
+    "小美",
+    "林博士"
+  ],
+  "tagline": "",
+  "last_frames": [],
+  "shots": [
+    [
+      "S01",
+      12,
+      "frames/S01.png"
+    ],
+    [
+      "S02",
+      12,
+      "frames/S02.png"
+    ],
+    [
+      "S03",
+      12,
+      "frames/S03.png"
+    ],
+    [
+      "S04",
+      12,
+      "frames/S04.png"
+    ],
+    [
+      "S05",
+      12,
+      "frames/S05.png"
+    ],
+    [
+      "S06",
+      12,
+      "frames/S06.png"
+    ],
+    [
+      "S07",
+      12,
+      "frames/S07.png"
+    ],
+    [
+      "S08",
+      12,
+      "frames/S08.png"
+    ],
+    [
+      "S09",
+      12,
+      "frames/S09.png"
+    ]
+  ],
+  "panels": {
+    "S01": "frame-S01",
+    "S02": "frame-S02",
+    "S03": "frame-S03",
+    "S04": "frame-S04",
+    "S05": "frame-S05",
+    "S06": "frame-S06",
+    "S07": "frame-S07",
+    "S08": "frame-S08",
+    "S09": "frame-S09"
+  }
+}

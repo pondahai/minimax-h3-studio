@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In the bright Japanese children's science anime style, Xiao Ming and Ah Chai stand on a lush green lawn under a deep blue night sky with a glowing red moon. Xiao Ming is positioned on the left, gesturing enthusiastically while Ah Chai sits happily beside him, creating a dynamic and educational composition. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Ming points his right index finger upward toward the red moon, his mouth moving as he speaks with excitement, while Ah Chai looks up at the moon with a cheerful expression. Xiao Ming (S1) says slowly, <d>[Chinese] 月食是地球擋住太陽光，</d> At 00:04.000, Xiao Ming brings both hands together in a scooping motion, wrapping them around an imaginary object to demonstrate the concept, his expression focused and instructional. Xiao Ming (S1) says slowly, <d>[Chinese] 月亮走進地球的影子，</d> At 00:08.000, Xiao Ming raises three fingers on his left hand, counting down one by one with each digit popping up, his mouth moving as he explains the different types of eclipses. Xiao Ming (S1) says slowly, <d>[Chinese] 有月全食、月偏食和半影月食！</d>
+
+overall_soundscape: A gentle night breeze rustles through the tall grass, accompanied by the faint chirping of crickets and the soft padding of Ah Chai's paws on the ground.
+
+non_diegetic_music: N/A

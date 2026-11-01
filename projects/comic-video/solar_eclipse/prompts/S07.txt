@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene in deep space, featuring the realistic Earth, the glowing Sun, and the Moon. The composition is a wide shot focusing on the celestial mechanics, bathed in soft, saturated sunlight. At 00:00.000, The Moon orbits slightly tilted relative to the Earth, visibly drifting off its standard path under the Sun's bright glow. A narrator says in an off-screen voiceover, <d>[Chinese] 月球的軌道斜了大約五度，</d> The on-screen characters' lips remain closed. At 00:04.000, The Moon passes directly between the Sun and Earth, casting a long shadow that glides over the Earth's surface without touching it. A narrator says in an off-screen voiceover, <d>[Chinese] 所以月球的影子常常從地球上方或下方錯過。</d> The on-screen characters' lips remain closed. At 00:09.000, The Moon continues its tilted orbit, and the camera slowly pulls back to reveal the vastness of the space around them. The camera has zoomed out to a wide shot showing the full orbit.
+
+overall_soundscape: A low, resonant hum of space travel, the soft swish of the Moon's shadow drifting past, and the distant crackle of solar energy.
+
+non_diegetic_music: N/A

@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Set in a bright Japanese children's science anime style with saturated green and blue colors, the scene opens in a sunny park with Xiao Ming and Ah Chai. Xiao Ming stands on the left holding a cold plastic cup of water, while Ah Chai sits on the right looking up. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Wide shot of the park as Xiao Ming lifts a clear plastic cup covered in condensation, with Ah Chai looking up at him with a happy expression. Xiao Ming (S1) says slowly, <d>[Chinese] 空氣裡有看不見的水蒸氣，</d> At 00:04.000, Close-up shot focusing on Xiao Ming's hand pointing at the water droplets on the outside of the plastic cup, his face showing excitement and concentration. Xiao Ming (S1) says slowly, <d>[Chinese] 碰到夠冷的杯子就變成水滴，</d> At 00:08.000, Medium shot pulls back slightly as Xiao Ming pats his chest with a proud expression, while Ah Chai wags his tail and smiles. Xiao Ming (S1) says slowly, <d>[Chinese] 水是從空氣來的，不是杯子漏的！</d>
+
+overall_soundscape: Light breeze rustling through the trees, soft chirping birds in the background, and the faint sound of condensation dripping from the plastic cup.
+
+non_diegetic_music: N/A

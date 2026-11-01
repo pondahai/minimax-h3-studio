@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene in a sunlit green park, featuring Xiao Ming on the left holding a plastic cup, Xiao Mei on the right, and Ah Chai sitting in the center. The colors are saturated and the atmosphere is cheerful and educational. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Ming holds a clear plastic cup filled with ice water, looking down at his wet hands with a surprised expression as water droplets slide down the cup's surface; the camera remains steady. Xiao Ming (S1) says slowly, <d>[Chinese] 哇！我的杯子怎麼濕了？</d> At 00:04.000, Xiao Mei leans forward with wide eyes staring at the cup while Ah Chai tilts his head upwards to look at the plastic cup; the camera slightly zooms in on the trio. Xiao Mei (S2) says slowly, <d>[Chinese] 杯子是不是破洞，</d> At 00:08.000, Xiao Mei bends her knees to inspect the bottom of the cup, and Xiao Ming lifts the cup high and rotates it in the air; the camera tilts up to follow the cup's movement. Xiao Mei (S2) says slowly, <d>[Chinese] 裡面的水漏出來了？</d>
+
+overall_soundscape: A warm breeze rustles through the green leaves, the clinking of ice cubes inside the cup, and a distant chirp from a bird.
+
+non_diegetic_music: N/A

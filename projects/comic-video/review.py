@@ -1,7 +1,7 @@
 """產出分鏡審查頁 <篇目>/review.html：每段首幀候選（標建議 seed 與理由）＋時間軸、鏡頭、台詞。
 
 用法：python review.py <篇目>
-圖片內嵌成 base64 JPEG（672 寬），單獨傳 review.html 也看得到圖。
+圖片內嵌成 base64 JPEG（360 寬縮圖，控制檔案大小讓手機與內建瀏覽器打得開），單獨傳 review.html 也看得到圖。
 首幀段＝config shots 第三欄是圖檔的段，候選為 frames/<名稱>_seedN.png；建議與理由寫在 <篇目>/review.json（{"rec": {段: seed}, "notes": {段: 理由}}）。
 """
 import base64, html, io, json, re
@@ -26,9 +26,9 @@ table{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:8px} th,td
 
 def embed(p):
     im = Image.open(p).convert("RGB")
-    im.thumbnail((672, 672))
+    im.thumbnail((360, 360))
     buf = io.BytesIO()
-    im.save(buf, "JPEG", quality=82)
+    im.save(buf, "JPEG", quality=60, optimize=True)
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
 

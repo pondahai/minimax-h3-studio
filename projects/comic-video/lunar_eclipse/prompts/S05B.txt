@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene featuring a massive, hyper-realistic moon dominating a deep blue night sky, rendered with saturated colors and soft sunlight. The composition is a centered close-up of the celestial body, framed by scattered stars and soft clouds. At 00:00.000, The camera performs a slow, smooth push-in towards the moon's surface, while soft, semi-transparent clouds drift horizontally across the frame, subtly obscuring the lunar glow. A narrator says in an off-screen voiceover, <d>[Chinese] 只經過半影，月亮只暗一點點，叫半影月食。</d> The on-screen characters' lips remain closed.
+
+overall_soundscape: A gentle, continuous night breeze rustles through the atmosphere, accompanied by the faint, high-pitched chirping of nocturnal crickets.
+
+non_diegetic_music: N/A

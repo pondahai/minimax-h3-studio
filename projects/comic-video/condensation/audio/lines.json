@@ -1,0 +1,245 @@
+[
+ {
+  "file": "S01_00_小明.wav",
+  "sid": "S01",
+  "start": 0,
+  "end": 4,
+  "who": "小明",
+  "text": "哇！我的杯子怎麼濕了？",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S01_04_小美.wav",
+  "sid": "S01",
+  "start": 4,
+  "end": 8,
+  "who": "小美",
+  "text": "杯子是不是破洞，",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S01_08_小美.wav",
+  "sid": "S01",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "裡面的水漏出來了？",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S02_00_林博士.wav",
+  "sid": "S02",
+  "start": 0,
+  "end": 4,
+  "who": "林博士",
+  "text": "其實我們周圍的空氣裡，",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S02_04_林博士.wav",
+  "sid": "S02",
+  "start": 4,
+  "end": 8,
+  "who": "林博士",
+  "text": "藏著看不見的水蒸氣喔！",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S02_08_小美.wav",
+  "sid": "S02",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "真的嗎？可是我什麼都沒看到！",
+  "audio_sec": 4.32
+ },
+ {
+  "file": "S03_00_小明.wav",
+  "sid": "S03",
+  "start": 0,
+  "end": 3,
+  "who": "小明",
+  "text": "杯子外面很冷，",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S03_03_小明.wav",
+  "sid": "S03",
+  "start": 3,
+  "end": 8,
+  "who": "小明",
+  "text": "水蒸氣一碰到，就變成小水滴了！",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S03_08_小美.wav",
+  "sid": "S03",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "所以水不是從杯子漏出來的！",
+  "audio_sec": 4.48
+ },
+ {
+  "file": "S04_00_林博士.wav",
+  "sid": "S04",
+  "start": 0,
+  "end": 4,
+  "who": "林博士",
+  "text": "我們用兩個一樣的杯子，",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S04_04_林博士.wav",
+  "sid": "S04",
+  "start": 4,
+  "end": 8,
+  "who": "林博士",
+  "text": "一杯冰水加冰塊，一杯常溫水，",
+  "audio_sec": 2.72
+ },
+ {
+  "file": "S04_08_林博士.wav",
+  "sid": "S04",
+  "start": 8,
+  "end": 12,
+  "who": "林博士",
+  "text": "看看杯子外面有什麼不同。",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S05_00_小美.wav",
+  "sid": "S05",
+  "start": 0,
+  "end": 5,
+  "who": "小美",
+  "text": "快看！冰水杯外面出現好多水珠！",
+  "audio_sec": 5.28
+ },
+ {
+  "file": "S05_05_小明.wav",
+  "sid": "S05",
+  "start": 5,
+  "end": 8,
+  "who": "小明",
+  "text": "常溫水的杯子還是乾的！",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S05_08_小美.wav",
+  "sid": "S05",
+  "start": 8,
+  "end": 12,
+  "who": "小美",
+  "text": "因為冰水讓杯子變冷了！",
+  "audio_sec": 4.0
+ },
+ {
+  "file": "S06_00_旁白.wav",
+  "sid": "S06",
+  "start": 0,
+  "end": 4,
+  "who": "旁白",
+  "text": "清晨葉子上的露珠、",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S06_04_旁白.wav",
+  "sid": "S06",
+  "start": 4,
+  "end": 8,
+  "who": "旁白",
+  "text": "窗戶上的水滴，",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S06_08_旁白.wav",
+  "sid": "S06",
+  "start": 8,
+  "end": 12,
+  "who": "旁白",
+  "text": "都是水蒸氣遇冷凝結成的。",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S07_00_林博士.wav",
+  "sid": "S07",
+  "start": 0,
+  "end": 4,
+  "who": "林博士",
+  "text": "天上的雲，也是水蒸氣在高空遇冷，",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S07_04_林博士.wav",
+  "sid": "S07",
+  "start": 4,
+  "end": 8,
+  "who": "林博士",
+  "text": "凝結成小水滴形成的，",
+  "audio_sec": 2.4
+ },
+ {
+  "file": "S07_08_林博士.wav",
+  "sid": "S07",
+  "start": 8,
+  "end": 12,
+  "who": "林博士",
+  "text": "這是水循環很重要的一環！",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S08_00_小明.wav",
+  "sid": "S08",
+  "start": 0,
+  "end": 4,
+  "who": "小明",
+  "text": "空氣裡有看不見的水蒸氣，",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S08_04_小明.wav",
+  "sid": "S08",
+  "start": 4,
+  "end": 8,
+  "who": "小明",
+  "text": "碰到夠冷的杯子就變成水滴，",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S08_08_小明.wav",
+  "sid": "S08",
+  "start": 8,
+  "end": 12,
+  "who": "小明",
+  "text": "水是從空氣來的，不是杯子漏的！",
+  "audio_sec": 4.0
+ },
+ {
+  "file": "S09_00_林博士.wav",
+  "sid": "S09",
+  "start": 0,
+  "end": 4,
+  "who": "林博士",
+  "text": "為什麼冷杯子比較容易出現水珠？",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S09_04_林博士.wav",
+  "sid": "S09",
+  "start": 4,
+  "end": 8,
+  "who": "林博士",
+  "text": "因為杯子越冷，旁邊的空氣也越冷，",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S09_08_林博士.wav",
+  "sid": "S09",
+  "start": 8,
+  "end": 12,
+  "who": "林博士",
+  "text": "水蒸氣遇冷變成水滴，黏在杯子外面。",
+  "audio_sec": 3.68
+ }
+]

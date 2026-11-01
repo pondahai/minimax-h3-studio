@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese children's science anime scene bathed in soft, warm sunlight inside a cozy study. Dr. Lin, Xiao Ming, Xiao Mei, and Ah Chai are gathered around a wooden desk, focused on a green plastic dinosaur, a red flashlight, and a white board. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Xiao Mei pushes the green dinosaur forward across the wooden desk towards the white board; the dinosaur's shadow on the board shrinks and its edges sharpen while Xiao Ming points at the board and Ah Chai sits at the edge. Xiao Mei (S1) says slowly, <d>[Chinese] 把恐龍移到紙板前面，影子變小了！</d> At 00:06.000, Dr. Lin extends a finger to indicate the short distance between the toy and the board, his expression serious and explanatory. Dr. Lin (S2) says slowly, <d>[Chinese] 被擋住的光還來不及散開，</d> At 00:09.000, The camera zooms in on Dr. Lin as he uses both hands to measure the gap, then points to the shadow on the board, his mouth moving as he speaks. Dr. Lin (S2) says slowly, <d>[Chinese] 就碰到紙板了，所以影子變小。</d>
+
+overall_soundscape: The soft crackle of the flashlight bulb, the gentle squeak of the dinosaur's plastic feet on the wood, and a light breeze from an open window.
+
+non_diegetic_music: N/A
