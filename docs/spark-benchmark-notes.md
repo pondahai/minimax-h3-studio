@@ -174,3 +174,7 @@
 #    gpu.log（每 5 秒：時間 溫度°C, 功耗W, SM 時脈MHz, 使用率%）
 # 4. 依 spark-baseline 文件恢復四個服務
 ```
+
+## 後續：改用 Pika H3 Flex（2026-11-01）
+
+本文的 Spark 數字都是 Turbo LoRA（FL2VA 8 步）。2026-11-01 起 Spark 的 `comic-video/bench.py`、`studio/bench.py` 預設改用 Pika H3 Flex LoRA（6 步），672×384、8 秒 FL2VA 推論從 170 秒降到 140 秒；Ref2VA 從 Turbo 4 步的 109 秒變成 138 秒。完整條件與結果見 [projects/flex-test/README.md](../projects/flex-test/README.md)。

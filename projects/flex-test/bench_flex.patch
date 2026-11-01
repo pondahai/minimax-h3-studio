@@ -1,0 +1,26 @@
+--- studio/bench.py.bak_preflex	2026-11-01 22:07:26.722096497 +0800
++++ studio/bench.py	2026-11-01 22:31:19.210765176 +0800
+@@ -140,6 +140,11 @@
+     (LORA_REPO, LORA_REMOTE, "loras"),
+ ]
+ LORA = Path(LORA_REMOTE).name
++# Pika H3 Flex（2026-11-01 A/B 實測畫質較好）：FL2VA、Ref2VA 都預設用 Flex LoRA＋官方 6-NFE sigmas＋lcm；H3_FLEX=0 切回 Turbo（Ref2VA 用 Flex 6 步比 Turbo 4 步慢約 27%）
++FLEX = os.environ.get("H3_FLEX", "1") == "1"
++if FLEX:
++    LORA = "pika_h3_flex_ref2va_comfy_bf16.safetensors" if INFERENCE_MODE == "reference" else "pika_h3_flex_fl2va_comfy_bf16.safetensors"  # 手動放進 models/loras（Pika-Labs/Pika-H3-Flex@3ff16644 comfy/loras）
++    model_files = [f for f in model_files if Path(f[1]).name != Path(LORA_REMOTE).name]
+ # 換人模式（H3_CHARACTER_SWAP=1）：疊加社群 Character Swap LoRA，<Video 1> 原片＋<Picture 1> 新角色
+ CHARACTER_SWAP = os.environ.get("H3_CHARACTER_SWAP", "0") == "1"
+ SWAP_LORA = None
+@@ -579,8 +584,9 @@
+ graph.update({
+     "8": {"class_type": "BasicGuider", "inputs": {"model": MODEL, "conditioning": CONDITIONING}},
+     "9": {"class_type": "RandomNoise", "inputs": {"noise_seed": SEED}},
+-    "10": {"class_type": "KSamplerSelect", "inputs": {"sampler_name": SAMPLER_NAME}},
+-    "11": {"class_type": "BasicScheduler", "inputs": {"model": MODEL, "scheduler": SCHEDULER_NAME, "steps": STEPS, "denoise": DENOISE}},
++    "10": {"class_type": "KSamplerSelect", "inputs": {"sampler_name": "lcm" if FLEX else SAMPLER_NAME}},
++    "11": ({"class_type": "ManualSigmas", "inputs": {"sigmas": "1.0, 0.972973, 0.923077, 0.8, 0.571429, 0.333333, 0.0"}} if FLEX else
++           {"class_type": "BasicScheduler", "inputs": {"model": MODEL, "scheduler": SCHEDULER_NAME, "steps": STEPS, "denoise": DENOISE}}),
+     "12": {"class_type": "SamplerCustomAdvanced", "inputs": {
+         "noise": ["9", 0], "guider": ["8", 0], "sampler": ["10", 0],
+         "sigmas": ["11", 0], "latent_image": ["7", 1]}},

@@ -240,7 +240,8 @@
 - 使用者審查、選定首幀後才開始跑 H3
 
 ### 6. 影片生成（H3）→ `bash run_series.sh <篇目>`／`bash run_jobs.sh <篇目> ...`
-- 草稿等級：672×384、Turbo 8 步、INT8；每段 12 秒約 5.5 分鐘（含載入），段間冷卻 60 秒
+- 草稿等級：672×384、INT8；每段 12 秒約 5.5 分鐘（含載入，Turbo 8 步時期的數字），段間冷卻 60 秒
+- **2026-11-01 起 `bench.py` 預設用 Pika H3 Flex LoRA（6 步，`lcm`＋官方 ManualSigmas）**，FL2VA 與 Ref2VA 都是；A/B 實測畫質較好，FL2VA 快約 17%、Ref2VA 慢約 27%。`-e H3_FLEX=0` 切回 Turbo。來源、設定與實驗紀錄見 [projects/flex-test/README.md](../projects/flex-test/README.md)。11/01 之前做好的各篇都是 Turbo 生成，重跑舊段會變成 Flex，接縫處留意畫風差異
 - 獨立段用 t2va（`H3_T2VA=1`）；續接段用 ffmpeg 取前段末幀當 `H3_INPUT_IMAGE`
 - 段落表在 `config.json` 的 `shots`：`[段, 秒數, 首幀來源]`，首幀來源 `-`＝t2va、圖檔路徑（如 `frames/S01.png`，選定的 seed 複製改名）＝用該圖、段名＝續接該段末幀
 - 從 Windows 傳到 Spark 的 `.sh` 要先轉成 LF 換行，否則 bash 會報 `$'

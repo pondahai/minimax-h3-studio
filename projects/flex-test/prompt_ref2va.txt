@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] The woman from <Picture 1> appears in a photorealistic cinematic medium shot in a cozy wooden cafe by a large window with soft afternoon side light and a shallow depth of field. A Taiwanese woman in her thirties with shoulder-length black hair and a cream knit sweater sits at a wooden table holding a white ceramic coffee cup with both hands. At 00:00.000, she smiles warmly at the camera and speaks. The woman (S1) says, <d>[Chinese] 今天的咖啡特別香，你也來一杯吧。</d> At 00:04.000, she lifts the cup to her lips, takes a small sip, then lowers the cup back to the table and tucks a strand of hair behind her right ear while still smiling. Only this one woman appears; no other people speak.
+
+overall_soundscape: Quiet cafe ambience with soft background chatter, the gentle clink of a ceramic cup on a wooden table, and a coffee machine hissing faintly in the distance.
+
+non_diegetic_music: N/A

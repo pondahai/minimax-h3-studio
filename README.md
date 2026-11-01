@@ -12,7 +12,8 @@ MiniMax H3 是一個多模態影片生成模型，畫面和聲音一起生成。
 - **首幀生成（FL2VA）**：從你給的圖片開始動起來，第一幀就是那張圖。
 - **音畫同步**：可用 2～15 秒的乾淨人聲克隆音色，用 `<d>[Chinese]台詞</d>` 寫台詞，同時生成環境音和配樂。
 - **影片參照與換人**：上傳原片當 `<Video 1>`，搭配社群 Character Swap LoRA 把原片人物換成參考圖的角色，保留動作、場景和其他人物。
-- **Turbo 4 步加速**：使用 INT8 量化主模型加官方 Turbo LoRA，只取樣 4 步；單次片長 4～15 秒。
+- **Turbo 4 步加速**：使用 INT8 量化主模型加官方 Turbo LoRA，只取樣 4 步；單次片長 4～15 秒。（Colab notebook）
+- **Pika H3 Flex（Spark，2026-11-01 起預設）**：DGX Spark 後端改疊 [Pika-Labs/Pika-H3-Flex](https://huggingface.co/Pika-Labs/Pika-H3-Flex) 的 ComfyUI LoRA，6 步取樣；A/B 實測畫質優於 Turbo。設定與實驗見 [projects/flex-test/README.md](projects/flex-test/README.md)，`H3_FLEX=0` 可切回 Turbo。
 - **限制**：提示詞須用英文並遵守標籤格式；推論時間約隨片長的平方增加（換人 9 秒約 9 分鐘，15 秒會超時），長片需分段處理。
 
 詳細用法見 [使用手冊第 3 節](docs/USER_GUIDE.md#3-生成模式)。
@@ -74,6 +75,7 @@ minimax-h3-studio/
 ├── uploads/                # 本地暫存的使用者上傳參照圖片、音訊與影片
 ├── outputs/                # 生成的 MP4 與同名 .json（提示詞、輸入設定、seed、各階段耗時）
 └── projects/
+    ├── flex-test/          # Pika H3 Flex vs Turbo 的 Spark A/B 實驗（來源、取樣設定、腳本、結果）
     └── comic-video/        # 漫畫轉影片工作流：共用腳本＋每篇一個子目錄（獨立於 Studio 前端，在 DGX Spark 上執行）
 ```
 
