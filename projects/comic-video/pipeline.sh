@@ -12,10 +12,49 @@ ST=$BASE/pipeline.status
 say() { echo "$(date '+%F %T') $*" | tee -a "$ST"; }
 : > "$ST"
 
+# 忙碌旗標：qwen-gradio-ui（:7860，前端豁免不停）跟 story-film-studio 都靠這個端點知道
+# GPU 現在被誰佔用，顯示提示／排隊等待，而不是連線錯誤。通用端點，不只給 H3 用。
+# trap 確保無論正常結束、ABORT 還是被殺掉，旗標都會被清掉，不會卡死在 busy=true。
+set_busy_status() {
+  curl -s -m 3 -X POST http://127.0.0.1:7860/busy_status \
+    -H 'Content-Type: application/json' \
+    -d "{\"busy\": $1, \"reason\": \"H3（$NAME）正在運作\"}" > /dev/null 2>&1 || true
+}
+trap 'set_busy_status false' EXIT
+set_busy_status true
+
+# 等 Qwen-Image 手上的工作做完才交班，不強制中斷進行中的生圖任務。
+# 查不到隊列（ComfyUI 沒在跑／連線失敗）視為沒有任務，直接放行。
+wait_qwen_idle() {
+  local max_wait=60 waited=0 busy
+  while [ $waited -lt $max_wait ]; do
+    busy=$(curl -s -m 5 http://127.0.0.1:8188/queue 2>/dev/null | python3 -c '
+import sys, json
+try:
+    q = json.load(sys.stdin)
+    print(1 if (q.get("queue_running") or q.get("queue_pending")) else 0)
+except Exception:
+    print(0)
+' 2>/dev/null)
+    [ "$busy" = "1" ] || return 0
+    sleep 3
+    waited=$((waited + 3))
+  done
+  say "等待 Qwen-Image 隊列清空逾時（${max_wait}秒），改為直接停掉，可能打斷進行中的任務"
+  return 1
+}
+
 # 0. 互斥檢查：只留 8002，TTS／Qwen-Image／Demucs／其他 H3 都不能開
-for c in qwen-image-comfyui qwen3.8-nvfp4 qwen-gradio-ui; do
-  docker ps --format '{{.Names}}' | grep -qx "$c" && { say "停掉 $c"; docker stop "$c" > /dev/null; }
-done
+# qwen-gradio-ui 豁免不停：前端很輕（透過 ComfyUI 才佔記憶體），停掉 qwen-image-comfyui 後
+# 它只是連不到後端、頁面顯示讀取中，不會額外佔用 H3 需要的記憶體；保留它讓使用者至少能看到
+# 頁面還在、知道「現在不能生圖」，而不是整個 8443 直接斷線。
+if docker ps --format '{{.Names}}' | grep -qx qwen-image-comfyui; then
+  say "等待 Qwen-Image 目前的工作做完才交班"
+  wait_qwen_idle
+  say "停掉 qwen-image-comfyui"
+  docker stop qwen-image-comfyui > /dev/null
+fi
+docker ps --format '{{.Names}}' | grep -qx qwen3.8-nvfp4 && { say "停掉 qwen3.8-nvfp4"; docker stop qwen3.8-nvfp4 > /dev/null; }
 pgrep -f "[c]hinese_tts_server.py" > /dev/null && { say "停掉 TTS"; pkill -f "[c]hinese_tts_server.py"; }
 if docker ps --format '{{.Names}}' | grep -qE '^h3-|^demucs'; then say "ABORT 已有 H3／Demucs 在跑"; exit 1; fi
 for f in config.json prompts/music_official.txt audio/lines.json; do [ -f "$f" ] || { say "ABORT 缺 $f"; exit 1; }; done
