@@ -31,6 +31,7 @@ elif GLOBAL_SCRIPTS.is_dir():
         sys.path.insert(0, str(GLOBAL_SCRIPTS))
 
 import runner
+import runner_spark
 
 UPLOADS_DIR = BASE_DIR / "uploads"
 OUTPUTS_DIR = BASE_DIR / "outputs"
@@ -54,6 +55,21 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 app.mount("/outputs", StaticFiles(directory=str(OUTPUTS_DIR)), name="outputs")
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
+# 生成後端：colab（Google Colab A100，扣 CU）或 spark（DGX Spark 上的 h3-bench 容器，和漫畫流程共用 GPU）
+BACKENDS = {"colab": runner.COLAB, "spark": runner_spark.SPARK}
+BACKEND_LABELS = {"colab": "Google Colab A100", "spark": "DGX Spark"}
+
+
+def _backend(name: Optional[str]):
+    if (name or "colab") not in BACKENDS:
+        raise HTTPException(status_code=400, detail=f"未知的生成後端：{name}")
+    return BACKENDS[name or "colab"]
+
+
+def _active_backend():
+    return BACKENDS.get(current_state.get("backend") or "colab", runner.COLAB)
+
+
 generation_lock = threading.Lock()
 active_generation_thread: Optional[threading.Thread] = None
 current_state = {
@@ -68,6 +84,7 @@ current_state = {
     "log_tail": [],
     "updated_at": None,
     "error": None,
+    "backend": "colab",
 }
 
 balance_cache = {
@@ -477,6 +494,8 @@ class GenerateRequest(BaseModel):
     timeout: int = 1500
     seed: Optional[int] = None
     output_name: Optional[str] = None
+    backend: Optional[str] = "spark"
+    resolution: Optional[str] = "draft"
 
 
 def _job_settings(job: dict) -> dict:
@@ -489,6 +508,7 @@ def _job_settings(job: dict) -> dict:
         "aspect": job.get("aspect"),
         "text_encoder": job.get("text_encoder", "official"),
         "first_frame_fit": job.get("first_frame_fit"),
+        "resolution": job.get("resolution", "full"),
         "requested_seconds": job.get("duration_seconds"),
         "reference_images": names(job.get("reference_images")),
         "reference_audios": names(job.get("reference_audios")),
@@ -496,16 +516,16 @@ def _job_settings(job: dict) -> dict:
     }
 
 
-def _begin_run(task: str) -> None:
+def _begin_run(task: str, backend: str = "colab") -> None:
     """Mark a new run before its thread starts, so the first status poll doesn't
     read the previous run's finished progress file and stop polling."""
     PROGRESS_FILE.unlink(missing_ok=True)
     # run 編號：中斷後立刻重新生成時，舊任務的背景執行緒結束得比較晚，不能讓它改到新任務的狀態
     current_state.update(run=current_state.get("run", 0) + 1, is_running=True, task=task, status="starting", stage=1, error=None,
-                         stage_label="申請分配 Google Colab A100 GPU", log_tail=["[*] 準備啟動新的生成任務..."])
+                         backend=backend, stage_label=f"準備 {BACKEND_LABELS[backend]} GPU", log_tail=["[*] 準備啟動新的生成任務..."])
 
 
-def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: int):
+def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: int, backend: str = "colab"):
     global current_state
     run = current_state.get("run")
 
@@ -519,9 +539,9 @@ def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: i
     current_state["task"] = "single"
     current_state["status"] = "starting"
     current_state["stage"] = 1
-    current_state["stage_label"] = "申請分配 Google Colab A100 GPU"
+    current_state["stage_label"] = f"準備 {BACKEND_LABELS[backend]} GPU"
     current_state["error"] = None
-    current_state["log_tail"] = ["[*] 正在建立 Google Colab 雲端工作階段 (Session)..."]
+    current_state["log_tail"] = [f"[*] 正在準備 {BACKEND_LABELS[backend]} 執行環境..."]
 
     try:
         result = runner.run_batch(
@@ -533,13 +553,14 @@ def _background_worker(manifest_data: dict, gpu: str, high_mem: bool, timeout: i
             progress_path=PROGRESS_FILE,
             output_dir=OUTPUTS_DIR,
             exec_timeout=timeout,
+            transport=BACKENDS[backend],
         )
         if not superseded():
             current_state["status"] = result.get("status", "completed")
             current_state["is_running"] = False
             current_state["stage"] = 5
             current_state["stage_label"] = "影片已完成並下載至本地"
-            current_state["log_tail"].append("[*] 批次生成完成，Colab Session 已安全關閉。")
+            current_state["log_tail"].append(f"[*] 批次生成完成，{BACKEND_LABELS[backend]} 已釋放。")
 
         # Save metadata for history（連同提示詞與輸入設定，方便事後檢討與重現）
         settings = {j["id"]: _job_settings(j) for j in manifest_data["jobs"]}
@@ -568,6 +589,7 @@ def start_generation(req: GenerateRequest):
     with generation_lock:
         if current_state["is_running"]:
             raise HTTPException(status_code=400, detail="另一個影片生成任務正在進行中。")
+        _backend(req.backend)
 
         if not (1 <= len(req.reference_images) <= 9):
             raise HTTPException(status_code=400, detail="需要提供 1 到 9 張參照圖片。")
@@ -627,6 +649,8 @@ def start_generation(req: GenerateRequest):
                     "aspect": "portrait" if req.aspect == "portrait" else "landscape",
                     "text_encoder": req.text_encoder or "heretic",
                     "first_frame_fit": req.first_frame_fit or "crop",
+                    # Colab 一律 1376×768；草稿只在 Spark 上有效
+                    "resolution": "full" if (req.backend or "spark") == "colab" or req.resolution == "full" else "draft",
                     "prompt": req.prompt,
                     "duration_seconds": req.duration_seconds,
                     "seed": req.seed if req.seed is not None else int(time.time()) % 1000000,
@@ -635,14 +659,15 @@ def start_generation(req: GenerateRequest):
             ]
         }
 
-        _begin_run("single")
+        backend = req.backend or "spark"
+        _begin_run("single", backend)
         active_generation_thread = threading.Thread(
             target=_background_worker,
-            args=(manifest_data, req.gpu, req.high_mem, req.timeout),
+            args=(manifest_data, req.gpu, req.high_mem, req.timeout, backend),
             daemon=True,
         )
         active_generation_thread.start()
-        return {"ok": True, "job_id": job_id, "message": "任務已排入 Google Colab 佇列"}
+        return {"ok": True, "job_id": job_id, "message": f"任務已排入 {BACKEND_LABELS[backend]} 佇列"}
 
 
 # 長片分段換人：原片切成 ≤ 8 秒的段落，依序換人（上一段結尾畫面當下一段的接續參考），最後接成一支
@@ -664,6 +689,8 @@ class LongSwapRequest(BaseModel):
     high_mem: bool = True
     timeout: int = 1500
     seed: Optional[int] = None
+    backend: Optional[str] = "spark"
+    resolution: Optional[str] = "draft"
 
 
 def _ffmpeg_path() -> str:
@@ -719,15 +746,16 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
     seed = req.seed if req.seed is not None else int(time.time()) % 1000000
     run = current_state.get("run")
     outputs: List[Path] = []
+    transport = _backend(req.backend)
 
     current_state.update({
         "is_running": True, "task": "long_swap", "status": "starting", "stage": 1, "error": None,
         "session": session, "segment": 0, "segment_count": len(segments), "jobs": [],
-        "stage_label": "建立 Colab GPU 執行階段",
+        "stage_label": f"準備 {BACKEND_LABELS[transport.name]} GPU",
         "log_tail": [f"[*] 長片分段換人：{len(segments)} 段，每段約 {segments[0][1]:.1f} 秒"],
     })
     try:
-        runner.start_session(session, req.gpu, req.high_mem)
+        transport.start(session, req.gpu, req.high_mem)
         continuity: Optional[Path] = None
         for index, (start, length) in enumerate(segments):
             if not current_state["is_running"]:
@@ -754,6 +782,7 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
                 "character_swap": True,
                 "aspect": "portrait" if req.aspect == "portrait" else "landscape",
                 "text_encoder": req.text_encoder or "heretic",
+                "resolution": "full" if transport.name == "colab" or req.resolution == "full" else "draft",
                 "prompt": prompt,
                 # 生成長度會向上對齊；要求整數秒向上取整，合併時再裁回原片段長度以保持時間軸同步
                 "duration_seconds": max(4, int(-(-length // 1))),
@@ -766,7 +795,7 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
                 result = runner.run_batch(
                     manifest_path, session=session, gpu=req.gpu, high_mem=req.high_mem,
                     stop_on_complete=False, progress_path=PROGRESS_FILE, output_dir=OUTPUTS_DIR,
-                    exec_timeout=req.timeout,
+                    exec_timeout=req.timeout, transport=transport,
                 )
             finally:
                 manifest_path.unlink(missing_ok=True)
@@ -811,9 +840,9 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
             current_state["log_tail"].append(f"錯誤：{exc}")
     finally:
         try:
-            runner.stop_session(session)
+            transport.stop(session)
         except Exception:
-            runner.emergency_stop_session(session)
+            transport.emergency_stop(session)
         if current_state.get("run") == run:
             current_state["is_running"] = False
         shutil.rmtree(work, ignore_errors=True)
@@ -826,6 +855,7 @@ def start_long_swap(req: LongSwapRequest):
     with generation_lock:
         if current_state["is_running"]:
             raise HTTPException(status_code=400, detail="另一個影片生成任務正在進行中。")
+        _backend(req.backend)
         if cv2 is None:
             raise HTTPException(status_code=500, detail="OpenCV (cv2) is not installed.")
         try:
@@ -854,7 +884,7 @@ def start_long_swap(req: LongSwapRequest):
             raise HTTPException(status_code=400, detail="原片至少要 4 秒。")
         segments = plan_segments(duration)
 
-        _begin_run("long_swap")
+        _begin_run("long_swap", req.backend or "spark")
         active_generation_thread = threading.Thread(
             target=_long_swap_worker, args=(req, images, source, segments), daemon=True,
         )
@@ -878,13 +908,14 @@ def cancel_generation():
     current_state["is_running"] = False
     current_state["status"] = "cancelled"
     current_state["stage"] = 0
-    current_state["stage_label"] = "任務已手動取消，Colab 虛擬機已安全釋放"
-    current_state["log_tail"].append("[*] 🛑 手動取消任務，正在強制釋放遠端 Colab...")
+    label = BACKEND_LABELS.get(current_state.get("backend") or "colab")
+    current_state["stage_label"] = f"任務已手動取消，{label} 已釋放"
+    current_state["log_tail"].append(f"[*] 🛑 手動取消任務，正在強制釋放 {label}...")
 
     if session:
-        runner.emergency_stop_session(session)
+        _active_backend().emergency_stop(session)
 
-    return {"ok": True, "message": "任務已中止並釋放 Colab 運算資源。"}
+    return {"ok": True, "message": f"任務已中止並釋放 {label}。"}
 
 
 @app.get("/api/status")
@@ -911,21 +942,22 @@ def get_status():
             status_str = "running"
 
     # Compute stages 1-5
+    backend_label = BACKEND_LABELS.get(current_state.get("backend") or "colab")
     stage = current_state["stage"]
     stage_label = current_state["stage_label"]
     progress_percent = 0
 
     if status_str == "starting":
         stage = 1
-        stage_label = "1/5 建立 Colab GPU 執行階段"
+        stage_label = f"1/5 準備 {backend_label} GPU"
         progress_percent = 20
     elif status_str == "uploading":
         stage = 2
-        stage_label = "2/5 上傳多模態素材至雲端"
+        stage_label = f"2/5 上傳多模態素材至 {backend_label}"
         progress_percent = 40
     elif status_str in ("running", "generating"):
         stage = 3
-        stage_label = "3/5 MiniMax H3 A100 GPU 取樣推論中"
+        stage_label = f"3/5 MiniMax H3 取樣推論中（{backend_label}）"
         progress_percent = 75
     elif status_str == "downloading":
         stage = 4
@@ -933,7 +965,7 @@ def get_status():
         progress_percent = 90
     elif status_str == "completed":
         stage = 5
-        stage_label = "5/5 完成！Colab 虛擬機已安全釋放"
+        stage_label = f"5/5 完成！{backend_label} 已釋放"
         progress_percent = 100
     elif status_str == "failed":
         stage = 0
@@ -966,6 +998,7 @@ def get_status():
         "progress_percent": progress_percent,
         "session": progress.get("session") or current_state["session"],
         "gpu": progress.get("gpu"),
+        "backend": current_state.get("backend") or "colab",
         "jobs": jobs,
         "log_tail": log_tail,
         "updated_at": progress.get("updated_at") or current_state["updated_at"],
@@ -985,17 +1018,18 @@ def stop_generation():
         except Exception:
             pass
 
+    transport = _active_backend()
     if session:
         try:
-            runner.stop_session(session)
+            transport.stop(session)
         except Exception as e:
-            runner.emergency_stop_session(session)
+            transport.emergency_stop(session)
 
     current_state["is_running"] = False
     current_state["status"] = "stopped"
     current_state["stage_label"] = "已手動停止"
-    current_state["log_tail"].append("[*] 已發送停止信號，Colab Session 已關閉。")
-    return {"ok": True, "message": "Colab session stopped."}
+    current_state["log_tail"].append(f"[*] 已發送停止信號，{BACKEND_LABELS[transport.name]} 已釋放。")
+    return {"ok": True, "message": "Session stopped."}
 
 
 @app.get("/api/history")

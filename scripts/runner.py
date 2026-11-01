@@ -144,7 +144,21 @@ def call_colab(
     session_to_stop: str | None = None,
     stall_timeout: float | None = DEFAULT_STALL_TIMEOUT_SECONDS,
 ) -> str:
-    command = [_colab_path(), f"--auth={AUTH}", *arguments]
+    on_abort = (lambda: emergency_stop_session(session_to_stop)) if session_to_stop else None
+    return stream_command([_colab_path(), f"--auth={AUTH}", *arguments], label=label, timeout=timeout,
+                          on_line=on_line, on_abort=on_abort, stall_timeout=stall_timeout)
+
+
+def stream_command(
+    command: list[str],
+    *,
+    label: str,
+    timeout: float,
+    on_line: Callable[[str], None] | None = None,
+    on_abort: Callable[[], None] | None = None,
+    stall_timeout: float | None = DEFAULT_STALL_TIMEOUT_SECONDS,
+) -> str:
+    """Run a command, streaming its lines; on a hard or stall timeout kill it and call on_abort (release the remote GPU)."""
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONUTF8"] = "1"
@@ -188,11 +202,11 @@ def call_colab(
             reader.join(timeout=2)
             if child.stdout is not None:
                 child.stdout.close()
-            if session_to_stop:
-                emergency_stop_session(session_to_stop)
+            if on_abort:
+                on_abort()
             raise ColabTimeoutError(
                 f"【總耗時超時】{label} 超過總執行時間上限 ({timeout:g} 秒 / {timeout/60:.1f} 分鐘)。"
-                f"已觸發緊急保護機制，自動中止並釋放 Colab 虛擬機，以防浪費算力！"
+                f"已觸發緊急保護機制，自動中止並釋放遠端 GPU，以防浪費算力！"
             )
 
         # 2. Heartbeat Stall Timeout check (8 minutes)
@@ -201,11 +215,11 @@ def call_colab(
             reader.join(timeout=2)
             if child.stdout is not None:
                 child.stdout.close()
-            if session_to_stop:
-                emergency_stop_session(session_to_stop)
+            if on_abort:
+                on_abort()
             raise ColabTimeoutError(
                 f"【心跳停滯保護觸發】{label} 連續超過 {int(stall_timeout//60)} 分鐘無任何進度或日誌輸出，判定遠端卡死。"
-                f"已自動強制中止並釋放 Colab 虛擬機，保護您的算力餘額不被浪費！"
+                f"已自動強制中止並釋放遠端 GPU！"
             )
 
         try:
@@ -553,6 +567,54 @@ def verify_mp4(path: Path) -> None:
         raise ValueError(f"Downloaded MP4 must contain video and audio streams; found {sorted(streams)}.")
 
 
+class ColabTransport:
+    """How run_batch reaches the GPU: Colab CLI session, files under /content."""
+
+    name = "colab"
+    remote_root = "/content"
+    max_exec_timeout = DEFAULT_MAX_EXEC_TIMEOUT_SECONDS
+
+    def check(self) -> None:
+        if not NOTEBOOK.is_file():
+            raise FileNotFoundError(f"Bundled inference notebook not found: {NOTEBOOK}")
+
+    def start(self, session: str, gpu: str, high_mem: bool) -> None:
+        start_session(session, gpu, high_mem)
+
+    def stop(self, session: str) -> None:
+        stop_session(session)
+
+    def emergency_stop(self, session: str) -> None:
+        emergency_stop_session(session)
+
+    def upload(self, session: str, local: Path, remote: str, *, label: str, timeout: float,
+               on_line: Callable[[str], None], stall_timeout: float | None = 120) -> None:
+        call_colab(["upload", "--session", session, str(local), remote], label=label, timeout=timeout,
+                   on_line=on_line, session_to_stop=session, stall_timeout=stall_timeout)
+
+    def execute(self, session: str, env_values: list[str], *, job_id: str, work_dir: Path, label: str,
+                timeout: int, on_line: Callable[[str], None]) -> None:
+        work_dir.mkdir(parents=True, exist_ok=True)
+        notebook_copy = work_dir / "MiniMax_H3_Turbo_Colab.ipynb"
+        shutil.copy2(NOTEBOOK, notebook_copy)
+        if session in _drive_sessions:
+            env_values = [*env_values, f"H3_DRIVE_MODELS={DRIVE_MODELS_DIR}"]
+        exec_args = ["exec", "--session", session, "--timeout", str(timeout)]
+        for value in env_values:
+            exec_args.extend(["--env", value])
+        exec_args.extend(["--file", str(notebook_copy)])
+        call_colab(exec_args, label=label, timeout=timeout + 60, on_line=on_line,
+                   session_to_stop=session, stall_timeout=DEFAULT_STALL_TIMEOUT_SECONDS)
+
+    def download(self, session: str, remote: str, local: Path, *, label: str,
+                 on_line: Callable[[str], None]) -> None:
+        call_colab(["download", "--session", session, remote, str(local)], label=label, timeout=600,
+                   on_line=on_line, session_to_stop=session, stall_timeout=180)
+
+
+COLAB = ColabTransport()
+
+
 def run_batch(
     manifest_path: Path,
     *,
@@ -564,22 +626,23 @@ def run_batch(
     output_dir: Path,
     exec_timeout: float,
     create_session_if_named: bool = False,
+    transport: Any = COLAB,
 ) -> dict[str, Any]:
-    if not NOTEBOOK.is_file():
-        raise FileNotFoundError(f"Bundled inference notebook not found: {NOTEBOOK}")
+    transport.check()
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     jobs = resolve_jobs(manifest, output_dir)
     owns_session = session is None or create_session_if_named
     if session is None:
         session = f"h3-{time.strftime('%Y%m%d-%H%M%S', time.gmtime())}-{uuid.uuid4().hex[:6]}"
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", session):
-        raise ValueError("Invalid Colab session name.")
+        raise ValueError("Invalid session name.")
 
     progress: dict[str, Any] = {
         "task": "batch",
         "status": "starting",
         "session": session,
-        "gpu": gpu,
+        "gpu": gpu if transport.name == "colab" else transport.name,
+        "backend": transport.name,
         "jobs": [{"id": job["id"], "title": job["title"], "status": "queued", "output": str(job["output_path"])} for job in jobs],
         "log_tail": [],
         "updated_at": now_iso(),
@@ -591,7 +654,7 @@ def run_batch(
         if not line or len(line) > 320 or "<Picture" in line or "<Subject" in line or "[Chinese]" in line:
             return
         # Notebook stage timings ("[h3-stage] name seconds") are kept per job; heartbeats only keep the
-        # stall watchdog alive (call_colab already counted them as activity) and stay out of log_tail.
+        # stall watchdog alive (stream_command already counted them as activity) and stay out of log_tail.
         if line.startswith("[h3-stage]"):
             job = next((item for item in progress["jobs"] if item["id"] == progress.get("current_job")), None)
             if job is not None:
@@ -602,13 +665,16 @@ def run_batch(
         progress["updated_at"] = now_iso()
         write_progress(progress_path, progress)
 
+    def upload(local: Path, remote: str, label: str, timeout: float, stall_timeout: float | None = 120) -> None:
+        transport.upload(session, local, remote, label=label, timeout=timeout, on_line=log_line, stall_timeout=stall_timeout)
+
     results: list[dict[str, Any]] = []
     batch_error: str | None = None
     work_root = manifest_path.parent / f"work_{uuid.uuid4().hex[:8]}"
     work_root.mkdir(parents=True, exist_ok=True)
     try:
         if owns_session:
-            start_session(session, gpu, high_mem)
+            transport.start(session, gpu, high_mem)
         progress["status"] = "running"
         progress["updated_at"] = now_iso()
         write_progress(progress_path, progress)
@@ -620,56 +686,29 @@ def run_batch(
             progress["updated_at"] = now_iso()
             write_progress(progress_path, progress)
             remote_refs: list[str] = []
-            remote_prefix = f"/content/h3_{job['id']}"
+            remote_prefix = f"{transport.remote_root}/h3_{job['id']}"
             is_first_frame = (job.get("mode") == "first_frame")
             remote_first_frame = f"{remote_prefix}_first_frame.png"
 
             if is_first_frame:
-                first_img = job["reference_images"][0]
-                call_colab(
-                    ["upload", "--session", session, str(first_img), remote_first_frame],
-                    label=f"upload first frame for {job['title']}",
-                    timeout=600,
-                    on_line=log_line,
-                    session_to_stop=session,
-                    stall_timeout=120,
-                )
+                upload(job["reference_images"][0], remote_first_frame, f"upload first frame for {job['title']}", 600)
                 remote_refs.append(remote_first_frame)
             else:
                 for image_index, image_path in enumerate(job["reference_images"], start=1):
                     remote = f"{remote_prefix}_reference_{image_index}.img"
-                    call_colab(
-                        ["upload", "--session", session, str(image_path), remote],
-                        label=f"upload reference {image_index} for {job['title']}",
-                        timeout=600,
-                        on_line=log_line,
-                        session_to_stop=session,
-                        stall_timeout=120,
-                    )
+                    upload(image_path, remote, f"upload reference {image_index} for {job['title']}", 600)
                     remote_refs.append(remote)
 
             remote_audios: list[str] = []
             for audio_index, audio_path in enumerate(job.get("reference_audios", []), start=1):
                 remote = f"{remote_prefix}_audio_{audio_index}{audio_path.suffix}"
-                call_colab(
-                    ["upload", "--session", session, str(audio_path), remote],
-                    label=f"upload audio {audio_index} for {job['title']}",
-                    timeout=300,
-                    on_line=log_line,
-                )
+                upload(audio_path, remote, f"upload audio {audio_index} for {job['title']}", 300, stall_timeout=DEFAULT_STALL_TIMEOUT_SECONDS)
                 remote_audios.append(remote)
 
             remote_videos: list[str] = []
             for video_index, video_path in enumerate(job.get("reference_videos", []), start=1):
                 remote = f"{remote_prefix}_video_{video_index}{video_path.suffix}"
-                call_colab(
-                    ["upload", "--session", session, str(video_path), remote],
-                    label=f"upload video {video_index} for {job['title']}",
-                    timeout=900,
-                    on_line=log_line,
-                    session_to_stop=session,
-                    stall_timeout=180,
-                )
+                upload(video_path, remote, f"upload video {video_index} for {job['title']}", 900, stall_timeout=180)
                 remote_videos.append(remote)
 
             # 時間軸錨點（MiniMaxH3AddGuide）：圖／音訊固定在指定幀
@@ -679,14 +718,7 @@ def run_batch(
                 for kind in ("image", "audio"):
                     if kind in guide:
                         remote = f"{remote_prefix}_guide_{guide_index}_{kind}{guide[kind].suffix}"
-                        call_colab(
-                            ["upload", "--session", session, str(guide[kind]), remote],
-                            label=f"upload guide {guide_index} {kind} for {job['title']}",
-                            timeout=300,
-                            on_line=log_line,
-                            session_to_stop=session,
-                            stall_timeout=120,
-                        )
+                        upload(guide[kind], remote, f"upload guide {guide_index} {kind} for {job['title']}", 300)
                         remote_guide[kind] = remote
                 remote_guides.append(remote_guide)
 
@@ -694,19 +726,8 @@ def run_batch(
             prompt_path.write_text(job["prompt"], encoding="utf-8")
             remote_prompt = f"{remote_prefix}_prompt.txt"
             remote_output = f"{remote_prefix}_output.mp4"
-            call_colab(
-                ["upload", "--session", session, str(prompt_path), remote_prompt],
-                label=f"upload prompt for {job['title']}",
-                timeout=120,
-                on_line=log_line,
-                session_to_stop=session,
-                stall_timeout=120,
-            )
-            job_notebook_dir = work_root / job["id"]
-            job_notebook_dir.mkdir(parents=True, exist_ok=True)
-            notebook_copy = job_notebook_dir / "MiniMax_H3_Turbo_Colab.ipynb"
-            shutil.copy2(NOTEBOOK, notebook_copy)
-            effective_exec_timeout = int(min(exec_timeout, DEFAULT_MAX_EXEC_TIMEOUT_SECONDS))
+            upload(prompt_path, remote_prompt, f"upload prompt for {job['title']}", 120)
+            effective_exec_timeout = int(min(exec_timeout, transport.max_exec_timeout))
             env_values = [
                 f"H3_INFERENCE_MODE={'first_frame' if is_first_frame else 'reference'}",
                 "H3_REFERENCE_IMAGES=" + json.dumps(remote_refs, separators=(",", ":")),
@@ -723,38 +744,21 @@ def run_batch(
                 "H3_ASPECT=" + job.get("aspect", "landscape"),
                 "H3_TEXT_ENCODER=" + job.get("text_encoder", "heretic"),
                 "H3_FIRST_FRAME_FIT=" + job.get("first_frame_fit", "crop"),
+                # 只有 Spark 的 Studio 版 bench.py 看這個；Colab notebook 固定 1376×768
+                "H3_RESOLUTION=" + ("full" if job.get("resolution") == "full" else "draft"),
             ]
             if is_first_frame:
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")
-            if session in _drive_sessions:
-                env_values.append(f"H3_DRIVE_MODELS={DRIVE_MODELS_DIR}")
-            exec_args = ["exec", "--session", session, "--timeout", str(effective_exec_timeout)]
-            for value in env_values:
-                exec_args.extend(["--env", value])
-            exec_args.extend(["--file", str(notebook_copy)])
             current.update({"status": "generating", "seed": job["seed"], "duration_seconds": job["duration_seconds"]})
             progress["updated_at"] = now_iso()
             write_progress(progress_path, progress)
-            call_colab(
-                exec_args,
-                label=f"generate {job['title']}",
-                timeout=effective_exec_timeout + 60,
-                on_line=log_line,
-                session_to_stop=session,
-                stall_timeout=DEFAULT_STALL_TIMEOUT_SECONDS,
-            )
+            transport.execute(session, env_values, job_id=job["id"], work_dir=work_root / job["id"],
+                              label=f"generate {job['title']}", timeout=effective_exec_timeout, on_line=log_line)
 
             current["status"] = "downloading"
             progress["updated_at"] = now_iso()
             write_progress(progress_path, progress)
-            call_colab(
-                ["download", "--session", session, remote_output, str(job["output_path"])],
-                label=f"download {job['title']}",
-                timeout=600,
-                on_line=log_line,
-                session_to_stop=session,
-                stall_timeout=180,
-            )
+            transport.download(session, remote_output, job["output_path"], label=f"download {job['title']}", on_line=log_line)
             verify_mp4(job["output_path"])
             current.update({"status": "completed", "finished_at": now_iso(), "bytes": job["output_path"].stat().st_size})
             results.append({"id": job["id"], "output": str(job["output_path"]), "status": "completed"})
@@ -784,10 +788,10 @@ def run_batch(
             progress["updated_at"] = now_iso()
             write_progress(progress_path, progress)
             try:
-                stop_session(session)
+                transport.stop(session)
                 progress["session_status"] = "stopped"
             except Exception as exc:
-                emergency_stop_session(session)
+                transport.emergency_stop(session)
                 progress["session_status"] = "stopped"
                 progress["cleanup_error"] = str(exc)
         elif not owns_session:

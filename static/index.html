@@ -378,6 +378,20 @@
             <label class="block text-[11px] font-semibold text-zinc-400 mb-1">秒數: <span id="durVal" class="text-brand-400 font-bold font-mono">12</span>s</label>
             <input type="range" id="durRange" min="4" max="15" value="12" class="w-full accent-brand-500 cursor-pointer" oninput="document.getElementById('durVal').innerText = this.value; updateEstimate()">
           </div>
+          <div class="col-span-2">
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">生成後端</label>
+            <select id="backendSelect" onchange="onBackendChange()" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2 py-1 text-xs text-zinc-200">
+              <option value="spark" selected>DGX Spark（本地，不扣 CU；漫畫流程在跑時會被擋）</option>
+              <option value="colab">Google Colab（扣 CU）</option>
+            </select>
+          </div>
+          <div class="col-span-2">
+            <label class="block text-[11px] font-semibold text-zinc-400 mb-1">解析度</label>
+            <select id="resolutionSelect" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2 py-1 text-xs text-zinc-200">
+              <option value="draft" selected>草稿 672×384（Spark 預設，較快）</option>
+              <option value="full">正式 1376×768</option>
+            </select>
+          </div>
           <div>
             <label class="block text-[11px] font-semibold text-zinc-400 mb-1">GPU 規格</label>
             <select id="gpuSelect" class="w-full bg-surface-850 border border-zinc-700/80 rounded-xl px-2 py-1 text-xs text-zinc-200">
@@ -414,12 +428,12 @@
         <!-- Big Launch CTA -->
         <button id="dispatchBtn" onclick="launchGeneration()" class="w-full py-3.5 bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-brand-500/25 flex items-center justify-center space-x-2 transition transform active:scale-[0.99]">
           <i data-lucide="play" class="w-4 h-4 fill-current"></i>
-          <span class="text-xs tracking-wider uppercase font-extrabold">啟動 Google Colab 雲端生成</span>
+          <span id="dispatchLabel" class="text-xs tracking-wider uppercase font-extrabold">啟動 Google Colab 雲端生成</span>
         </button>
 
         <button id="stopSessionBtn" onclick="stopActiveSession()" class="hidden w-full py-2 bg-red-950/40 hover:bg-red-900/60 border border-red-800 text-red-300 text-xs font-semibold rounded-xl flex items-center justify-center space-x-1 transition">
           <i data-lucide="power" class="w-3.5 h-3.5"></i>
-          <span>緊急中斷並關閉 Colab 虛擬機</span>
+          <span id="stopSessionLabel">緊急中斷並關閉 Colab 虛擬機</span>
         </button>
       </div>
 
@@ -526,6 +540,11 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
+      try {
+        const saved = localStorage.getItem('h3Backend');
+        if (saved === 'spark' || saved === 'colab') document.getElementById('backendSelect').value = saved;
+      } catch (e) {}
+      onBackendChange();
       fetchBalance();
       fetchHistory();
       setInterval(fetchBalance, 30000);
@@ -577,6 +596,22 @@
     }
 
     // Colab Balance Fetcher
+    // 生成後端切換：Spark 不用 GPU 規格，也不扣 Colab CU
+    function onBackendChange() {
+      const spark = document.getElementById('backendSelect').value === 'spark';
+      document.getElementById('gpuSelect').disabled = spark;
+      document.getElementById('gpuSelect').classList.toggle('opacity-40', spark);
+      // Colab notebook 固定輸出正式解析度，草稿只有 Spark 能選
+      const res = document.getElementById('resolutionSelect');
+      res.value = spark ? 'draft' : 'full';
+      res.disabled = !spark;
+      res.classList.toggle('opacity-40', !spark);
+      document.getElementById('balanceCard').classList.toggle('opacity-40', spark);
+      document.getElementById('dispatchLabel').innerText = spark ? '啟動 DGX Spark 本地生成' : '啟動 Google Colab 雲端生成';
+      document.getElementById('stopSessionLabel').innerText = spark ? '緊急中斷 Spark 上的 H3 容器' : '緊急中斷並關閉 Colab 虛擬機';
+      try { localStorage.setItem('h3Backend', spark ? 'spark' : 'colab'); } catch (e) {}
+    }
+
     async function fetchBalance(force = false) {
       try {
         const res = await fetch(`/api/balance?force_refresh=${force}`);
@@ -1271,6 +1306,8 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         prompt: prompt,
         duration_seconds: parseInt(document.getElementById('durRange').value),
         gpu: document.getElementById('gpuSelect').value,
+        backend: document.getElementById('backendSelect').value,
+        resolution: document.getElementById('resolutionSelect').value,
         aspect: document.getElementById('aspectSelect').value,
         text_encoder: document.getElementById('textEncoderSelect').value,
         first_frame_fit: document.getElementById('firstFrameFitSelect').value,
@@ -1285,6 +1322,8 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         text_encoder: reqBody.text_encoder,
         prompt: prompt,
         gpu: reqBody.gpu,
+        backend: reqBody.backend,
+        resolution: reqBody.resolution,
         high_mem: true
       } : reqBody;
 
