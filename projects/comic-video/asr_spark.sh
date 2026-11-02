@@ -4,7 +4,7 @@
 # 檢查不通過時 exit 3，第一行印 PREFLIGHT 原因，呼叫端改用 Xavier。
 HUB=$HOME/breeze-asr-hub
 CLI=$HUB/engine/whisper.cpp/build/bin/whisper-cli
-MODEL=$HUB/models/ggml-breeze-asr-${ASR_MODEL:-26}.bin
+MODEL=$HUB/models/${ASR_MODEL_FILE:-ggml-breeze-asr-${ASR_MODEL:-26}.bin}  # 非中文用 ggml-large-v3-turbo.bin（Breeze 會把日文翻成中文）
 MIN_FREE_GB=${ASR_MIN_FREE_GB:-8}  # 模型 3 GB＋推理暫存，留餘裕
 
 fail() { echo "PREFLIGHT $*"; exit 3; }
@@ -22,7 +22,7 @@ dir=$(mktemp -d) || exit 1
 trap 'rm -rf "$dir"' EXIT
 tar -x -C "$dir" || exit 1
 files=("$dir"/*.wav)
-"$CLI" -m "$MODEL" -l zh -nt -np -otxt $(printf -- '-f %s ' "${files[@]}") > /dev/null 2>&1 || { echo "whisper-cli 失敗" >&2; exit 1; }
+"$CLI" -m "$MODEL" -l ${ASR_LANG:-zh} -nt -np -otxt $(printf -- '-f %s ' "${files[@]}") > /dev/null 2>&1 || { echo "whisper-cli 失敗" >&2; exit 1; }
 for f in "${files[@]}"; do
   printf '%s\t%s\n' "$(basename "$f")" "$(tr -d '\n' < "$f.txt" | sed 's/^ *//')"
 done
