@@ -106,7 +106,7 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。它和上面�
    - **影片素材（`<Video 1-3>`）**：支援拖曳或點擊上傳 MP4 / MOV（2～15 秒），原聲一併帶入（接到 `ref_video_audios`）。上傳後自動檢查長度，超出 2～15 秒會移除；第一支影片若為直式，畫面比例自動切成直式。
 3. **影片換人模式（Character Swap）**：
    - 勾選「換人模式」後，把 `<Video 1>` 裡的人換成 `<Picture 1>` 的角色，保留原片的鏡頭、背景、其他人、動作節奏與原聲。
-   - **換人＋換聲（Spark 後端，2026-11-02）**：同時上傳 `<Audio 1>` 人聲時，後端不把原片音軌送進模型，改用 `<Audio 1>` 音色說台詞（`H3_VIDEO_AUDIO=1` 可強制保留原片音軌）。實驗見 [projects/flex-test/README.md](projects/flex-test/README.md#換人模式疊-flex2026-11-02)。
+   - **換人＋換聲（2026-11-02，Colab 與 Spark）**：同時上傳 `<Audio 1>` 人聲時，後端不把原片音軌送進模型，改用 `<Audio 1>` 音色說台詞（`H3_VIDEO_AUDIO=1` 可強制保留原片音軌）。實驗見 [projects/flex-test/README.md](projects/flex-test/README.md#換人模式疊-flex2026-11-02)。
    - 後端自動疊加社群 [MiniMax H3 Character Swap LoRA](https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA)（`h3_character_swap_v1.5.safetensors`，強度 1.0），並在提示詞加入換人指示。
    - 使用建議：4～5 秒的連續鏡頭（不要有剪接）、一次只換一個人，並在分鏡中具體描述原片人物的動作（模型不會自動照抄動作）。特寫時的表情可能跟不上原片。
    - **LLM 擴寫提示詞**：在「LLM 擴寫提示詞」輸入簡短中文構想（留空則潤飾現有 Prompt），後端（`/api/expand_prompt`）依目前素材數量、片長與是否換人模式，請 LLM 寫成符合 H3 語法的完整英文 Prompt，填入可編輯的 Prompt 欄。介面為 OpenAI 相容的 `/v1/chat/completions`，以環境變數設定：`H3_LLM_BASE_URL`（預設 `http://localhost:8080/v1`，即 llama.cpp 的預設埠）、`H3_LLM_MODEL`（空白 = 伺服器第一個模型）、`H3_LLM_API_KEY`、`H3_LLM_THINKING`（預設 `1`，推理模型先推理再作答，品質較好但約 30～40 秒；設 `0` 約 2 秒）。擴寫時會把參考圖與原片的 6 張畫面一起送給支援看圖的 LLM（`H3_LLM_VISION=0` 關閉），讓提示詞依實際畫面描述場景與動作。

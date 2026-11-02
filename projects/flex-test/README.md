@@ -81,4 +81,5 @@
 | 林博士參考音 | 108 Hz |
 
   每支約 330 秒。對照影片 `ab_voice_*.mp4`（前 8 秒送、後 8 秒不送，不進 git）。
-- 定案：Spark 的 `studio/bench.py`、`comic-video/bench.py` 改成「換人模式且有 `<Audio>`」時自動不送原片音軌，`H3_VIDEO_AUDIO=1／0` 可強制開關；改動見 [`bench_voice.patch`](bench_voice.patch)，原檔備份 `*.bak_prevoice`。只換人不給 `<Audio>` 時行為不變（保留原聲）。Colab notebook 未改。
+- 定案：Spark 的 `studio/bench.py`、`comic-video/bench.py` 改成「換人模式且有 `<Audio>`」時自動不送原片音軌，`H3_VIDEO_AUDIO=1／0` 可強制開關；改動見 [`bench_voice.patch`](bench_voice.patch)，原檔備份 `*.bak_prevoice`。只換人不給 `<Audio>` 時行為不變（保留原聲）。
+- Colab：notebook 原本接法相同，所以同樣換不了聲。在 Spark 用 Turbo＋強制送原片音軌（`H3_FLEX=0 H3_VIDEO_AUDIO=1`，等同 Colab 圖）重現，音高 242 Hz 仍是原片女聲。`assets/MiniMax_H3_Turbo_Colab.ipynb` 已套用同樣邏輯（尚未在 Colab 上實跑）。
