@@ -307,6 +307,13 @@ EXPAND_SWAP_RULES = """Character swap mode: <Video 1> is the source performance,
 - Do not invent dialogue; the original audio is kept.
 - Do not invent exact timestamps, prop types or outcomes that neither the frames nor the user's idea show."""
 
+# 換人＋換聲：有 <Audio> 時後端不送原片音軌（bench.py／notebook 的 USE_VIDEO_AUDIO），提示詞要改要求 <Audio 1> 音色
+EXPAND_SWAP_VOICE_RULES = """Voice swap: <Audio 1> is attached, so the replaced person also takes the voice of <Audio 1>; the original voice of <Video 1> is NOT kept.
+These rules override the original-audio rules above.
+- Add right after the opening sentence: Replace the original voice with the voice of <Audio 1>.
+- Write the person's speech as: S1 speaks with the exact vocal timbre, pitch, and accent of <Audio 1>, saying, <d>[Chinese] line</d>. Use the lines from the user's idea; if none are given, keep the speech timing of <Video 1> and write short lines that fit the mouth movement.
+- Keep the scene, camera and other people of <Video 1>; describe the ambient sound in overall_soundscape instead of saying the original audio is kept."""
+
 LLM_VISION = os.environ.get("H3_LLM_VISION", "1") == "1"  # 把參考圖與影片畫面一起送給支援看圖的 LLM
 LLM_VIDEO_FRAMES = 6
 
@@ -417,6 +424,8 @@ def expand_prompt(req: ExpandPromptRequest):
     if video_seconds:
         assets += f" <Video 1> is {video_seconds:.1f} seconds long."
     system = EXPAND_SYSTEM_PROMPT + ("\n\n" + EXPAND_SWAP_RULES if req.character_swap else "")
+    if req.character_swap and req.audio_count > 0:
+        system += "\n\n" + EXPAND_SWAP_VOICE_RULES
     user = assets + "\n\nUser idea (may be in Chinese):\n" + (req.idea.strip() or "(none)")
     if (req.current_prompt or "").strip():
         user += "\n\nCurrent prompt to improve (keep what still fits the idea):\n" + req.current_prompt.strip()
@@ -681,6 +690,7 @@ LONG_SWAP_CONTINUITY = (
 class LongSwapRequest(BaseModel):
     title: Optional[str] = "Long Character Swap"
     reference_images: List[str]
+    reference_audios: Optional[List[str]] = []  # 換聲：每段都帶同一組 <Audio>
     source_video: str
     aspect: Optional[str] = "landscape"
     text_encoder: Optional[str] = "heretic"
@@ -744,6 +754,7 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
     work.mkdir(parents=True, exist_ok=True)
     session = f"h3-{run_id}".replace("_", "-")
     seed = req.seed if req.seed is not None else int(time.time()) % 1000000
+    audios = list(req.reference_audios or [])
     run = current_state.get("run")
     outputs: List[Path] = []
     transport = _backend(req.backend)
@@ -777,7 +788,7 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
                 "title": f"{req.title} {index + 1}/{len(segments)}",
                 "mode": "reference",
                 "reference_images": refs,
-                "reference_audios": [],
+                "reference_audios": audios,
                 "reference_videos": [str(clip)],
                 "character_swap": True,
                 "aspect": "portrait" if req.aspect == "portrait" else "landscape",
@@ -878,6 +889,17 @@ def start_long_swap(req: LongSwapRequest):
             source = UPLOADS_DIR / source.name
         if not source.is_file():
             raise HTTPException(status_code=400, detail=f"找不到原片：{req.source_video}")
+        if len(req.reference_audios or []) > 3:
+            raise HTTPException(status_code=400, detail="最多 3 段音訊。")
+        resolved_audios = []
+        for aud in req.reference_audios or []:
+            ap = Path(aud)
+            if not ap.is_absolute():
+                ap = UPLOADS_DIR / ap.name
+            if not ap.is_file():
+                raise HTTPException(status_code=400, detail=f"找不到音訊：{aud}")
+            resolved_audios.append(str(ap))
+        req.reference_audios = resolved_audios
 
         duration = _video_duration(source)
         if duration < 4:
