@@ -6,6 +6,7 @@
 # Spark 目錄：~/h3-bench/comic-video/（本目錄的腳本＋bench.py）、~/h3-bench/comic-video/<篇目>/
 set -u
 ROOT=$(cd "$(dirname "$0")" && pwd)
+. "$ROOT/wait_cool.sh"
 NAME=$1
 BASE=$ROOT/$NAME
 cd "$BASE" || exit 1
@@ -52,7 +53,7 @@ while [ $# -gt 0 ]; do
   else
     echo "$(date -Is) $sid 失敗 rc=$rc"; FAILED=1; break
   fi
-  sleep 60  # 冷卻
+  wait_cool
 done
 kill $MEMPID
 echo "$(date -Is) 系列結束"
