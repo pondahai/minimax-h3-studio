@@ -187,6 +187,43 @@
         <p>• 對話台詞自動封裝為 <code class="text-purple-300">&lt;d&gt;[Chinese] ...&lt;/d&gt;</code></p>
       </div>
 
+      <!-- 素材使用說明 -->
+      <details class="rounded-xl border border-zinc-800/60 bg-surface-850/40 p-3 text-[11px] text-zinc-400 group">
+        <summary class="cursor-pointer select-none text-zinc-300 font-semibold flex items-center justify-between">
+          <span>📖 素材使用說明</span>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition group-open:rotate-180"></i>
+        </summary>
+        <div class="mt-2 space-y-3 leading-relaxed">
+          <div>
+            <p class="font-semibold text-brand-300">🖼️ 參考圖 &lt;Picture 1～9&gt;</p>
+            <p>• <b class="text-zinc-200">必填</b>，1～9 張，依上傳順序編號；可直接貼截圖。</p>
+            <p>• <b class="text-zinc-200">Ref2VA</b>：每張都是外觀參考（角色、服裝、風格），構圖會重新生成。</p>
+            <p>• <b class="text-zinc-200">FL2VA</b>：第 1 張是首幀，影片第 0 秒就是這張圖；第 2 張起才是一般參考。比例不符時依「首幀比例不符時」處理。</p>
+            <p>• 「擷取最後一幀」會拿上一支影片的最後一格當首幀，並自動切到 FL2VA，用來接續多鏡。</p>
+          </div>
+          <div>
+            <p class="font-semibold text-emerald-300">🎙️ 參考聲音 &lt;Audio 1～3&gt;</p>
+            <p>• 選填，最多 3 段，MP3/WAV，建議 2～15 秒的乾淨人聲。用途是複製<b class="text-zinc-200">音色</b>，不是背景音樂。</p>
+            <p>• 多角色時可每人分配一段：分鏡台詞旁的音色選單選「Audio N」，或在主體定義寫明「S1 用 &lt;Audio 1&gt; 的音色說話」。</p>
+            <p>• 沒上傳時用模型預設的聲音和環境音。</p>
+          </div>
+          <div>
+            <p class="font-semibold text-amber-300">🎞️ 參考影片 &lt;Video 1～3&gt;</p>
+            <p>• 選填，最多 3 支，MP4/MOV，每支 2～15 秒，原片聲音會一起帶入。</p>
+            <p>• 第 1 支會決定輸出秒數（對齊原片，限 4～15 秒）；直式原片會自動改成直式輸出。</p>
+            <p>• 有影片時推論明顯較慢（只有圖片的約 5 倍）。</p>
+            <p>• 通常只需要 &lt;Video 1&gt;。第 2、3 支屬於進階用法（例如分別提供動作、運鏡、氛圍），要在提示詞裡自己指定用途，效果未經驗證；LLM 擴寫只看得到 &lt;Video 1&gt; 的畫面。</p>
+          </div>
+          <div>
+            <p class="font-semibold text-amber-300">🔁 換人模式</p>
+            <p>• 只能在 <b class="text-zinc-200">Ref2VA</b> 使用，且必須有 &lt;Video 1&gt;。效果是把 &lt;Video 1&gt; 裡的人換成 &lt;Picture 1&gt;，鏡頭、背景、其他人和動作節奏照原片。</p>
+            <p>• 有上傳 &lt;Audio 1&gt; 時連聲音一起換，不保留原片人聲。</p>
+            <p>• 建議 4～5 秒連續鏡頭、一次一人；超過 6 秒容易漂移，超過 10 秒容易超時。分鏡要具體描述原片動作，模型不會自動照抄。</p>
+            <p>• 長片（超過 15 秒）只能用換人模式，且只能上傳這一支：會自動切成每段 8 秒以內，逐段換人再接成一支；此時參考圖最多 8 張。</p>
+          </div>
+        </div>
+      </details>
+
     </div>
 
     <!-- COL 2: Storyboard & Script Canvas (5 cols) -->
@@ -520,7 +557,7 @@
             <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
           </button>
         </div>
-        <div id="historyList" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+        <div id="historyList" class="space-y-1.5 max-h-96 overflow-y-auto pr-1">
           <!-- Populated dynamically -->
         </div>
       </div>
@@ -1479,14 +1516,21 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         const res = await fetch('/api/history');
         const data = await res.json();
         const list = document.getElementById('historyList');
-        if (data.videos && data.videos.length > 0) {
-          list.innerHTML = data.videos.map(v => `
-            <div onclick="playVideo('${v.url}', '${v.filename}')" class="p-2 rounded-xl bg-surface-850 hover:bg-surface-800 border border-zinc-800 cursor-pointer flex items-center justify-between text-xs transition">
-              <div class="flex items-center space-x-2 overflow-hidden">
-                <i data-lucide="play-circle" class="w-3.5 h-3.5 text-brand-400 shrink-0"></i>
-                <div class="truncate text-[11px] text-zinc-300">${escapeHtml(v.filename)}</div>
+        historyVideos = data.videos || [];
+        if (historyVideos.length > 0) {
+          list.innerHTML = historyVideos.map((v, i) => `
+            <div class="rounded-xl bg-surface-850 border border-zinc-800 text-xs">
+              <div onclick="playVideo('${v.url}', '${v.filename}')" class="p-2 rounded-xl hover:bg-surface-800 cursor-pointer flex items-center justify-between transition">
+                <div class="flex items-center space-x-2 overflow-hidden">
+                  <i data-lucide="play-circle" class="w-3.5 h-3.5 text-brand-400 shrink-0"></i>
+                  <div class="truncate text-[11px] text-zinc-300">${escapeHtml(v.filename)}</div>
+                </div>
+                <div class="flex items-center space-x-2 shrink-0">
+                  <span class="text-[10px] text-zinc-500 font-mono">${v.size_mb} MB</span>
+                  ${v.metadata ? `<button onclick="event.stopPropagation(); toggleHistoryMeta(${i})" title="提示詞與參數" class="text-zinc-500 hover:text-white"><i data-lucide="info" class="w-3.5 h-3.5"></i></button>` : ''}
+                </div>
               </div>
-              <span class="text-[10px] text-zinc-500 font-mono shrink-0">${v.size_mb} MB</span>
+              <div id="historyMeta${i}" class="hidden px-2 pb-2"></div>
             </div>
           `).join('');
           lucide.createIcons();
@@ -1496,6 +1540,53 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       } catch (e) {
         console.error(e);
       }
+    }
+
+    let historyVideos = [];
+
+    // 展開某支歷史影片當時的提示詞與生成參數
+    function toggleHistoryMeta(i) {
+      const box = document.getElementById(`historyMeta${i}`);
+      if (!box.classList.contains('hidden')) { box.classList.add('hidden'); return; }
+      const meta = historyVideos[i].metadata || {};
+      const rows = Object.entries(meta)
+        .filter(([k, v]) => k !== 'prompt' && v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0))
+        .map(([k, v]) => `<div class="flex gap-2"><span class="text-zinc-500 shrink-0">${escapeHtml(k)}</span><span class="text-zinc-300 break-all">${escapeHtml(typeof v === 'object' ? JSON.stringify(v) : String(v))}</span></div>`)
+        .join('');
+      box.innerHTML = `
+        ${meta.prompt ? `<pre class="whitespace-pre-wrap break-words bg-surface-950 border border-zinc-800 rounded-lg p-2 text-[10px] text-zinc-200 font-mono max-h-40 overflow-y-auto">${escapeHtml(meta.prompt)}</pre>` : ''}
+        <div class="mt-1.5 space-y-0.5 text-[10px] font-mono">${rows}</div>
+        <button onclick="applyHistorySettings(${i})" class="mt-2 w-full px-2 py-1 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-[11px]">套用此提示詞與設定</button>
+      `;
+      box.classList.remove('hidden');
+    }
+
+    // 把歷史影片的提示詞與設定填回表單（參考素材只存檔名，需重新上傳）
+    function applyHistorySettings(i) {
+      const meta = historyVideos[i].metadata || {};
+      if (meta.mode === 'ref2va' || meta.mode === 'fl2va') setWorkflowMode(meta.mode);
+      const setSelect = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val != null && [...el.options].some(o => o.value === String(val))) el.value = String(val);
+      };
+      setSelect('resolutionSelect', meta.resolution);
+      setSelect('aspectSelect', meta.aspect);
+      setSelect('textEncoderSelect', meta.text_encoder);
+      setSelect('firstFrameFitSelect', meta.first_frame_fit);
+      if (meta.requested_seconds) {
+        const dur = document.getElementById('durRange');
+        dur.value = meta.requested_seconds;
+        dur.dispatchEvent(new Event('input'));
+      }
+      const swap = document.getElementById('characterSwapToggle');
+      if (swap) { swap.checked = !!meta.character_swap; swap.dispatchEvent(new Event('change')); }
+      if (meta.prompt) {
+        setPromptSource('free');
+        showRawPrompt();
+        document.getElementById('rawPromptArea').value = meta.prompt;
+      }
+      const refs = [...(meta.reference_images || []), ...(meta.reference_audios || []), ...(meta.reference_videos || [])];
+      if (refs.length) alert(`已套用提示詞與設定。\n參考素材需自行重新上傳：\n${refs.join('\n')}`);
     }
 
     // HTML5 Background Desktop Notification
