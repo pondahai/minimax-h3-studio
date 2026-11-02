@@ -673,6 +673,11 @@ def start_generation(req: GenerateRequest):
             resolved_videos.append(str(vp))
         if len(resolved_videos) > 3:
             raise HTTPException(status_code=400, detail="最多 3 支參照影片。")
+        # 官方限制：參照影片合計 ≤ 15 秒（留 0.1 秒給影格取整誤差）
+        if len(resolved_videos) > 1:
+            total = sum(_video_duration(Path(v)) for v in resolved_videos)
+            if total > 15.1:
+                raise HTTPException(status_code=400, detail=f"參照影片總長 {total:.1f} 秒，超過 15 秒上限，請裁短或減少支數。")
         if req.character_swap and not resolved_videos:
             raise HTTPException(status_code=400, detail="換人模式需要上傳一支原片。")
 

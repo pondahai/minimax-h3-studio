@@ -210,9 +210,11 @@
           <div>
             <p class="font-semibold text-amber-300">🎞️ 參考影片 &lt;Video 1～3&gt;</p>
             <p>• 選填，最多 3 支，MP4/MOV，每支 2～15 秒，原片聲音會一起帶入。</p>
+            <p>• <b class="text-zinc-200">多支影片加起來總長不能超過 15 秒</b>（官方限制，超過會無法送出）。</p>
             <p>• 第 1 支會決定輸出秒數（對齊原片，限 4～15 秒）；直式原片會自動改成直式輸出。</p>
             <p>• 有影片時推論明顯較慢（只有圖片的約 5 倍）。</p>
-            <p>• 通常只需要 &lt;Video 1&gt;。第 2、3 支屬於進階用法（例如分別提供動作、運鏡、氛圍），要在提示詞裡自己指定用途，效果未經驗證；LLM 擴寫只看得到 &lt;Video 1&gt; 的畫面。</p>
+            <p>• 官方說明的用途是<b class="text-zinc-200">編輯原片</b>：以 &lt;Video 1&gt; 為底，改台詞或內容，構圖與場景保留。</p>
+            <p>• 第 2、3 支分工（例如一支給動作、一支給運鏡）是社群建議，官方沒有範例，效果未經驗證；要用的話在提示詞裡逐支寫明用途。LLM 擴寫只看得到 &lt;Video 1&gt; 的畫面。</p>
           </div>
           <div>
             <p class="font-semibold text-amber-300">🔁 換人模式</p>
@@ -1309,6 +1311,11 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       const longSwap = !!longVideo;
       if (longSwap && (!characterSwap || uploadedVideos.length !== 1 || uploadedVideos[0] !== longVideo)) {
         alert('超過 15 秒的原片只能用於換人模式，且只能上傳這一支影片（會自動分段處理）。');
+        return;
+      }
+      const videoTotal = uploadedVideos.reduce((s, v) => s + (v.duration || 0), 0);
+      if (!longSwap && uploadedVideos.length > 1 && videoTotal > 15.1) {
+        alert(`參照影片總長 ${videoTotal.toFixed(1)} 秒，超過官方 15 秒上限。請裁短或減少支數。`);
         return;
       }
       if (longSwap && uploadedImages.length > 8) {
