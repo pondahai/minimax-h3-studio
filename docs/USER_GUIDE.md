@@ -225,6 +225,7 @@ python app.py
    - 保留參考角色的臉、頭髮和服裝。不寫的話，模型可能沿用原片的衣服。
    - 具體描述原片人物的動作。模型不會自動照抄動作，要寫出來。
    - 保留場景、鏡頭、其他人和原聲。
+   - **要連聲音一起換**（只限 Spark 後端）：在「音色克隆資產」再上傳一段 2～15 秒的人聲（成為 `<Audio 1>`），提示詞改寫「Replace the original voice with the voice of `<Audio 1>`」和「S1 speaks with the exact vocal timbre, pitch, and accent of `<Audio 1>`, saying, `<d>[Chinese] 台詞</d>`」，不要寫保留原聲。這時後端會自動不把原片音軌送進模型；原片音軌一送進去，模型就照原聲重生成，`<Audio 1>` 完全無效。台詞內容與時間最好跟原片一致，嘴型才對得上。Colab 後端尚未支援換聲。
 5. 確認秒數和原片差不多（上傳影片時已自動設成原片長度，無條件進位），按生成。
 
 **限制**

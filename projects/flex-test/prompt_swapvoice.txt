@@ -1,0 +1,7 @@
+Replace the woman with shoulder-length black hair and a cream knit sweater in <Video 1> with the character from <Picture 1>. Replace the original voice with the voice of <Audio 1>. Keep the reference character face, hair, glasses, short beard and dark blue denim shirt from <Picture 1>.
+
+integrated_multimodal_description: [Shot 1] A photorealistic cinematic medium shot in a cozy wooden cafe by a large window with soft afternoon side light, exactly as in <Video 1>. The man from <Picture 1> sits at the wooden table holding a white ceramic coffee cup with both hands, following the pose, gaze, expression, movement and timing of <Video 1>. At 00:00.000, he smiles warmly at the camera and speaks. The man (S1) speaks with the exact vocal timbre, pitch, and accent of <Audio 1>, saying, <d>[Chinese] 今天的咖啡特別香，你也來一杯吧。</d> At 00:04.000, he lifts the cup to his lips, takes a small sip, lowers the cup back to the table and raises his right hand near his ear while still smiling. Only this one man appears; no other people speak.
+
+overall_soundscape: Quiet cafe ambience with soft background chatter, the gentle clink of a ceramic cup on a wooden table, and a coffee machine hissing faintly in the distance.
+
+non_diegetic_music: N/A
