@@ -293,6 +293,7 @@ Rules:
 - Refer to reference images exactly as <Picture 1> ... <Picture N>, reference videos as <Video 1> ... <Video N>, reference audio as <Audio 1> ... <Audio N>. Only use tags for assets that exist.
 - Describe who the subject is (tie them to their <Picture N>), what they do moment by moment, camera framing and movement, setting, lighting, and the soundscape.
 - Spoken lines go inside <d>[Chinese] ...</d> (or <d>[English] ...</d>), preceded by who speaks, e.g. The woman says, <d>[Chinese] 你好。</d>
+- The language tag is always exactly [Chinese] (never [Traditional Chinese] or anything else, never omitted), but the characters of the line itself are Traditional Chinese as used in Taiwan, never Simplified; keep the user's wording when they give the line. Example: <d>[Chinese] 這裡的風景很美。</d>
 - Keep actions physically plausible and paced to fit the requested duration.
 - Write the user's idea faithfully; add concrete visual detail, never change its intent.
 - When frames of a reference video are attached, describe its setting, subjects, camera and action exactly as the frames show them; never relocate or reinvent what <Video N> contains.
