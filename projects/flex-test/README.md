@@ -84,3 +84,17 @@
 - 定案：Spark 的 `studio/bench.py`、`comic-video/bench.py` 改成「換人模式且有 `<Audio>`」時自動不送原片音軌，`H3_VIDEO_AUDIO=1／0` 可強制開關；改動見 [`bench_voice.patch`](bench_voice.patch)，原檔備份 `*.bak_prevoice`。只換人不給 `<Audio>` 時行為不變（保留原聲）。
 - Colab：notebook 原本接法相同，所以同樣換不了聲。在 Spark 用 Turbo＋強制送原片音軌（`H3_FLEX=0 H3_VIDEO_AUDIO=1`，等同 Colab 圖）重現，音高 242 Hz 仍是原片女聲。`assets/MiniMax_H3_Turbo_Colab.ipynb` 已套用同樣邏輯，2026-11-02 在 Colab A100 實跑（同素材、seed 164723、8 秒、1376×768）：日誌顯示不送原片音軌，音高 118 Hz（林博士 108 Hz），換聲成功；推論 270 秒、全程 8 分鐘、約 1 CU。
 - 前端：`app.py` 的 LLM 擴寫在換人＋有 `<Audio>` 時加上換聲規則（`EXPAND_SWAP_VOICE_RULES`）；`index.html` 的導演分鏡、固定換人指示、換人勾選框說明同步改成換聲寫法；長片分段換人改成每段都帶 `<Audio>`（尚未實跑）。
+
+## Colab 改用 Flex（2026-11-02）
+
+同素材（真人首幀、`prompt_fl2va.txt`／`prompt_ref2va.txt`）、seed 164723、8 秒，在同一個 Colab A100 session 依序跑 4 支（1376×768）。只比推論時間（第一支另含安裝與下載）：
+
+| 模式 | Turbo | Flex | 差別 |
+|---|---|---|---|
+| FL2VA | 8 步，321 秒 | 6 步，240 秒 | Flex 快 25% |
+| Ref2VA | 4 步，171 秒 | 6 步，240 秒 | Flex 慢 41% |
+
+- Flex LoRA 在 Colab 下載約 4 秒，幾乎不增加成本。4 支共用約 3 CU。
+- 定案：Colab 的 FL2VA 預設 Flex，Ref2VA 為省 CU 留在 Turbo 4 步（使用者決定）。notebook 的 `H3_FLEX` 預設依模式而定，runner manifest 可用 `flex: true／false` 強制；不填就交給各後端預設（Spark 兩種都用 Flex）。
+- 修改：notebook 下載清單加入鎖定版本的 Flex LoRA（repo 內在 `comfy/loras/`，下載後搬到 `models/loras`）、取樣改 `lcm`＋`ManualSigmas`；`scripts/backup_models.py` 的 Drive 備份清單加入兩個 Flex LoRA。
+- 對照影片 `colab/ab_colab_cfl.mp4`、`colab/ab_colab_cref.mp4`（不進 git）。
