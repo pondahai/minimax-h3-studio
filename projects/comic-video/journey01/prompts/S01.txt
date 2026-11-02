@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A vibrant Japanese school shonen anime scene, bathed in bright, saturated sunlight. Wukong stands in the foreground on the left, facing away from the camera towards a closed school gate, with a detailed school building featuring a clock tower in the background. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, A wide shot slowly pushes in as Wukong walks up the concrete path towards the large grey gate and stops, craning his neck upward to look at the entrance. At 00:04.000, The camera cuts to a medium shot as Wukong tilts his head, squinting his eyes mischievously while tapping his chin, his mouth moving as he speaks. Wukong (S1) says slowly, <d>[Chinese] 天宮體育館……學生禁止進入？</d> At 00:08.000, In a medium shot, Wukong turns his head to face the camera with a cheeky grin, pointing his thumb back over his shoulder toward the gate. Wukong (S1) says slowly, <d>[Chinese] 嗯……那裡面一定很好玩！</d>
+
+overall_soundscape: Light rustling of leaves in the warm breeze and faint chirping of distant birds. The distinct sound of Wukong's sneakers scuffing against the concrete pavement as he walks.
+
+non_diegetic_music: N/A

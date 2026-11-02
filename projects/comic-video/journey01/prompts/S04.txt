@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] In a bright Japanese school shonen anime style with saturated colors and sunny lighting, a medium shot captures a green sports hall side door. Wujing holds the door while Wukong squeezes through, and Bajie gets comically stuck in the frame. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Bajie’s round body wedges firmly in the door frame while Wukong grins mischievously from the other side; Bajie’s mouth moves frantically as he shouts, his face turning red with effort. Bajie (S1) says slowly, <d>[Chinese] 我……過不去！</d> At 00:04.000, Wujing turns his head with a deadpan expression, his black-rimmed glasses catching the light, while the green door frame vibrates and shakes from Bajie’s struggles. Wujing (S2) says slowly, <d>[Chinese] 你昨天不是吃了三個便當嗎？</d> At 00:08.000, Bajie finally pops through the door with a burst of motion, landing in a heap on the floor while waving his arms in protest against the background noise. Bajie (S1) says slowly, <d>[Chinese] 那是昨天的事！</d>
+
+overall_soundscape: The heavy thud of a wooden door frame vibrating and shaking, followed by the loud squeak of fabric stretching and a soft thump as Bajie hits the floor.
+
+non_diegetic_music: N/A

@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright, saturated Japanese school shonen anime scene set in a sun-drenched corridor. Wukong is the focal point in the foreground, while a squad of older students in navy police-style uniforms chases him from the background. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, The camera tracks backward as the lead discipline squad member lunges forward from the background, pointing an accusing finger while the rest of the squad runs in unison. the discipline squad (S1) says slowly, <d>[Chinese] 孫悟空！站住！</d> At 00:04.000, Wukong sprints toward the camera, his golden circlet headband gleaming as he sticks out his tongue and grins, his black jacket flapping as he tightens his grip on the golden staff. Wukong (S2) says slowly, <d>[Chinese] 才不要！</d> At 00:08.000, Wukong dives through a gap in the navy uniforms and vanishes toward the bright light at the end of the hall, while the pursuing squad members tumble past the empty space, flailing their arms to catch him. Wukong is a small, energetic figure sprinting toward the blinding sunlight at the corridor's exit.
+
+overall_soundscape: The rhythmic thudding of navy shoes on linoleum, the sharp squeak of rubber soles, and the rhythmic rustling of navy uniforms as they run.
+
+non_diegetic_music: N/A
