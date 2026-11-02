@@ -313,7 +313,8 @@ EXPAND_SWAP_VOICE_RULES = """Voice swap: <Audio 1> is attached, so the replaced 
 These rules override the original-audio rules above.
 - Add right after the opening sentence: Replace the original voice with the voice of <Audio 1>.
 - Write the person's speech as: S1 speaks with the exact vocal timbre, pitch, and accent of <Audio 1>, saying, <d>[Chinese] line</d>. Use the lines from the user's idea; if none are given, keep the speech timing of <Video 1> and write short lines that fit the mouth movement.
-- Keep the scene, camera and other people of <Video 1>; describe the ambient sound in overall_soundscape instead of saying the original audio is kept."""
+- Keep the scene, camera and other people of <Video 1>; describe the ambient sound in overall_soundscape instead of saying the original audio is kept.
+- When the assets list when speech is heard in <Video 1>, the new lines must be spoken at those same times so they match the mouth movement: begin the sentence that carries each line with its start time, e.g. At 00:00.000, he smiles at the camera and speaks. The man (S1) speaks with the exact vocal timbre, pitch, and accent of <Audio 1>, saying, <d>[Chinese] …</d> Put each line in the order of the speech spans, and put actions that happen after the speech after it. This overrides the rule against inventing timestamps."""
 
 LLM_VISION = os.environ.get("H3_LLM_VISION", "1") == "1"  # 把參考圖與影片畫面一起送給支援看圖的 LLM
 LLM_VIDEO_FRAMES = 6
@@ -352,6 +353,34 @@ def _jpeg_data_url(frame, max_side: int = 768) -> str:
         frame = cv2.resize(frame, (int(w * scale), int(h * scale)))
     ok, buf = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
     return "data:image/jpeg;base64," + base64.b64encode(buf.tobytes()).decode()
+
+
+def _speech_spans(video: Path) -> List[tuple]:
+    """原片音軌中有人聲的時段（秒）。換聲時 LLM 聽不到原片，台詞沒寫時間點就會被 H3 排到片尾，和原片嘴型對不上。"""
+    import subprocess
+    import numpy as np
+    exe = shutil.which("ffmpeg")
+    if not exe:
+        import imageio_ffmpeg
+        exe = imageio_ffmpeg.get_ffmpeg_exe()
+    proc = subprocess.run([exe, "-v", "error", "-i", str(video), "-vn", "-ac", "1", "-ar", "16000", "-f", "s16le", "-"],
+                          capture_output=True, timeout=60)
+    x = np.frombuffer(proc.stdout, np.int16).astype(np.float32)
+    hop = 800  # 50 ms
+    if proc.returncode != 0 or len(x) < hop:
+        return []
+    rms = np.sqrt((x[: len(x) // hop * hop].reshape(-1, hop) ** 2).mean(axis=1))
+    loud = rms > max(300.0, 0.2 * float(np.percentile(rms, 95)))
+    spans: List[list] = []
+    for i, on in enumerate(loud):
+        t = i * hop / 16000
+        if not on:
+            continue
+        if spans and t - spans[-1][1] <= 0.4:  # 句中短停頓併成同一段
+            spans[-1][1] = t + 0.05
+        else:
+            spans.append([t, t + 0.05])
+    return [(round(a, 1), round(b, 1)) for a, b in spans if b - a >= 0.3]
 
 
 def _vision_parts(req: "ExpandPromptRequest") -> tuple:
@@ -427,6 +456,13 @@ def expand_prompt(req: ExpandPromptRequest):
     system = EXPAND_SYSTEM_PROMPT + ("\n\n" + EXPAND_SWAP_RULES if req.character_swap else "")
     if req.character_swap and req.audio_count > 0:
         system += "\n\n" + EXPAND_SWAP_VOICE_RULES
+        video = _upload_file(req.video_path)
+        try:
+            spans = _speech_spans(video) if video else []
+        except Exception:
+            spans = []
+        if spans:
+            assets += " Speech is heard in <Video 1> at: " + ", ".join(f"{a:.1f}-{b:.1f} s" for a, b in spans) + "."
     user = assets + "\n\nUser idea (may be in Chinese):\n" + (req.idea.strip() or "(none)")
     if (req.current_prompt or "").strip():
         user += "\n\nCurrent prompt to improve (keep what still fits the idea):\n" + req.current_prompt.strip()
