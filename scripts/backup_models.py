@@ -30,6 +30,7 @@ import runner  # noqa: E402
 BASE = ("Comfy-Org/MiniMax-H3", "e5eb578a89295337b8ff433a035929ce0279e0b6")
 FL2VA_LORA = ("drbaph/MiniMax-H3-Turbo-Lora-ComfyUI", "bb2bc497cbaca89dadd0bcf1856eed4f8275be20")
 SWAP_LORA = ("akatz-ai/MiniMax-H3-Character-Swap-LoRA", "96ea3407b230b6f7df71c58c70e31df96bd7e533")
+FLEX = ("Pika-Labs/Pika-H3-Flex", "3ff166447d5edb1406107ab8370c42000ce173e4")
 HERETIC = ("Momoking/Qwen3-VL-32B-Heretic-MiniMax-H3-NVFP4", "0a9486d17cfb20c1a7abc97118c4d95910b9b1f4")
 
 REF2VA_FILES = [
@@ -39,12 +40,14 @@ REF2VA_FILES = [
     (*BASE, "vae/minimax_h3_audio_vae_fp32.safetensors"),
     (*BASE, "loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors"),
     (*SWAP_LORA, "h3_character_swap_v1.5.safetensors"),
+    (*FLEX, "comfy/loras/pika_h3_flex_ref2va_comfy_bf16.safetensors"),  # H3_FLEX=1 時才用
 ]
 FL2VA_FILES = [
     (*BASE, "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors"),
     (*BASE, "diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors"),
     (*BASE, "vae/minimax_h3_video_vae_fp16.safetensors"),
     (*FL2VA_LORA, "minimax_h3_turbo_v4_step600_ema_pruned_comfyui.safetensors"),
+    (*FLEX, "comfy/loras/pika_h3_flex_fl2va_comfy_bf16.safetensors"),  # FL2VA 預設
 ]
 HERETIC_FILES = [(*HERETIC, "qwen3vl_32b_heretic_minimax_h3_nvfp4.safetensors")]
 

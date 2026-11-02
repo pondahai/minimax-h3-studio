@@ -30,7 +30,7 @@ Studio 是一個在本機執行的網頁介面。影片生成不在你的電腦�
 
 - **你的電腦需要**：Windows（其他系統未測）、Python 3.12、網路。不需要顯示卡。
 - **你需要的帳號**：一個有 Colab 算力點數（Compute Units，CU）的 Google 帳號。CU 為 0 的帳號申請不到 A100。
-- **模型組成**：MiniMax H3 原模型（INT8 量化版）、官方 Turbo 4 步加速 LoRA；換人模式再加掛社群 Character Swap LoRA V1.5。
+- **模型組成**：MiniMax H3 原模型（INT8 量化版）加少步數 LoRA：FL2VA 用 [Pika H3 Flex](https://huggingface.co/Pika-Labs/Pika-H3-Flex)（6 步），Ref2VA 用官方 Turbo（4 步）；換人模式再加掛社群 Character Swap LoRA V1.5。manifest 的 `flex: true／false` 可強制。
 
 ---
 
@@ -358,7 +358,8 @@ H3 的提示詞要用英文寫，並遵守標籤格式。Studio 提供三種輔�
 |---|---|---|
 | HF `Comfy-Org/MiniMax-H3` | 主模型、文字編碼器、VAE、Ref2VA Turbo LoRA | `e5eb578a89` |
 | HF `akatz-ai/MiniMax-H3-Character-Swap-LoRA` | 換人 LoRA V1.5 | `96ea3407b2` |
-| HF `drbaph/MiniMax-H3-Turbo-Lora-ComfyUI` | FL2VA Turbo LoRA | `bb2bc497cb` |
+| HF `drbaph/MiniMax-H3-Turbo-Lora-ComfyUI` | FL2VA Turbo LoRA（`flex: false` 時） | `bb2bc497cb` |
+| HF `Pika-Labs/Pika-H3-Flex` | FL2VA Flex LoRA（預設）、Ref2VA Flex LoRA（`flex: true` 時） | `3ff1664470`（2026-11-02 加入） |
 | GitHub `Comfy-Org/ComfyUI` | 推論引擎 | `1a82e6d01f` |
 | GitHub `ComfyUI-VideoHelperSuite` | 讀取影片的節點 | `4d907bee61` |
 
