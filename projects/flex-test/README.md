@@ -51,4 +51,34 @@
 
 - **會變成 Flex**：Spark 上的漫畫轉影片流程（`comic-video/run_jobs.sh`、`run_series.sh` 用的 `comic-video/bench.py`）與 Studio 的 Spark 後端（`scripts/runner_spark.py` 用的 `studio/bench.py`）。
 - **不受影響**：Colab notebook（`assets/MiniMax_H3_Turbo_Colab.ipynb`）仍是 Turbo；Spark 上舊的 `butterfly/`、`run_bench*.sh` 各用自己那份 bench.py。
-- 換人模式（Character Swap LoRA）疊在 Flex 上的效果尚未測試。
+- 換人模式也走 Ref2VA，所以同樣預設 Flex（實測見下節）。
+
+## 換人模式疊 Flex（2026-11-02）
+
+### 換人：Turbo vs Flex
+
+- 原片：上面 FL2VA Turbo seed 164723 的咖啡館女性（`fl_A1.mp4`，8 秒）當 `<Video 1>`
+- 新角色：Qwen-Image 生成的寫實男性（眼鏡、短鬍、深藍襯衫，純白背景）[`swap_char.png`](swap_char.png) 當 `<Picture 1>`
+- 提示詞 [`prompt_swap.txt`](prompt_swap.txt)，腳本 [`run_swap.sh`](run_swap.sh)（用正式 `studio/bench.py`，`H3_CHARACTER_SWAP=1`）
+
+| | Turbo 4 步 | Flex 6 步 |
+|---|---|---|
+| 總時間（seed 164723／42） | 259／249 秒 | 338／349 秒 |
+
+兩組都成功換成新角色，眼鏡、鬍子、襯衫、背景、動作時間點都保留；Flex 慢約 35%。換人維持預設 Flex。
+
+### 換人＋換聲
+
+- 問題：換人後樣貌換了，聲音仍是原片女聲。即使加了 `<Audio 1>`（《影子》林博士參考音，`comic-video/shadow/audio/ref_林博士.wav`）並在提示詞要求用它的音色，結果仍與原片相同。
+- 原因：`bench.py` 把原片音軌接到 `ref_video_audios.ref_video_audio_N`，模型照它重生成原聲，`<Audio>` 音色被蓋掉。
+- 實驗：同提示詞（[`prompt_swapvoice.txt`](prompt_swapvoice.txt)），只差有沒有送原片音軌：
+
+| | 中位音高 |
+|---|---|
+| 原片（女） | 250 Hz |
+| 換人＋`<Audio 1>`，送原片音軌（2 個 seed） | 250 Hz，與原片完全相同 |
+| 換人＋`<Audio 1>`，不送原片音軌（2 個 seed） | 112 Hz |
+| 林博士參考音 | 108 Hz |
+
+  每支約 330 秒。對照影片 `ab_voice_*.mp4`（前 8 秒送、後 8 秒不送，不進 git）。
+- 定案：Spark 的 `studio/bench.py`、`comic-video/bench.py` 改成「換人模式且有 `<Audio>`」時自動不送原片音軌，`H3_VIDEO_AUDIO=1／0` 可強制開關；改動見 [`bench_voice.patch`](bench_voice.patch)，原檔備份 `*.bak_prevoice`。只換人不給 `<Audio>` 時行為不變（保留原聲）。Colab notebook 未改。
