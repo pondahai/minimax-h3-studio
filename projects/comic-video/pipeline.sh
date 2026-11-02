@@ -59,7 +59,12 @@ pgrep -f "[c]hinese_tts_server.py" > /dev/null && { say "停掉 TTS"; pkill -f "
 if docker ps --format '{{.Names}}' | grep -qE '^h3-|^demucs'; then say "ABORT 已有 H3／Demucs 在跑"; exit 1; fi
 for f in config.json prompts/music_official.txt audio/lines.json; do [ -f "$f" ] || { say "ABORT 缺 $f"; exit 1; }; done
 SIDS=$(python3 -c 'import json; print(" ".join(s for s, _, _ in json.load(open("config.json"))["shots"]))')
-for sid in $SIDS; do [ -f "prompts/$sid.txt" ] && [ -f "frames/$sid.png" ] || { say "ABORT 缺 $sid 的 prompt 或首幀"; exit 1; }; done
+# 首幀來源是圖檔才檢查圖；續接段（來源＝前段名）只要 prompt，首幀由 run_series.sh 取前段末幀
+python3 -c 'import json
+for s, _, src in json.load(open("config.json"))["shots"]: print(s, src)' | while read -r sid src; do
+  [ -f "prompts/$sid.txt" ] || { say "ABORT 缺 $sid 的 prompt"; exit 1; }
+  case "$src" in *.png) [ -f "$src" ] || { say "ABORT 缺 $sid 的首幀 $src"; exit 1; } ;; esac
+done || exit 1
 say "開始：$SIDS ＋ music1"
 
 # 1. 配樂

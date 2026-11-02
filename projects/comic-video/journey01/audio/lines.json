@@ -6,7 +6,7 @@
   "end": 8,
   "who": "悟空",
   "text": "天宮體育館……學生禁止進入？",
-  "audio_sec": 3.52
+  "audio_sec": 2.88
  },
  {
   "file": "S01_08_悟空.wav",
@@ -15,39 +15,39 @@
   "end": 12,
   "who": "悟空",
   "text": "嗯……那裡面一定很好玩！",
-  "audio_sec": 3.36
+  "audio_sec": 2.24
  },
  {
   "file": "S02_00_悟空.wav",
   "sid": "S02",
   "start": 0,
-  "end": 3,
-  "who": "悟空",
-  "text": "八戒！悟淨！重大發現！",
-  "audio_sec": 4.8
- },
- {
-  "file": "S02_03_悟空.wav",
-  "sid": "S02",
-  "start": 3,
   "end": 5,
   "who": "悟空",
-  "text": "天宮體育館！",
-  "audio_sec": 1.92
+  "text": "八戒！悟淨！重大發現！",
+  "audio_sec": 2.56
  },
  {
-  "file": "S02_05_八戒.wav",
+  "file": "S02_05_悟空.wav",
   "sid": "S02",
   "start": 5,
   "end": 7,
+  "who": "悟空",
+  "text": "天宮體育館！",
+  "audio_sec": 1.12
+ },
+ {
+  "file": "S02_07_八戒.wav",
+  "sid": "S02",
+  "start": 7,
+  "end": 9,
   "who": "八戒",
   "text": "什麼？有食堂嗎？",
   "audio_sec": 1.92
  },
  {
-  "file": "S02_07_悟淨.wav",
+  "file": "S02_09_悟淨.wav",
   "sid": "S02",
-  "start": 7,
+  "start": 9,
   "end": 12,
   "who": "悟淨",
   "text": "你們兩個的判斷標準，是不是有問題？",
@@ -60,7 +60,7 @@
   "end": 4,
   "who": "悟空",
   "text": "作戰計畫：一，偷偷進去；",
-  "audio_sec": 3.52
+  "audio_sec": 2.24
  },
  {
   "file": "S03_04_悟空.wav",
@@ -69,7 +69,7 @@
   "end": 6,
   "who": "悟空",
   "text": "二，找到寶物！",
-  "audio_sec": 2.08
+  "audio_sec": 1.92
  },
  {
   "file": "S03_06_八戒.wav",
@@ -96,7 +96,7 @@
   "end": 12,
   "who": "悟空",
   "text": "不被抓到。",
-  "audio_sec": 1.6
+  "audio_sec": 1.12
  },
  {
   "file": "S04_00_八戒.wav",
@@ -105,7 +105,7 @@
   "end": 4,
   "who": "八戒",
   "text": "我……過不去！",
-  "audio_sec": 1.28
+  "audio_sec": 1.6
  },
  {
   "file": "S04_04_悟淨.wav",
@@ -132,7 +132,7 @@
   "end": 7,
   "who": "悟空",
   "text": "看！金色的！",
-  "audio_sec": 2.4
+  "audio_sec": 1.92
  },
  {
   "file": "S05_07_悟淨.wav",
@@ -150,7 +150,7 @@
   "end": 12,
   "who": "悟空",
   "text": "我只是看看。",
-  "audio_sec": 1.6
+  "audio_sec": 1.12
  },
  {
   "file": "S06_00_悟空.wav",
@@ -159,7 +159,7 @@
   "end": 4,
   "who": "悟空",
   "text": "哇——！",
-  "audio_sec": 1.12
+  "audio_sec": 0.64
  },
  {
   "file": "S06_04_悟空.wav",
@@ -168,7 +168,7 @@
   "end": 8,
   "who": "悟空",
   "text": "金箍棒！",
-  "audio_sec": 1.92
+  "audio_sec": 0.96
  },
  {
   "file": "S06_08_八戒.wav",
@@ -195,7 +195,7 @@
   "end": 6,
   "who": "風紀隊",
   "text": "警報！警報！天宮體育館的金箍棒訓練器遭到啟動！",
-  "audio_sec": 5.44
+  "audio_sec": 5.6
  },
  {
   "file": "S07_06_悟淨.wav",
@@ -222,7 +222,7 @@
   "end": 12,
   "who": "悟空",
   "text": "快跑！",
-  "audio_sec": 1.28
+  "audio_sec": 0.8
  },
  {
   "file": "S08_00_風紀隊.wav",
@@ -231,7 +231,7 @@
   "end": 4,
   "who": "風紀隊",
   "text": "孫悟空！站住！",
-  "audio_sec": 2.24
+  "audio_sec": 2.4
  },
  {
   "file": "S08_04_悟空.wav",
@@ -240,7 +240,7 @@
   "end": 8,
   "who": "悟空",
   "text": "才不要！",
-  "audio_sec": 1.44
+  "audio_sec": 0.96
  },
  {
   "file": "S09_04_八戒.wav",
@@ -258,21 +258,21 @@
   "end": 12,
   "who": "悟空",
   "text": "嗨。",
-  "audio_sec": 0.8
+  "audio_sec": 0.64
  },
  {
   "file": "S10_04_唐老師.wav",
   "sid": "S10",
   "start": 4,
-  "end": 7,
+  "end": 6,
   "who": "唐老師",
   "text": "悟——空——。",
   "audio_sec": 1.44
  },
  {
-  "file": "S10_07_唐老師.wav",
+  "file": "S10_06_唐老師.wav",
   "sid": "S10",
-  "start": 7,
+  "start": 6,
   "end": 9,
   "who": "唐老師",
   "text": "現在是下午。",
@@ -285,7 +285,7 @@
   "end": 12,
   "who": "悟空",
   "text": "老師……下午安。",
-  "audio_sec": 2.24
+  "audio_sec": 1.92
  },
  {
   "file": "S11_00_唐老師.wav",
@@ -321,7 +321,7 @@
   "end": 4,
   "who": "悟空",
   "text": "下一次的計畫……",
-  "audio_sec": 1.92
+  "audio_sec": 1.76
  },
  {
   "file": "S12_04_唐老師.wav",
@@ -339,7 +339,7 @@
   "end": 4,
   "who": "悟空",
   "text": "計畫二：尋找真正的寶物！",
-  "audio_sec": 3.04
+  "audio_sec": 2.4
  },
  {
   "file": "S13_04_八戒.wav",
@@ -366,6 +366,6 @@
   "end": 12,
   "who": "悟空",
   "text": "嘿嘿嘿……",
-  "audio_sec": 1.6
+  "audio_sec": 0.64
  }
 ]

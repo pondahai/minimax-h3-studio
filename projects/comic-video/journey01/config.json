@@ -90,14 +90,16 @@
   },
   "ref_text": "大家好，今天天氣真好，我們一起去森林裡看看吧！",
   "ref_transcript": {
-    "悟空": "八戒！悟淨！重大發現！那裡面一定很好玩！",
+    "悟空": "我是孫悟空，今天下課想去體育館看看，你們要不要一起來？",
     "八戒": "什麼？有食堂嗎？我……過不去！",
     "悟淨": "你們兩個的判斷標準，是不是有問題？",
     "唐老師": "悟——空——。現在是下午。",
     "風紀隊": "孫悟空！站住！"
   },
   "t2s": true,
-  "pronounce": {},
+  "pronounce": {
+    "箍": "姑"
+  },
   "prompt_format": "official",
   "no_text_rule_en": "No text of any kind may appear in the picture: no letters, signs, blackboard writing, labels, numbers, sound-effect lettering or icons.",
   "style_en": "bright Japanese school shonen anime, saturated colors, sunny",
