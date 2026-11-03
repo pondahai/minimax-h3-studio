@@ -100,17 +100,29 @@ def add_music(src, music, dst, total):
     subprocess.run(cmd, check=True)
 
 
+def load_sync(cfg, d):
+    """載入 H3 開口時段與 DTW 錨點（mux.py、subs.py 共用，字幕才會跟語音同一個時間）。"""
+    if (d / "sfx" / "lipsync.json").exists():
+        LIPSYNC.update(json.loads((d / "sfx" / "lipsync.json").read_text(encoding="utf-8")))
+        print(f"對齊 H3 嘴型：{len(LIPSYNC)} 句")
+    # H3 沒生成人聲時量不到開口時段，台詞會貼在分鏡時段開頭；人看畫面找到角色開口的秒數，寫進 config lipsync_manual 覆蓋
+    # （第二集 S08 八戒「我可以再來一碗嗎？」）。手動的句子不走 DTW
+    for f, span in cfg.get("lipsync_manual", {}).items():
+        LIPSYNC[f] = span
+        print(f"手動開口時段：{f} {span[0]}–{span[1]}s")
+    if (d / "sfx" / "align.json").exists():
+        ALIGN.update(json.loads((d / "sfx" / "align.json").read_text(encoding="utf-8")))
+        for f in cfg.get("lipsync_manual", {}):
+            ALIGN.pop(f, None)
+        print(f"DTW 逐段對齊：{len(ALIGN)} 句")
+
+
 if __name__ == "__main__":
     cfg, d, _ = comic.load()
     MIXED = d / "mixed"
     MIXED.mkdir(exist_ok=True)
     dur = comic.durations(cfg)
-    if (d / "sfx" / "lipsync.json").exists():
-        LIPSYNC.update(json.loads((d / "sfx" / "lipsync.json").read_text(encoding="utf-8")))
-        print(f"對齊 H3 嘴型：{len(LIPSYNC)} 句")
-    if (d / "sfx" / "align.json").exists():
-        ALIGN.update(json.loads((d / "sfx" / "align.json").read_text(encoding="utf-8")))
-        print(f"DTW 逐段對齊：{len(ALIGN)} 句")
+    load_sync(cfg, d)
     report = json.loads((d / "audio" / "lines.json").read_text(encoding="utf-8"))
     sids = list(dur)
     for sid in sids:

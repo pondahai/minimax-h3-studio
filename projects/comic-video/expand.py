@@ -38,6 +38,8 @@ Reply with JSON only, no markdown:
   Describe concrete appearance, motion, expression, light, color and camera movement. Every item needs at least one visible change
   (character action, prop change or camera movement); never leave the picture static.
   If the row's sound is a character line, describe that character speaking: mouth moving, expression and gestures. Do not write the words.
+  In that row every other character on screen listens with mouth closed: write "listens quietly with mouth closed" for each of them,
+  and give them only quiet reactions (nodding, looking, smiling with closed lips), never an open mouth, gasp or exclamation.
   If the row's sound is narration (旁白) or silent, the characters do not speak.
 - final_frame: if the storyboard describes a final frame (末幀), one sentence describing it; otherwise "".
 - soundscape: 1-3 English sentences of ambient and physical action sounds only (breeze, birds, water, objects). Never speech or music.
@@ -86,9 +88,19 @@ def assemble(cfg, sid, block, parts):
                 speakers.setdefault(who, f"S{len(speakers) + 1}")
                 name = cfg.get("names_en", {}).get(who, who)
                 line += f" {name} ({speakers[who]}) says slowly, <d>[Chinese] {said}</d>"
+                # 同畫面其他角色有生動反應時 H3 會讓他開口（第二集 S01 悟淨的台詞變八戒嘴動）；8002 不一定照規則寫，這裡固定補一句
+                others = [n for n in cfg.get("looks_en", {}) if n != name and re.search(rf"\b{re.escape(n)}\b", parts["intro"] + " ".join(parts["ranges"]))]
+                if others:
+                    line += f" Only {name} is speaking; {', '.join(others)} keep their mouths closed."
         sentences.append(line)
     if speakers:  # H3 預設講很快（一句 1.5 秒），TTS 對不上嘴；要它慢慢講，每句約佔滿時段
         sentences.insert(1, SLOW)
+    # 只寫英文名 H3 不知道誰是誰，會讓畫面最顯眼的角色開口（《現代西遊》第二集 S01 悟淨的台詞變悟空嘴動）：
+    # 每個角色第一次出現時補上定裝圖外觀
+    text = " ".join(sentences)
+    for name, look in cfg.get("looks_en", {}).items():
+        text = re.sub(rf"\b{re.escape(name)}\b", f"{name} ({look})", text, count=1)
+    sentences = [text]
     if sid in cfg.get("last_frames", []):  # 官方尾幀句：Picture 2 錨定在片長秒數
         sentences.append(f"<Picture 2> (from [Shot 1]) aligns with the {comic.durations(cfg)[sid]:.2f}-second mark of the target video.")
     if parts.get("final_frame"):
