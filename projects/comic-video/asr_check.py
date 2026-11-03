@@ -76,3 +76,12 @@ if __name__ == "__main__":
         lines = json.loads((d / "audio" / "lines.json").read_text(encoding="utf-8"))
         for ln, t in zip(lines, transcribe_all([d / "audio" / ln["file"] for ln in lines])):
             print(f"{ln['file']}\n  原文：{ln['text']}\n  ASR ：{t}", flush=True)
+    if LANG == "ja":
+        # Whisper 會照文意修正讀音（は 唸 ha、常温 唸 ちょうおん 都照樣寫對），再用音素模型聽一次
+        import re, phoneme_check
+        by_file = {ln["file"]: ln["text"] for ln in json.loads((d / "audio" / "lines.json").read_text(encoding="utf-8"))}
+        items = ([(p, by_file[re.sub(r"_v\d+(?=\.wav$)", "", p.name)]) for p in paths] if wavs
+                 else [(d / "audio" / f, t) for f, t in by_file.items()])
+        print("\n── 音素比對 ──", flush=True)
+        bad = phoneme_check.check(cfg, items)
+        print(f"\n發音可疑 {len(bad)} 句：{'、'.join(bad) or '無'}")

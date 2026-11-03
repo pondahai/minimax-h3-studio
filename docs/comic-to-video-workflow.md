@@ -395,5 +395,6 @@ H3 官方支援三種圖片錨定：首幀（I2VA）、尾幀（L2VA）、首尾
 
 - 計畫與各篇進度見 `docs/japanese-version-plan.md`；目錄 `<篇目>_ja/`，Spark 上 `video`、`music` 用 symlink 指回中文版，`sfx/` 只連 `*_novocals.wav`（`lipsync.json`、`align.json` 是對中文台詞量的，不能沿用）
 - **ASR 不能用 Breeze**：Breeze 會把日文直接翻成中文。config 設 `"lang": "ja"`，`asr_check.py` 會改用 Spark 上的 `ggml-large-v3-turbo.bin`（`asr_spark.sh` 的 `ASR_MODEL_FILE`）；Spark 不能跑時直接停，不退回 Xavier
-- 日文 ASR 判讀：同音異字（錠温＝常温、梅雨＝露）代表發音正確；多出音節（水油蒸気）或不同音（超温、女王）才是壞句
+- 日文 ASR 判讀：同音異字（梅雨＝露）代表字音對；多出音節（水油蒸気）或不同音（超温、女王）是壞句
+- **Whisper 驗不出讀音錯**：它照文意寫字，は 唸成 ha、常温 唸成 ちょうおん 都照樣寫對（《凝結》S04_04、S05_05 都這樣漏掉）。`lang: ja` 時 `asr_check.py` 會接著跑 `phoneme_check.py`：Spark 上 `facebook/wav2vec2-xlsr-53-espeak-cv-ft` 聽實際音素，和 `pronounce` 全假名逐音比對，標出 j↔ch、z↔s、w↔h 對調與整句相似度 < 0.6 的句子。k/t 被聽成 g/d 是正常的清音濁化，不算。標出的句子再人工試聽
 - Windows 上跑 `tts.py`／`asr_check.py` 要設 `PYTHONIOENCODING=utf-8`，否則片假名檔名印出時 cp950 報錯中斷
