@@ -526,7 +526,7 @@ def compose_prompt(req: Ref2VAPromptRequest):
 class GenerateRequest(BaseModel):
     title: Optional[str] = "MiniMax Video"
     mode: Optional[str] = "ref2va"
-    reference_images: List[str]
+    reference_images: List[str] = []
     reference_audios: Optional[List[str]] = []
     reference_videos: Optional[List[str]] = []
     character_swap: bool = False
@@ -637,7 +637,12 @@ def start_generation(req: GenerateRequest):
             raise HTTPException(status_code=400, detail="另一個影片生成任務正在進行中。")
         _backend(req.backend)
 
-        if not (1 <= len(req.reference_images) <= 9):
+        mode_val = str(req.mode or "").lower()
+        mode_val = "t2va" if mode_val == "t2va" else "first_frame" if mode_val in ("fl2va", "first_frame") else "reference"
+        if mode_val == "t2va":
+            if req.reference_images or req.reference_videos or req.character_swap:
+                raise HTTPException(status_code=400, detail="T2VA 純文字模式不使用參照圖片或影片。")
+        elif not (1 <= len(req.reference_images) <= 9):
             raise HTTPException(status_code=400, detail="需要提供 1 到 9 張參照圖片。")
 
         if not (4 <= req.duration_seconds <= 15):
@@ -681,7 +686,6 @@ def start_generation(req: GenerateRequest):
         if not output_name.endswith(".mp4"):
             output_name += ".mp4"
 
-        mode_val = "first_frame" if str(req.mode or "").lower() in ("fl2va", "first_frame") else "reference"
         manifest_data = {
             "jobs": [
                 {

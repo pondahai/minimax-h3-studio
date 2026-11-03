@@ -441,8 +441,14 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
     for index, raw in enumerate(jobs, start=1):
         if not isinstance(raw, dict):
             raise ValueError(f"Job {index} must be an object.")
-        refs = raw.get("reference_images", raw.get("images"))
-        if not isinstance(refs, list) or not 1 <= len(refs) <= 9:
+        # t2va：純文字生影片，走 FL2VA 主模型但不接首幀，不需要圖
+        mode = str(raw.get("mode", "reference")).lower()
+        mode = "t2va" if mode == "t2va" else "first_frame" if mode in ("first_frame", "fl2va") else "reference"
+        refs = raw.get("reference_images", raw.get("images")) or []
+        if mode == "t2va":
+            if refs:
+                raise ValueError(f"Job {index} is t2va and must not have reference images.")
+        elif not isinstance(refs, list) or not 1 <= len(refs) <= 9:
             raise ValueError(f"Job {index} must have 1–9 reference images.")
         image_paths: list[Path] = []
         for image in refs:
@@ -461,7 +467,6 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
         if not prompt.strip():
             raise ValueError(f"Job {index} needs a non-empty UTF-8 prompt.")
         image_count = len(image_paths)
-        mode = "first_frame" if str(raw.get("mode", "reference")).lower() in ("first_frame", "fl2va") else "reference"
         if mode == "reference":
             invalid = sorted({int(n) for n in PICTURE_RE.findall(prompt) if int(n) < 1 or int(n) > image_count})
             if invalid:
@@ -690,10 +695,13 @@ def run_batch(
             write_progress(progress_path, progress)
             remote_refs: list[str] = []
             remote_prefix = f"{transport.remote_root}/h3_{job['id']}"
-            is_first_frame = (job.get("mode") == "first_frame")
+            is_t2va = (job.get("mode") == "t2va")
+            is_first_frame = is_t2va or (job.get("mode") == "first_frame")
             remote_first_frame = f"{remote_prefix}_first_frame.png"
 
-            if is_first_frame:
+            if is_t2va:
+                pass
+            elif is_first_frame:
                 upload(job["reference_images"][0], remote_first_frame, f"upload first frame for {job['title']}", 600)
                 remote_refs.append(remote_first_frame)
             else:
@@ -750,7 +758,9 @@ def run_batch(
                 # 只有 Spark 的 Studio 版 bench.py 看這個；Colab notebook 固定 1376×768
                 "H3_RESOLUTION=" + ("full" if job.get("resolution") == "full" else "draft"),
             ]
-            if is_first_frame:
+            if is_t2va:
+                env_values.append("H3_T2VA=1")
+            elif is_first_frame:
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")
             if job.get("flex") is not None:
                 env_values.append("H3_FLEX=" + ("1" if job["flex"] else "0"))
