@@ -1,0 +1,6 @@
+
+integrated_multimodal_description: [Shot 1] Bright Japanese shonen anime style. A static wide shot of an empty museum gallery at night, with glass display cases glowing in warm golden light and tiny sparkles of light floating slowly in the air. No people or animals appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A quiet, softly echoing indoor hall with a faint hum of display lights.
+
+non_diegetic_music: A playful, curious and gently mysterious instrumental piece for a children's museum adventure, led by a light pizzicato strings and celesta melody with soft guzheng accents over warm piano chords, with light woodblock percussion keeping a tiptoeing, unhurried beat, at a relaxed tempo and soft, even dynamics.
