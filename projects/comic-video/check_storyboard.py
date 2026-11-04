@@ -1,4 +1,4 @@
-"""檢查分鏡稿是否照 docs/comic-to-video-workflow.md 第 2 節的規則寫（人寫的或 8002 寫的都適用）。
+"""檢查分鏡稿是否照 docs/comic-to-video-workflow.md 第 2 節的規則寫（人寫的或本地 LLM 寫的都適用）。
 
 用法：python check_storyboard.py <篇目> [分鏡檔]   （預設 storyboard.md）
 檢查：段長 ≤12 秒、時間軸連續、每列 2–6 秒、台詞語速、每列有動作、阿柴不說話、說話者是已知角色、
@@ -60,15 +60,16 @@ def check_shot(cfg, shot, prev):
     seen = set()
     for a, b, vis, cam, snd in rows:
         span = b - a
-        if not 2 <= span <= 6:
+        said = lines(snd)
+        n = sum(len(re.findall(r"[一-鿿]", t)) for _, t in said)
+        cps = CPS_CHILD if any(w in cfg.get("children", CHILDREN) for w, _ in said) else CPS
+        # 一句長台詞本來就要 6 秒以上時放行（時間表指定的 5–12、3–10），不要逼模型把一句拆成兩列
+        if not 2 <= span <= max(6, -(-n // cps) + 1):
             issues.append(f"{a}–{b} 秒 一列 {span} 秒（建議 3–5 秒一個事件）")
         if STILL.search(vis) or not MOTION.search(vis + cam):
             issues.append(f"{a}–{b} 秒 動作太少：{vis[:30]}")
         if TEXT_IN_PICTURE.search(vis):
             issues.append(f"{a}–{b} 秒 畫面可能有字：{TEXT_IN_PICTURE.search(vis)[0]}")
-        said = lines(snd)
-        n = sum(len(re.findall(r"[一-鿿]", t)) for _, t in said)
-        cps = CPS_CHILD if any(w in cfg.get("children", CHILDREN) for w, _ in said) else CPS
         if said and span > 0 and n / span > cps:
             issues.append(f"{a}–{b} 秒 台詞 {n} 字／{span} 秒，超過 {cps} 字／秒")
         for who, _ in said:

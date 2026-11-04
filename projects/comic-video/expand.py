@@ -1,4 +1,4 @@
-"""把 <篇目>/storyboard.md 每段連同對應漫畫分格送 8002 擴寫成影片 prompt，輸出 <篇目>/prompts/SXX.txt。
+"""把 <篇目>/storyboard.md 每段連同對應漫畫分格送本地 LLM（comic.LLM_URL，預設 8006）擴寫成影片 prompt，輸出 <篇目>/prompts/SXX.txt。
 
 用法：python expand.py <篇目> [段落...]   （不帶段落 = 全部）
 config 的 prompt_format：
@@ -12,7 +12,6 @@ from pathlib import Path
 
 import comic
 
-URL = "http://100.89.149.50:8002/v1/chat/completions"
 
 SYSTEM = """你是影片生成提示詞擴寫器。輸入是一段 12 秒以內的分鏡表（秒數區間、畫面、鏡頭、聲音）。
 請輸出一段給文生影片模型用的中文提示詞，規則：
@@ -88,7 +87,7 @@ def assemble(cfg, sid, block, parts):
                 speakers.setdefault(who, f"S{len(speakers) + 1}")
                 name = cfg.get("names_en", {}).get(who, who)
                 line += f" {name} ({speakers[who]}) says slowly, <d>[Chinese] {said}</d>"
-                # 同畫面其他角色有生動反應時 H3 會讓他開口（第二集 S01 悟淨的台詞變八戒嘴動）；8002 不一定照規則寫，這裡固定補一句
+                # 同畫面其他角色有生動反應時 H3 會讓他開口（第二集 S01 悟淨的台詞變八戒嘴動）；LLM 不一定照規則寫，這裡固定補一句
                 others = [n for n in cfg.get("looks_en", {}) if n != name and re.search(rf"\b{re.escape(n)}\b", parts["intro"] + " ".join(parts["ranges"]))]
                 if others:
                     line += f" Only {name} is speaking; {', '.join(others)} keep their mouths closed."
@@ -121,6 +120,9 @@ def shots(d):
 
 def expand(cfg, sid, block, tries=3):
     img = base64.b64encode((Path(cfg["panel_dir"]) / f"{cfg['panels'][sid]}.png").read_bytes()).decode()
+    # config expand_notes：給個別段的審稿意見，接在分鏡後面一起送
+    if note := cfg.get("expand_notes", {}).get(sid):
+        block = f"{block}\n\n審稿意見（一定要照做）：{note}"
     user = [{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img}"}},
             {"type": "text", "text": block}]
     req_body = {
@@ -129,13 +131,10 @@ def expand(cfg, sid, block, tries=3):
         "chat_template_kwargs": {"enable_thinking": False},
     }
     if official(cfg):
-        # 8002 偶爾回不合法的 JSON（《彩虹》S05、S06）：用 llama.cpp 的 JSON 文法限制輸出，段數不符再重試
+        # LLM 偶爾回不合法的 JSON（8002《彩虹》S05、S06）：用 JSON 模式限制輸出（llama.cpp、vLLM 都支援），段數不符再重試
         req_body["response_format"] = {"type": "json_object"}
-    body = json.dumps(req_body).encode()
     for attempt in range(1, tries + 1):
-        req = urllib.request.Request(URL, body, {"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=300) as r:
-            result = json.load(r)["choices"][0]["message"]["content"].strip()
+        result = comic.llm(req_body, timeout=300).strip()
         if not official(cfg):
             return result
         try:

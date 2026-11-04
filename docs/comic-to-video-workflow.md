@@ -41,7 +41,8 @@
 
 | 服務 | 位置 | 用途 |
 |---|---|---|
-| llama.cpp（多模態） | Spark `100.89.149.50:8002` | 分鏡擴寫成影片 prompt，可附圖 |
+| vLLM `qwen3.8-nvfp4`（Qwen3.8-27B，多模態） | Spark `100.89.149.50:8006` | **2026-11-04 起工作流唯一 LLM**：分鏡草稿、首幀 prompt、擴寫、外觀、對嘴檢查（`comic.llm()`；平常可停著，第一次呼叫自動 `docker start`） |
+| llama.cpp（多模態） | Spark `100.89.149.50:8002` | 2026-11-04 前的工作流 LLM；`LLM_PORT=8002` 可改回。下文歷史紀錄裡的「8002」指它 |
 | VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑） | 角色配音 |
 | Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`） | 生成首幀 |
 | MiniMax H3 | Spark `~/h3-bench`（docker image `h3-bench`） | 生成影片／配樂 |
@@ -71,7 +72,7 @@
 
 新增工具時要更新這張表。
 
-**記憶體互斥**：TTS、Qwen-Image、H3 三者一次只開一個；跑 H3 時 Spark 上只留 8002（停掉 `qwen3.8-nvfp4`、`qwen-image-comfyui`）。實測 H3 跑時系統用量約 71 GB／121 GB，沒有用到 swap。
+**記憶體互斥**：TTS、Qwen-Image、H3 三者一次只開一個；跑 H3 時 Spark 上只留 8002（停掉 `qwen3.8-nvfp4`、`qwen-image-comfyui`）；工作流改用 8006 後仍照這個規則，H3 跑完再由腳本自動啟動 8006。實測 H3 跑時系統用量約 71 GB／121 GB，沒有用到 swap。
 
 `qwen-gradio-ui` 前端**豁免不停**：它本身很輕（記憶體主要靠 ComfyUI），停掉 `qwen-image-comfyui` 後前端連不到後端，但頁面還能開；`pipeline.sh` 會在停 ComfyUI 前後呼叫前端的 `/busy_status`（通用忙碌旗標，不只給 H3 用）設/清狀態，畫面上顯示「H3 正在運作，請稍等」而不是連線錯誤；`story-film-studio` 送出圖請求前也會查同一個端點排隊等待。細節見 [dgx-spark-ops/notes/h3-qwen-coexistence-plan.md](https://github.com/pondahai/dgx-spark-ops/blob/master/notes/h3-qwen-coexistence-plan.md)。
 

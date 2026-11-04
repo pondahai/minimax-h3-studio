@@ -27,3 +27,46 @@ def load():
 
 def durations(cfg):
     return {sid: dur for sid, dur, _ in cfg["shots"]}
+
+
+# 本地 LLM（分鏡、首幀 prompt、擴寫、外觀、對嘴檢查共用）。預設 8006＝Spark vLLM qwen3.8-nvfp4（2026-11-04 起取代 8002）；
+# 環境變數 LLM_PORT=8002 改回 llama.cpp。8006 平常可能停著（pipeline.sh 跑 H3 前會停掉它），第一次呼叫時自動 docker start。
+LLM_PORT = os.environ.get("LLM_PORT", os.environ.get("SB_PORT", "8006"))
+LLM_URL = f"http://100.89.149.50:{LLM_PORT}/v1/chat/completions"
+LLM_MODEL = {"8006": "qwen3.8"}.get(LLM_PORT)
+_llm_ready = False
+
+
+def ensure_llm():
+    import subprocess, time, urllib.request
+    global _llm_ready
+    if _llm_ready:
+        return
+    models = LLM_URL.replace("/chat/completions", "/models")
+    try:
+        urllib.request.urlopen(models, timeout=5)
+    except OSError:
+        if LLM_PORT != "8006":
+            raise
+        print("8006 沒在跑，docker start qwen3.8-nvfp4（冷啟動數分鐘）", flush=True)
+        subprocess.run(["ssh", "funsteam@100.89.149.50", "docker start qwen3.8-nvfp4"], check=True, capture_output=True)
+        for _ in range(180):  # vLLM 冷啟動要讀 22 GB 權重＋編譯，實測 3 分鐘以上，給 15 分鐘
+            time.sleep(5)
+            try:
+                urllib.request.urlopen(models, timeout=5)
+                break
+            except OSError:
+                pass
+        else:
+            sys.exit("8006 啟動逾時")
+    _llm_ready = True
+
+
+def llm(body, timeout=600):
+    """送 chat completion（body 不用帶 model），回傳 content 文字。"""
+    import urllib.request
+    ensure_llm()
+    data = json.dumps({**({"model": LLM_MODEL} if LLM_MODEL else {}), **body}).encode()
+    req = urllib.request.Request(LLM_URL, data, {"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.load(r)["choices"][0]["message"]["content"]

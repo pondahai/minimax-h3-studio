@@ -1,4 +1,4 @@
-"""H3 沒生成人聲的台詞（lipsync.json 量不到開口時段）：8002 在分鏡時段內每 0.25 秒看一格，判斷說話者嘴巴開不開，
+"""H3 沒生成人聲的台詞（lipsync.json 量不到開口時段）：本地 LLM（comic.LLM_URL，預設 8006）在分鏡時段內每 0.25 秒看一格，判斷說話者嘴巴開不開，
 找出開口時段，印出可貼進 config lipsync_manual 的 JSON（mux.py 會照這個時段放台詞）。
 用法：python mouth_spans.py <篇目> <台詞檔名>...   例：python mouth_spans.py journey02 S08_08_八戒.wav"""
 import base64, json, subprocess, sys, tempfile, urllib.request
@@ -6,7 +6,6 @@ from pathlib import Path
 import imageio_ffmpeg
 import comic
 
-URL = "http://100.89.149.50:8002/v1/chat/completions"
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 STEP = 0.25
 
@@ -24,9 +23,7 @@ def is_open(name, look, png):
                          {"role": "user", "content": [{"type": "image_url", "image_url": {
                              "url": "data:image/png;base64," + base64.b64encode(png).decode()}}]}],
             "temperature": 0, "max_tokens": 5, "chat_template_kwargs": {"enable_thinking": False}}
-    req = urllib.request.Request(URL, json.dumps(body).encode(), {"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        return json.load(r)["choices"][0]["message"]["content"].strip().lower()
+    return comic.llm(body, timeout=120).strip().lower()
 
 
 def span(ts, marks, need):

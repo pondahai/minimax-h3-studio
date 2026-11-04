@@ -44,7 +44,7 @@ except Exception:
   return 1
 }
 
-# 0. 互斥檢查：只留 8002，TTS／Qwen-Image／Demucs／其他 H3 都不能開
+# 0. 互斥檢查：TTS／Qwen-Image／Demucs／其他 H3／8006 都不能開（工作流的 LLM 自 2026-11-04 改用 8006，跑完 H3 後各腳本第一次呼叫時會自動 docker start）；8002 不動
 # qwen-gradio-ui 豁免不停：前端很輕（透過 ComfyUI 才佔記憶體），停掉 qwen-image-comfyui 後
 # 它只是連不到後端、頁面顯示讀取中，不會額外佔用 H3 需要的記憶體；保留它讓使用者至少能看到
 # 頁面還在、知道「現在不能生圖」，而不是整個 8443 直接斷線。
