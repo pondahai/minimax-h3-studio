@@ -37,6 +37,8 @@
 
 ## 機器與服務
 
+在另一台 Spark 從零建置：見 [spark-deployment-guide.md](spark-deployment-guide.md)。
+
 | 服務 | 位置 | 用途 |
 |---|---|---|
 | llama.cpp（多模態） | Spark `100.89.149.50:8002` | 分鏡擴寫成影片 prompt，可附圖 |
