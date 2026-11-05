@@ -1,0 +1,301 @@
+{
+  "title": "現代西遊大冒險 第五集：八戒決戰台南小吃",
+  "source": "https://shezi.org.tw/modern-journey/#weekly-journey-ep05（header＋panel-01～12）",
+  "style": "明亮日系校園少年漫畫動畫風、色彩飽和；台南老街小吃攤、古蹟，白天到夕陽",
+  "no_text_rule": "不要在畫面中出現任何文字、標籤、招牌字、黑板字、狀聲詞或圖示",
+  "ref_text": "大家好，今天天氣真好，我們一起去森林裡看看吧！",
+  "ref_transcript": {
+    "悟空": "我是孫悟空，今天下課想去體育館看看，你們要不要一起來？",
+    "八戒": "什麼？有食堂嗎？我……過不去！",
+    "悟淨": "你們兩個的判斷標準，是不是有問題？",
+    "鸚鵡": "打開來看看吧！下一站，尋找第二枚求知印！",
+    "老闆": "台南的牛肉湯很有名，趁熱先喝一口原味的湯！",
+    "阿姨": "這是台南的棺材板，是將吐司炸得酥脆，裡面裝滿濃濃的海鮮餡。",
+    "爸爸": "不好意思，我們迷路了，想去安平古堡，但不知道怎麼走……",
+    "媽媽": "太謝謝你們了！"
+  },
+  "t2s": true,
+  "pronounce": {
+    "箍": "姑"
+  },
+  "lang": "zh",
+  "panel_dir": "C:/Users/USER/AppData/Local/Temp/claude/C--Users-USER-Documents-GitHub-minimax-h3-studio/9ac82123-2b72-4275-a604-6b8724494096/scratchpad/journey05_panels",
+  "style_en": "bright Japanese school shonen anime, saturated colors; Tainan old-town food stalls and historic sites, from daytime to sunset",
+  "characters": "悟空＝棕色刺蝟爆炸頭、金色緊箍頭圈、黑底紅邊外套、紅色內搭、黑色背包；八戒＝圓胖男孩、黑色豬鼻圖案鴨舌帽、深藍運動外套、常拿著麵包；悟淨＝黑短髮、黑框眼鏡、淺藍襯衫、灰色背包、表情冷靜；鸚鵡＝紅頭、黃胸、綠藍翅膀的金剛鸚鵡卡通吉祥物，常停在悟空肩上或身邊；老闆＝五十歲左右的台南牛肉湯店老闆，綁白色頭巾、白色短袖上衣、灰色工作圍裙、黑長褲、拖鞋、笑容爽朗；阿姨＝中年小吃店阿姨，棕髮盤髻、淡紫上衣、橘紅圍裙、親切笑容；爸爸＝觀光客爸爸，深藍棒球帽、灰綠上衣、卡其長褲、背黑色大背包、手拿地圖；媽媽＝戴米色草帽、棕長髮、白上衣、橄欖綠背心與長裙的觀光客媽媽；小女孩＝黑長髮、粉紅上衣與粉紅蓬裙的小女孩，爸媽的女兒",
+  "characters_en": "Wukong (悟空) = a mischievous boy with spiky brown hair, a golden circlet headband, a black jacket with red trim over a red shirt, and a black backpack; Bajie (八戒) = a chubby boy in a black cap with a pig-snout emblem and a navy track jacket, often holding a bun; Wujing (悟淨) = a calm boy with short black hair, black-rimmed glasses, a light-blue shirt and a grey backpack; the parrot (鸚鵡) = a cartoon macaw mascot with a red head, yellow chest and green-blue wings, usually perched near Wukong; the shop owner (老闆) = a cheerful Tainan beef-soup shop owner around fifty, in a white head towel, a white T-shirt, a grey work apron, black trousers and sandals; the auntie (阿姨) = a friendly middle-aged food-stall woman with brown hair in a bun, a lavender blouse and an orange-red apron; the dad (爸爸) = a tourist father in a navy baseball cap, sage-green shirt, khaki trousers and big backpack, holding a map; the mom (媽媽) = a tourist mother with long brown hair, a beige straw hat, a white blouse and an olive vest and skirt; the girl (小女孩) = their little daughter with long black hair in a pink top and pink tutu skirt.",
+  "names_en": {
+    "悟空": "Wukong",
+    "八戒": "Bajie",
+    "悟淨": "Wujing",
+    "鸚鵡": "the parrot",
+    "老闆": "the shop owner",
+    "阿姨": "the auntie",
+    "爸爸": "the dad",
+    "媽媽": "the mom",
+    "小女孩": "the girl"
+  },
+  "children": [
+    "悟空",
+    "八戒",
+    "悟淨"
+  ],
+  "speakers": [
+    "悟空",
+    "八戒",
+    "悟淨",
+    "鸚鵡",
+    "老闆",
+    "阿姨",
+    "爸爸",
+    "媽媽"
+  ],
+  "voices": {
+    "悟空": "十歲調皮男孩，台灣華語口音，聲音明亮有精神、語速偏快",
+    "八戒": "愛吃貪玩的胖小子，台灣國語腔調，聲音偏低、帶點撒嬌",
+    "悟淨": "沉著可靠的少年聲，台灣華語口音，咬字清楚、語速平穩",
+    "鸚鵡": "活潑尖細的卡通鸚鵡聲，台灣華語口音，高音調、語速快、有點聒噪",
+    "老闆": "五十歲左右的台南牛肉湯老闆，中年男性，男聲，台灣國語腔調，聲音宏亮豪爽、熱情好客",
+    "阿姨": "四十多歲熱情的小吃店老闆娘，中年女性，女聲，台灣華語口音，聲音明亮爽朗、語氣熱情",
+    "爸爸": "四十歲左右的觀光客爸爸，中年男性，男聲，台灣華語口音，聲音溫和、有點不好意思、語氣客氣",
+    "媽媽": "三十多歲親切的媽媽，女性，女聲，台灣華語口音，聲音溫柔開朗、充滿感激"
+  },
+  "no_text_rule_en": "No text of any kind may appear in the picture: no letters, signs, blackboard writing, labels, numbers, sound-effect lettering or icons.",
+  "prompt_format": "official",
+  "looks_en": {
+    "Wukong": "the boy with spiky brown hair and a golden headband wearing a black jacket over a yellow shirt with red cuffs and red sneakers",
+    "Bajie": "the chubby boy with brown hair wearing a dark blue cap with pig ears, a navy blue zip-up jacket with white stripes, matching navy pants, and white sneakers with navy accents",
+    "Wujing": "the slender boy with messy black hair, black-rimmed glasses, a light blue t-shirt, dark navy pants, white sneakers, and a dark grey backpack",
+    "the parrot": "the small cartoon parrot with a blue crest, red and yellow face, green wings, and a blue belly with yellow and red tail feathers",
+    "the shop owner": "the stocky young man with black hair, white headband, white short-sleeved shirt, dark gray apron, black pants, and black flip-flops",
+    "the auntie": "the average build woman with brown hair in a bun, wearing a light purple short-sleeved shirt, a red apron, dark brown trousers, and brown loafers.",
+    "the dad": "the average build young man with short black hair, wearing a blue baseball cap, olive green polo shirt, tan trousers, and white sneakers, carrying a black backpack",
+    "the mom": "the slender girl with short brown hair, wearing a beige straw hat, white shirt, olive green vest, olive green skirt, and beige sneakers.",
+    "the girl": "the petite girl with shoulder-length dark brown hair, wearing a pink t-shirt, pink pleated skirt, white sneakers, and a pink backpack"
+  },
+  "tagline": "下一集：悟空搭高鐵大暴走！尋找第五枚「科學印」",
+  "char_refs": {
+    "悟空": "journey01/frames/char_wukong.png",
+    "八戒": "journey01/frames/char_bajie.png",
+    "悟淨": "journey01/frames/char_wujing.png",
+    "鸚鵡": "journey02/frames/char_parrot.png",
+    "老闆": "journey05/frames/char_boss.png",
+    "阿姨": "journey05/frames/char_auntie.png",
+    "爸爸": "journey05/frames/char_dad.png",
+    "媽媽": "journey05/frames/char_mom.png",
+    "小女孩": "journey05/frames/char_girl.png"
+  },
+  "panel_cast": {
+    "1": [
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "2": [
+      "悟空",
+      "八戒",
+      "悟淨"
+    ],
+    "3": [
+      "八戒",
+      "悟淨"
+    ],
+    "4": [
+      "老闆",
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "5": [
+      "阿姨",
+      "悟空",
+      "八戒",
+      "悟淨"
+    ],
+    "6": [
+      "悟空",
+      "八戒",
+      "悟淨"
+    ],
+    "7": [
+      "悟空",
+      "八戒",
+      "悟淨"
+    ],
+    "8": [
+      "悟空",
+      "八戒",
+      "悟淨"
+    ],
+    "9": [
+      "爸爸",
+      "媽媽",
+      "小女孩",
+      "悟空",
+      "鸚鵡"
+    ],
+    "10": [
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "11": [
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "12": [
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ]
+  },
+  "panel_notes": {
+    "1": "本集沒有旁白，所有台詞都要標說話的角色；一列只放一句台詞。台南高鐵站月台，白色高鐵列車。招牌一律空白。台詞：悟空「這一集我們要去台南，尋找第四枚印章：『分享印』！」悟淨「聽說台南小吃很有名，但我們只有一天時間！」八戒「太棒了！我要全部吃一遍！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–5 悟空；5–9 悟淨；9–12 八戒。",
+    "2": "國華街小吃街，人潮、攤位、紅燈籠，招牌空白。台詞：悟空「哇！這裡有好多美食！」八戒「我先吃這個，然後那個，再那個……」悟淨「八戒，我們先想想怎麼分配時間吧！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–3 悟空；3–8 八戒；8–12 悟淨。",
+    "3": "八戒拿著一張長長的美食清單（紙上不出現文字），興奮握拳。台詞：八戒「我要全部吃！十樣都要！」悟淨「但是我們只有一天，也要留時間參觀景點喔！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–4 八戒；4–10 悟淨（悟淨在畫面外說話也可以入鏡）；10–12 無台詞。",
+    "4": "牛肉湯店，綁白頭巾的老闆端上冒熱氣的牛肉湯。台詞：老闆「台南的牛肉湯很有名，趁熱先喝一口原味的湯！」悟空「好香！」八戒「哇！好好吃！這是我吃過最嫩的牛肉！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–5 老闆；5–7 悟空；7–12 八戒。",
+    "5": "小吃攤，阿姨端出棺材板（炸得金黃的厚吐司盒，裡面是海鮮餡）。台詞：阿姨「這是台南的棺材板，是將吐司炸得酥脆，裡面裝滿濃濃的海鮮餡。」八戒「外酥內軟，有點燙，但真的好好吃！」悟淨「台南小吃很有創意！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–8 阿姨；8–12 無台詞（三人看著棺材板）。第二段（續接第一段末幀）：0–6 八戒；6–9 悟淨；9–12 無台詞。",
+    "6": "桌上擺滿各種小吃，八戒抱頭煩惱。台詞：八戒「哇！還有這麼多！我到底該先吃哪一個？」悟淨「我們可以三個人分著吃，一次點幾樣一起分享。」悟空「對！這樣可以吃到更多種類的美食，也比較不浪費！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–5 八戒；5–11 悟淨；11–12 無台詞。第二段（續接）：0–7 悟空；7–12 無台詞（三人開始分菜）。",
+    "7": "三人圍桌分食，開心互相夾菜。台詞：悟空「一起分享真的很棒！不同的小吃都有不同的味道。」八戒「比起一個人吃，和朋友分享更開心！而且可以吃到更多！」悟淨「分享不只是食物，也是分享快樂。」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–6 悟空；6–12 八戒。第二段（續接）：0–5 悟淨；5–12 無台詞（三人舉杯／碰碗笑）。",
+    "8": "赤崁樓前（紅牆、飛簷古樓），三人參觀。台詞：悟淨「赤崁樓是台南重要的歷史古蹟，這裡曾經是不同文化交流的地方，有荷蘭、明鄭和清朝的歷史。」悟空「原來台南不只有美食，還有這麼豐富的歷史故事！」八戒「我們吃到的食物，也是不同文化交流的結晶呢！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–11 悟淨（整句一列）；11–12 無台詞。第二段（續接）：0–6 悟空；6–12 八戒。",
+    "9": "老街上，一家三口（戴帽背包的爸爸拿地圖、草帽媽媽、雙馬尾小女孩）向悟空問路，鸚鵡在旁。台詞：爸爸「不好意思，我們迷路了，想去安平古堡，但不知道怎麼走……」悟空「我們來幫忙吧！我們剛好也要去，一起走吧！」媽媽「太謝謝你們了！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–7 爸爸；7–12 悟空。第二段（續接）：0–3 媽媽；3–12 無台詞（大家一起往前走，鸚鵡帶路）。",
+    "10": "安平古堡城牆上看夕陽，古堡白色瞭望塔、橘紅天空、海。三人背影＋鸚鵡。台詞：悟空「哇！這裡的夕陽好漂亮！」八戒「今天我們不只吃到美食，還幫助了別人，也看到這麼棒的景色！」悟淨「台南真是一個充滿美食、歷史和人情味的地方！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–4 悟空；4–12 八戒。第二段（續接）：0–7 悟淨；7–12 無台詞（夕陽慢慢沉入海）。",
+    "11": "獲得第四枚印章：發光的綠色羅盤印章（不出現文字）。台詞：鸚鵡「分享，讓我們發現更多美好。願意與他人分享食物、時間、知識與快樂，就能看見不一樣的風景，也讓旅程更有意義。」悟空「太好了！我們得到第四枚印章了！」八戒「分享真的很快樂！」悟淨「下一站要去哪裡呢？」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段，鸚鵡的印章說明拆三句。第一段：0–4 鸚鵡「分享，讓我們發現更多美好。」；4–12 鸚鵡「願意與他人分享食物、時間、知識與快樂，就能看見不一樣的風景，」。第二段（續接）：0–3 鸚鵡「也讓旅程更有意義。」；3–7 悟空；7–9 八戒；9–12 悟淨。",
+    "12": "台灣冒險地圖（羊皮紙，四個已蓋印章、其餘空圈，不放數字和地名），高鐵駛過。鸚鵡「下一集，悟空搭高鐵大暴走！尋找第五枚科學印！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–7 鸚鵡；7–12 無台詞（高鐵駛過地圖）。"
+  },
+  "frame_cast": {
+    "S07": [
+      "悟空",
+      "八戒",
+      "悟淨"
+    ]
+  },
+  "shots": [
+    [
+      "S01",
+      12,
+      "frames/S01.png"
+    ],
+    [
+      "S02",
+      12,
+      "frames/S02.png"
+    ],
+    [
+      "S03",
+      12,
+      "frames/S03.png"
+    ],
+    [
+      "S04",
+      12,
+      "frames/S04.png"
+    ],
+    [
+      "S05",
+      12,
+      "frames/S05.png"
+    ],
+    [
+      "S06",
+      12,
+      "S05"
+    ],
+    [
+      "S07",
+      12,
+      "frames/S07.png"
+    ],
+    [
+      "S08",
+      12,
+      "S07"
+    ],
+    [
+      "S09",
+      12,
+      "frames/S09.png"
+    ],
+    [
+      "S10",
+      12,
+      "S09"
+    ],
+    [
+      "S11",
+      12,
+      "frames/S11.png"
+    ],
+    [
+      "S12",
+      12,
+      "S11"
+    ],
+    [
+      "S13",
+      12,
+      "frames/S13.png"
+    ],
+    [
+      "S14",
+      12,
+      "S13"
+    ],
+    [
+      "S15",
+      12,
+      "frames/S15.png"
+    ],
+    [
+      "S16",
+      12,
+      "S15"
+    ],
+    [
+      "S17",
+      12,
+      "frames/S17.png"
+    ],
+    [
+      "S18",
+      12,
+      "S17"
+    ],
+    [
+      "S19",
+      12,
+      "frames/S19.png"
+    ]
+  ],
+  "panels": {
+    "S01": "frame-S01",
+    "S02": "frame-S02",
+    "S03": "frame-S03",
+    "S04": "frame-S04",
+    "S05": "frame-S05",
+    "S06": "frame-S05",
+    "S07": "frame-S07",
+    "S08": "frame-S07",
+    "S09": "frame-S09",
+    "S10": "frame-S09",
+    "S11": "frame-S11",
+    "S12": "frame-S11",
+    "S13": "frame-S13",
+    "S14": "frame-S13",
+    "S15": "frame-S15",
+    "S16": "frame-S15",
+    "S17": "frame-S17",
+    "S18": "frame-S17",
+    "S19": "frame-S19"
+  },
+  "last_frames": [],
+  "expand_notes": {
+    "S03": "畫面只有胖男孩（Bajie）一人站在小吃店裡，沒有老闆、阿姨或其他人物；眼鏡男孩 4 秒起從右側入鏡。",
+    "S07": "畫面只有三個男孩（Wukong、Bajie、Wujing）坐在木桌旁，沒有鸚鵡、沒有老闆、沒有阿姨、沒有其他人物。"
+  }
+}

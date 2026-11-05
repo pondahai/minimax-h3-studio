@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Bright Japanese shonen anime style. A static wide shot of an empty old-town food street in the afternoon, with small wooden food stalls, steaming pots and red lanterns under warm sunlight, and a red-walled historic tower in the distance. No people or animals appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A calm afternoon with a light breeze and the faint sizzle of a distant stall.
+
+non_diegetic_music: A cheerful, warm and playful instrumental piece for a children's food adventure, led by a bouncy pipa and bamboo flute melody over plucked acoustic guitar and warm piano chords, with light woodblock and hand percussion keeping a happy strolling beat, at a moderate tempo and soft, even dynamics.
