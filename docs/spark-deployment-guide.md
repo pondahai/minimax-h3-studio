@@ -78,7 +78,7 @@ docker build -t h3-bench:latest ~/h3-bench
 docker run -d --name qwen3.8-nvfp4 --gpus all --ipc host --network host \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
   vllm/vllm-openai:nightly \
-  --model unsloth/Qwen3.8-27B-NVFP4 --trust-remote-code --served-model-name qwen3.8 \
+  --model Jiunsong/SuperQwen3.8-27b-abliterated-NVFP4-DGX-Spark --trust-remote-code --served-model-name qwen3.8 \
   --reasoning-parser qwen3 --tool-call-parser qwen3_xml --enable-auto-tool-choice \
   --max-model-len 131072 --kv-cache-dtype fp8 --gpu-memory-utilization 0.35 \
   --kv-cache-memory-bytes 10737418240 \
@@ -86,6 +86,8 @@ docker run -d --name qwen3.8-nvfp4 --gpus all --ipc host --network host \
   --max-num-seqs 4 --max-num-batched-tokens 8192 --no-enable-prefix-caching \
   --host 0.0.0.0 --port 8006
 ```
+
+權重 2026-11-04 起從 `unsloth/Qwen3.8-27B-NVFP4` 換成無審查版 `Jiunsong/SuperQwen3.8-27b-abliterated-NVFP4-DGX-Spark`，其他參數不變。
 
 上面的參數是從參考機 `docker inspect` 抄來的。網路模式與重啟策略請在新機用 `docker inspect qwen3.8-nvfp4` 對照。用不到時就停著，H3 跑的時候一定要停。
 

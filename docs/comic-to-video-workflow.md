@@ -41,7 +41,7 @@
 
 | 服務 | 位置 | 用途 |
 |---|---|---|
-| vLLM `qwen3.8-nvfp4`（Qwen3.8-27B，多模態） | Spark `100.89.149.50:8006` | **2026-11-04 起工作流唯一 LLM**：分鏡草稿、首幀 prompt、擴寫、外觀、對嘴檢查（`comic.llm()`；平常可停著，第一次呼叫自動 `docker start`） |
+| vLLM `qwen3.8-nvfp4`（SuperQwen3.8-27B abliterated NVFP4，`Jiunsong/SuperQwen3.8-27b-abliterated-NVFP4-DGX-Spark`，無審查，多模態） | Spark `100.89.149.50:8006` | **2026-11-04 起工作流唯一 LLM**：分鏡草稿、首幀 prompt、擴寫、外觀、對嘴檢查（`comic.llm()`；平常可停著，第一次呼叫自動 `docker start`） |
 | llama.cpp（多模態） | Spark `100.89.149.50:8002` | 2026-11-04 前的工作流 LLM；`LLM_PORT=8002` 可改回。下文歷史紀錄裡的「8002」指它 |
 | VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑） | 角色配音 |
 | Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`） | 生成首幀 |
