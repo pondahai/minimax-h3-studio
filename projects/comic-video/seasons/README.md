@@ -1,6 +1,6 @@
 # 《為什麼會有四季？》
 
-漫畫轉影片工作流的第五篇（2026-10-30 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-workflow.md](../../../docs/comic-to-video-workflow.md)。
+漫畫轉影片工作流的第五篇（2026-10-30 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-notes.md](../../../docs/comic-to-video-notes.md)。
 
 - 來源：社子文教基金會「科學天地／自然小探險隊」[《為什麼會有四季？》](https://shezi.org.tw/science/why-four-seasons/)（網站 header＋panel-01～06，算 7 格；footer 當片尾標語）
 - 規格：12 段 144 秒、672×384 草稿等級；全部獨立段，每段用 Qwen-Image 首幀

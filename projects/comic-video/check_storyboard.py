@@ -1,4 +1,4 @@
-"""檢查分鏡稿是否照 docs/comic-to-video-workflow.md 第 2 節的規則寫（人寫的或本地 LLM 寫的都適用）。
+"""檢查分鏡稿是否照 docs/comic-to-video-notes.md 第 2 節的規則寫（人寫的或本地 LLM 寫的都適用）。
 
 用法：python check_storyboard.py <篇目> [分鏡檔]   （預設 storyboard.md）
 檢查：段長 ≤12 秒、時間軸連續、每列 2–6 秒、台詞語速、每列有動作、阿柴不說話、說話者是已知角色、

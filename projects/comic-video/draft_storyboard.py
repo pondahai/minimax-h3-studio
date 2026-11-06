@@ -5,7 +5,7 @@
 和前面已寫好的段落摘要；config 有 panel_notes 時，把該格的人工備註（科學更正、安全句、段數）一起送，備註優先於通則。
 每格寫完用 check_storyboard.py 的規則驗收，有問題把清單回饋給 LLM 重寫，最多 REVISE 輪。
 仍沒過的問題寫進檔尾「## 未解決」，交給人看。
-第一版（7 格一次送）的結果見 docs/comic-to-video-workflow.md。
+第一版（7 格一次送）的結果見 docs/comic-to-video-notes.md。
 """
 import base64, json, re, urllib.request
 from pathlib import Path

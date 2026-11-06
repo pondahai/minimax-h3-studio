@@ -1,4 +1,6 @@
-# 漫畫轉影片工作流程（復盤筆記）
+# 漫畫轉影片：踩坑與試驗紀錄（歷史參考）
+
+> 每集照做的步驟在 [comic-to-video-runbook.md](comic-to-video-runbook.md)。本檔是各步驟的來由、試驗經過與踩坑表，平常不用從頭讀；查某一步「為什麼這樣做」時再翻。
 
 首次實作：2026-10-29，社子文教基金會「科學天地／自然小探險隊」《蝴蝶生命循環》（7 格）→ 約 119 秒草稿影片
 程式與素材：[`projects/comic-video/`](../projects/comic-video/)（共用腳本）、[`butterfly/`](../projects/comic-video/butterfly/)（這篇的分鏡、prompt、設定）

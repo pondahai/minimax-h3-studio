@@ -88,7 +88,7 @@ minimax-h3-studio/
      → H3 分段生成（續接段接前段末幀）→ H3 配樂 → 合成 → 字幕
 ```
 
-TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。它和上面的 Studio 前端是**分開的兩套流程**：不經過 `app.py` 和 Colab，全部用命令列腳本在 DGX Spark 上跑。說明見 [projects/comic-video/README.md](projects/comic-video/README.md)，完整復盤筆記見 [docs/comic-to-video-workflow.md](docs/comic-to-video-workflow.md)。
+TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。它和上面的 Studio 前端是**分開的兩套流程**：不經過 `app.py` 和 Colab，全部用命令列腳本在 DGX Spark 上跑。說明見 [projects/comic-video/README.md](projects/comic-video/README.md)，每集步驟清單見 [docs/comic-to-video-runbook.md](docs/comic-to-video-runbook.md)，踩坑紀錄見 [docs/comic-to-video-notes.md](docs/comic-to-video-notes.md)。
 
 ---
 

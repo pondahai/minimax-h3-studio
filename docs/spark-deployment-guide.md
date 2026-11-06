@@ -1,6 +1,6 @@
 # 在另一台 DGX Spark 部署漫畫轉影片工作流
 
-2026-11-04 依參考機（`funsteam@100.89.149.50`）現況整理：映像檔、compose、下載腳本、模型路徑都是實際盤點的結果。各步驟怎麼用、踩過哪些坑，見 [comic-to-video-workflow.md](comic-to-video-workflow.md)；本文只說「要裝什麼、裝在哪裡」。
+2026-11-04 依參考機（`funsteam@100.89.149.50`）現況整理：映像檔、compose、下載腳本、模型路徑都是實際盤點的結果。各步驟怎麼用、踩過哪些坑，見 [comic-to-video-notes.md](comic-to-video-notes.md)；本文只說「要裝什麼、裝在哪裡」。
 
 ## 0. 總覽
 

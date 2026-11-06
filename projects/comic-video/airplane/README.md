@@ -1,6 +1,6 @@
 # 《飛機是怎麼飛的？》
 
-漫畫轉影片工作流的第七篇（2026-10-31 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-workflow.md](../../../docs/comic-to-video-workflow.md)。
+漫畫轉影片工作流的第七篇（2026-10-31 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-notes.md](../../../docs/comic-to-video-notes.md)。
 
 - 來源：社子文教基金會「科學天地」[《飛機是怎麼飛的？》](https://shezi.org.tw/science/how-airplanes-fly/)（網站 header 算第 1 格，共 8 格；網站沒有 footer，片尾標語取自第 8 格）
 - 規格：同一篇做兩個版本，各 14 段 168 秒、672×384 草稿等級；全部獨立段，每段用 Qwen-Image 首幀
