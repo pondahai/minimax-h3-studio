@@ -258,6 +258,10 @@
   - 流程：互斥檢查（停 Qwen／TTS，H3 或 Demucs 在跑就 ABORT）→ music1（`asr_spark.sh` 檢查人聲，自動設成 `bgm.wav`）→ 各段 `ONLY=SXX run_series.sh`，失敗重試 1 次、仍失敗就跳過（失敗的 run 目錄改名 `SXX_fail1`）→ `out/` 複製到 `video/` → `sfx.sh` → `lipsync_measure.py` → `align_dtw.py` → `mux.py` 出 `mixed/` 試聽版；不做全片、字幕、分享版
   - 進度看 `<篇目>/pipeline.status`（每階段一行，最後一行 `DONE` 或 `ABORT`）；細節在 `series.log`、`post.log`
   - 跑完（DONE、ABORT、被暫停都算，EXIT trap）自動還原開跑前停掉的 8006 與 TTS，8002 若沒在跑也順手拉起來；ComfyUI 按需不還原。不推播；使用者回來後由 Claude 讀 status 接續
+  - **8006 冷啟動拆解（2026-11-06）**：約 5 分鐘＝讀主模型權重 118–136 秒＋MTP 草稿頭 21–24 秒＋編譯（讀快取）約 11 秒＋**FlashInfer fp4_gemm 自動調校 107 秒**＋多模態預熱 11 秒。這版 vLLM 把調校結果的硬碟快取寫死關掉（`vllm/model_executor/warmup/kernel_warmup.py` 的 `_FLASHINFER_USE_PERSISTENT_CACHE = False`），每次重開都重調
+    - 已在 container 裡改成 `True`（原檔 `kernel_warmup.py.orig`），快取存在 `/root/.cache/vllm/flashinfer_autotune_cache/…/autotune_configs.json`。實測調校 107 秒 → 0.45 秒、引擎初始化 130 → 24 秒，整體約 5 分 → 3 分 40 秒，推論正常
+    - 改的是 container 內的檔案：`docker start／restart` 保留；**重建 container 或換 image 要再改一次**（`sed -i 's/^_FLASHINFER_USE_PERSISTENT_CACHE = False/_FLASHINFER_USE_PERSISTENT_CACHE = True/'`）。vLLM 自己標註這個快取還是實驗功能
+    - 剩下最大的是讀權重（19 GB 約 2 分多鐘），尚未處理
   - 8006 的 container 是 `unless-stopped`：開機會自己起來，但被 `docker stop` 後就一直停著，所以要靠上面的還原（2026-11-06 前沒有還原，跑完 8006／TTS 都停著；同時發現 8002 在 11-05 15:15 被不明原因正常結束，已手動拉起）
 - 在 Spark 上排隊等前一批跑完：`pgrep -f`／`pkill -f` 會比對到自己所在的 `bash -c` 或 ssh 指令（字串裡就有那個關鍵字），等待迴圈永遠不結束、或把自己的 ssh 砍掉。關鍵字寫成 `"[r]un_series.sh rainbow"` 這種形式避開；本機監看用 `timeout` 包住每次 ssh，長時間工作一律在 Spark 上 `setsid nohup … &` 啟動
 - `run_jobs.sh`：單獨重跑指定段或其他工作，格式 `名稱 prompt檔 seed 秒數 首幀|-`
