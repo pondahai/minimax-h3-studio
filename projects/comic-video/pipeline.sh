@@ -67,33 +67,40 @@ for s, _, src in json.load(open("config.json"))["shots"]: print(s, src)' | while
 done || exit 1
 say "開始：$SIDS ＋ music1"
 
-# 1. 配樂
+# 1. 配樂：H3 配樂是抽卡，常混吟唱／誦經／說話聲（第六集 seed 1、2 都中）。
+#   prompt 補禁止人聲句（降低機率）；每個 seed 生成後用 Demucs 拆人聲軌「只做偵測」，
+#   人聲軌 RMS／伴奏 RMS > 0.1 或人聲軌 ASR（去掉括號幻聽）有中文 → 換下一個 seed，最多 MUSIC_TRIES 個。
+#   bgm.wav 一律用原始配樂（Demucs 去人聲後伴奏受損嚴重，第六集使用者試聽否決）。
+#   實測：有人聲 8.4、5.6；乾淨 0.002、0.011。
 mkdir -p music
-if [ ! -f out/music1.mp4 ]; then
-  # H3 配樂是抽卡，常混吟唱／誦經／說話聲（第六集 seed 1、2 都中）。prompt 先明確禁止人聲（降低機率，不保證）
-  NOVOX="Strictly instrumental with no human voice at all: no vocals, no singing, no humming, no chanting, no choir, no speech."
-  sed "/^non_diegetic_music:/ { /no vocals/! s/\$/ $NOVOX/ }" prompts/music_official.txt > prompts/music_run.txt
-  bash "$ROOT/run_jobs.sh" "$NAME" "music1 prompts/music_run.txt 1 12 -"
-fi
-if [ -f out/music1.mp4 ]; then
-  ffmpeg -y -loglevel error -i out/music1.mp4 -vn -ar 44100 music/music1.wav && cp music/music1.wav music/bgm.wav
-  # 再用 Demucs 濾掉人聲軌，bgm.wav 改用伴奏（music1_novocals.wav）；原始 music1.wav 保留
-  cp music/music1.wav music/music1_h3.wav
-  if docker run --rm --name demucs-music --gpus all --ipc=host -v "$BASE/music:/w" demucs-sfx music1_h3.wav >> post.log 2>&1 \
-     && [ -f music/music1_novocals.wav ]; then
-    cp music/music1_novocals.wav music/bgm.wav; say "music1 已用 Demucs 去人聲（bgm.wav＝伴奏，人聲軌 music1_vocals.wav）"
-  else
-    say "music1 Demucs 去人聲失敗，bgm.wav 暫用原始 music1（看 post.log）"
-  fi
-  rm -f music/music1_h3.wav
-  tmp=$(mktemp -d); cp music/bgm.wav "$tmp/000.wav"
+NOVOX="Strictly instrumental with no human voice at all: no vocals, no singing, no humming, no chanting, no choir, no speech."
+sed "/^non_diegetic_music:/ { /no vocals/! s/\$/ $NOVOX/ }" prompts/music_official.txt > prompts/music_run.txt
+music_ok=""
+for seed in $(seq 1 ${MUSIC_TRIES:-4}); do
+  m=music$seed
+  [ -f out/$m.mp4 ] || bash "$ROOT/run_jobs.sh" "$NAME" "$m prompts/music_run.txt $seed 12 -"
+  [ -f out/$m.mp4 ] || { say "$m 生成失敗"; continue; }
+  ffmpeg -y -loglevel error -i out/$m.mp4 -vn -ar 44100 music/$m.wav
+  cp music/$m.wav music/${m}_h3.wav
+  docker run --rm --name demucs-music --gpus all --ipc=host -v "$BASE/music:/w" demucs-sfx ${m}_h3.wav >> post.log 2>&1
+  rm -f music/${m}_h3.wav
+  if [ ! -f music/${m}_vocals.wav ]; then say "$m Demucs 失敗，無法偵測人聲，暫用（看 post.log）"; music_ok=$m; break; fi
+  ratio=$(python3 -c "
+import wave, array, math
+def rms(f):
+    w = wave.open(f); a = array.array('h', w.readframes(w.getnframes())); return math.sqrt(sum(x*x for x in a) / max(len(a), 1))
+print(round(rms('music/${m}_vocals.wav') / max(rms('music/${m}_novocals.wav'), 1e-6), 3))")
+  tmp=$(mktemp -d); cp music/${m}_vocals.wav "$tmp/000.wav"
   asr=$(tar -C "$tmp" -cf - 000.wav | bash "$ROOT/asr_spark.sh" 2>/dev/null | cut -f2-); rm -rf "$tmp"
-  # whisper 對純音樂常幻聽成括號短語（「(日語)」「(臺北 新加坡)」「(我愛你)」），去掉括號內容再判斷
-  if echo "$asr" | sed 's/([^)]*)//g' | grep -qP '[\x{4e00}-\x{9fff}]'; then say "music1 完成，ASR 聽到人聲：$asr（仍暫用當 bgm，要人聽）"
-  else say "music1 完成，ASR 沒聽到人聲（${asr:-空白}），已設成 bgm.wav"; fi
-else
-  say "music1 失敗，試聽版會沒有配樂"
-fi
+  # whisper 對純音樂常幻聽成括號短語（「(日語)」「(我愛你)」），去掉括號內容再判斷
+  if python3 -c "import sys; sys.exit(0 if float('$ratio') > 0.1 else 1)" || echo "$asr" | sed 's/([^)]*)//g' | grep -qP '[\x{4e00}-\x{9fff}]'; then
+    say "$m 有人聲（人聲／伴奏 $ratio，人聲軌 ASR：${asr:-空白}），換下一個 seed"
+  else
+    say "$m 乾淨（人聲／伴奏 $ratio），設成 bgm.wav"; music_ok=$m; break
+  fi
+done
+if [ -n "$music_ok" ]; then cp music/$music_ok.wav music/bgm.wav
+else say "配樂 ${MUSIC_TRIES:-4} 個 seed 都有人聲，試聽版沒有配樂，要人處理"; rm -f music/bgm.wav; fi
 
 # 2. 各段 H3：失敗重試 1 次，仍失敗就跳過
 failed=""
