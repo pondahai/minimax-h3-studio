@@ -82,3 +82,13 @@
 - **做**：README「成品」與「YouTube」段（照前一集的長度與語氣：約 110 字故事、3 點「會學到」、下集預告、原作出處、#標籤）
 - **做**：本集新學到的事寫進 notes 的踩坑表；若改變了某一步的做法，同步改本檔
 - **完成**：交出所有版本並 commit
+
+## 日文版（中文版完成後另做，只重配聲音）
+計畫與各篇進度：[japanese-version-plan.md](japanese-version-plan.md)；踩坑見 notes「日文版」段。
+- **做**：寫 `<篇目>_ja/lines_ja.json`（片名、角色日文名、每句台詞＋全假名讀音，助詞は寫わ；秒數照中文版）→ `python ja_scaffold.py <篇目>`：產生 storyboard、config（`lang: ja`、`t2s: false`、日文字型）、校稿檔，複製參考音，提示偏長的句子
+- **停**：校稿檔給日文同事校對，回來後改 `lines_ja.json` 重跑 `ja_scaffold.py`
+- **做**：Windows 上設 `PYTHONIOENCODING=utf-8`；`tts.py <篇目>_ja` → `asr_check.py <篇目>_ja`（Whisper large-v3-turbo＋音素比對；Spark 有 H3 在跑就等它結束）
+- **做**：ASR 錯字或音素比對標出的句子重配 3–5 版，`asr_check.py <篇目>_ja <候選 wav…>` 篩過，只把通過的給使用者挑
+- **停**：使用者試聽（音素比對抓不到全部，最後以耳朵為準）
+- **做**：Spark 建 `<篇目>_ja/`：`video`、`music` symlink 到中文版，`sfx/` 只連 `*_novocals.wav`（lipsync、align 是中文台詞量的，不能沿用）→ `mux.py` → `subs.py` → share 版；**關 TTS**
+- **完成**：`_sub.mp4`、`_share.mp4` 交給使用者；計畫的進度表更新
