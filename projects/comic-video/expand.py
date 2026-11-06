@@ -79,19 +79,56 @@ def rows(block):
     return re.findall(r"^\| (\d+)–(\d+) \|.*\| ([^|]*?) \|$", block, re.M)
 
 
+ANGLES = ["仰拍", "俯拍", "低角度", "高角度", "背影", "越過"]
+
+
+def cameras(block):
+    """分鏡表每列的鏡頭欄。"""
+    return re.findall(r"^\| \d+–\d+ \|[^|]*\| ([^|]*?) \|[^|]*\|$", block, re.M)
+
+
+def view(cam):
+    """視角：換角度的詞直接當自己一類；景別只分三級（全景／中景～近景／特寫），中景、中近景、近景之間只是稍微推近，不算換視角。"""
+    for a in ANGLES:
+        if a in cam:
+            return a
+    if "特寫" in cam:
+        return "特寫"
+    if "全景" in cam:
+        return "全景"
+    if any(s in cam for s in ("中景", "中近景", "近景")):
+        return "中景"
+    return None
+
+
+def is_cut(prev, cur):
+    """mixed 模式：一場戲換視角（景別大跳或換角度，或鏡頭欄寫「切」）才開新的 [Shot]；
+    同一視角裡角色接連做幾個動作 → 留在同一個鏡頭，用 At 00:0X.000 指定秒數（2026-11-06，第七集 S01 每列都切，使用者要畫面流暢）。"""
+    if "切" in cur:
+        return True
+    return view(cur) is not None and view(prev) is not None and view(cur) != view(prev)
+
+
 def assemble(cfg, sid, block, parts):
-    """組成官方格式 prompt：每列一個分鏡（[Shot N] At 00:0X.000, the shot cuts to …），台詞放 <d>，旁白寫 voiceover 並讓角色閉嘴。"""
-    inline = cfg.get("prompt_format") == "official_inline"
+    """組成官方格式 prompt，台詞放 <d>，旁白寫 voiceover 並讓角色閉嘴。分鏡方式看 prompt_format：
+    official＝每列一個 [Shot N]；official_mixed＝只在換景別／角度處開 [Shot N]，其餘同鏡頭內 At 00:0X.000；official_inline＝全在 [Shot 1]。"""
+    fmt = cfg.get("prompt_format", "official")
+    inline = fmt == "official_inline"
+    cams = cameras(block)
     speakers = {}
     lines = []
+    n_shot = 1
     for i, ((start, _, sound), text) in enumerate(zip(rows(block), parts["ranges"])):
         text = text.strip()
         if inline:
             line = f"At {stamp(start)}, {text}"
         elif i == 0:
             line = text
+        elif fmt == "official_mixed" and not (i < len(cams) and is_cut(cams[i - 1], cams[i])):
+            line = f"At {stamp(start)}, within the same continuous shot, {text}"
         else:  # 官方：時間戳只寫在切鏡處；換段＝新的狀態／時刻
-            line = f"[Shot {i + 1}] At {stamp(start)}, the shot cuts to the next moment of the same scene: {text}"
+            n_shot += 1
+            line = f"[Shot {n_shot}] At {stamp(start)}, the shot cuts to the next moment of the same scene: {text}"
         if m := re.match(r"(\S+?)：「(.+?)」", sound):
             who, said = m[1], m[2]
             if who == "旁白":
@@ -126,7 +163,7 @@ def assemble(cfg, sid, block, parts):
     if not has_frame:
         return body
     if last and not inline:  # 官方首尾幀開頭句：Picture 2 對齊最後一個分鏡、片長秒數
-        head = INSTRUCTION_FIRST_LAST.format(n=1 if inline else len(lines), sec=comic.durations(cfg)[sid])
+        head = INSTRUCTION_FIRST_LAST.format(n=1 if inline else n_shot, sec=comic.durations(cfg)[sid])
     else:
         head = INSTRUCTION_FIRST_FRAME  # 有首幀（Qwen-Image 圖或前段末幀）才加官方開頭句
     return f"{head}\n\n{body}"

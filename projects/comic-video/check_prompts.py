@@ -29,7 +29,7 @@ def check_official(cfg, sid, block, prompt):
     desc = prompt[pos[0]:pos[1]] if -1 not in pos else prompt
     rows = re.findall(r"^\| (\d+)–(\d+) \|(.*?)\| ([^|]*) \|$", block, re.M)
     stamps = [int(m) for m in re.findall(r"At 00:(\d\d)\.\d{3}", desc)]
-    if "[Shot 2]" in desc or len(rows) == 1:  # 官方多分鏡：第 1 列（[Shot 1]）不寫時間戳
+    if "[Shot 2]" in desc or len(rows) == 1 or cfg.get("prompt_format") == "official_mixed":  # 官方多分鏡／mixed：第 1 列（[Shot 1]）不寫時間戳
         stamps = [int(rows[0][0])] + stamps if rows else stamps
     if stamps != [int(a) for a, *_ in rows]:
         issues.append(f"時間戳不符：分鏡 {[int(a) for a, *_ in rows]}，prompt {stamps}")
