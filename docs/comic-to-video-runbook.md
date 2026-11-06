@@ -12,7 +12,7 @@
 | 分鏡、首幀 prompt、擴寫、對嘴檢查（LLM） | 8006（`comic.llm()` 會自動 `docker start`） | — |
 | 配音、聲音候選 | TTS :8792（`tts.py` 會自動開） | — |
 | 首幀、立繪（Qwen-Image） | ComfyUI :8188（`qwen_frame.py` 自動叫醒） | **TTS**（`qwen_frame.py` 自動關） |
-| H3 影片、配樂（`pipeline.sh`） | 只留 8002 | 8006、TTS、ComfyUI（`pipeline.sh` 自動停，跑完還原 8006／TTS） |
+| H3 影片、配樂（`pipeline.sh`） | 8006（2026-11-06 起常駐） | 8002、TTS、ComfyUI（`pipeline.sh` 自動停，跑完還原 8002／TTS） |
 
 - 呼叫服務前 5 秒檢查埠有沒有開；遠端啟動一律 `setsid -f … < /dev/null`
 - ssh 字串裡的 `pkill -f`／`pgrep -f` 關鍵字寫成 `[c]hinese_tts` 這種形式，否則會砍到自己的 ssh
@@ -63,6 +63,8 @@
 
 ## 8. H3 prompt
 - **做**：`python expand.py <篇目>` → `python check_prompts.py <篇目>`；人工看多出的角色、畫面文字、無人段有沒有被寫進人物
+- 格式（2026-11-06 起）：分鏡表每列一個 `[Shot N] At 00:0X.000, the shot cuts to the next moment of the same scene: …`（`[Shot 1]` 不寫時間戳）；有尾幀的段用官方首尾幀開頭句。舊寫法是 `prompt_format: official_inline`
+- **新格式還沒在漫畫段落實跑過**：第一次用時先只跑一段 H3，看有沒有在每列真的硬切，再決定整集用哪個格式
 - **做**：配樂 prompt `prompts/music_official.txt`（官方格式，空景＋樂器）
 
 ## 9. H3 影片（Spark 離線）
