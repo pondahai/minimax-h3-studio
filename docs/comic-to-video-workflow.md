@@ -43,8 +43,8 @@
 |---|---|---|
 | vLLM `qwen3.8-nvfp4`（SuperQwen3.8-27B abliterated NVFP4，`Jiunsong/SuperQwen3.8-27b-abliterated-NVFP4-DGX-Spark`，無審查，多模態） | Spark `100.89.149.50:8006` | **2026-11-04 起工作流唯一 LLM**：分鏡草稿、首幀 prompt、擴寫、外觀、對嘴檢查（`comic.llm()`；平常可停著，第一次呼叫自動 `docker start`） |
 | llama.cpp（多模態） | Spark `100.89.149.50:8002` | 2026-11-04 前的工作流 LLM；`LLM_PORT=8002` 可改回。下文歷史紀錄裡的「8002」指它 |
-| VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑） | 角色配音 |
-| Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`） | 生成首幀 |
+| VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑；8006 冷啟動或 pipeline 互斥會把它停掉） | 角色配音。啟動：`ssh … 'cd ~/dgx-voxcpm-eval && source .venv/bin/activate && setsid nohup python chinese_tts_server.py > tts.log 2>&1 < /dev/null &'`；`tts.py` 呼叫前 5 秒檢查埠，沒開立即報錯（第六集曾靜靜卡 600 秒逾時） |
+| Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`，按需） | 生成首幀。沒開時要叫醒 `comfy_ondemand.py`：它只聽 `127.0.0.1:8190`，必須 `ssh … "curl -X POST http://127.0.0.1:8190/ensure"`（從本機打或用 GET 都不行），回 `{"ok": true}` 後 8188 就可用 |
 | MiniMax H3 | Spark `~/h3-bench`（docker image `h3-bench`） | 生成影片／配樂 |
 | Breeze ASR（**預設**，按需） | Spark `~/breeze-asr-hub`（whisper.cpp CUDA＋`ggml-breeze-asr-26.bin`），由 `asr_spark.sh` 啟動 | 核對 TTS 有沒有唸對 |
 | Breeze ASR（備援，常駐） | Xavier `100.108.74.45:8013`，SSH 帳號 `nvidia` | Spark 資源檢查不通過時自動改用 |
@@ -244,7 +244,8 @@
 - 使用者審查、選定首幀後才開始跑 H3
 
 ### 6. 影片生成（H3）→ `bash run_series.sh <篇目>`／`bash run_jobs.sh <篇目> ...`
-- 草稿等級：672×384、INT8；每段 12 秒約 5.5 分鐘（含載入，Turbo 8 步時期的數字），段間冷卻 60 秒
+- 草稿等級：672×384、INT8；每段 12 秒約 5.5 分鐘（含載入，Turbo 8 步時期的數字）。Flex 實測（第六集）每段生成約 4 分鐘
+- 段間冷卻由 `wait_cool.sh` 決定：GPU 降到 `COOL_TEMP` 以下就接下一段，最短 10 秒、最長 90 秒。2026-11-05 起預設 58°C（原 55°C 時 GPU 常卡在 55–56°C，每段等 85–90 秒；改 58°C 後約 50 秒，每段省約 40 秒）。每段 `run_series.sh` 都重新 source，改了 Spark 上的檔案下一段就生效
 - **2026-11-01 起 `bench.py` 預設用 Pika H3 Flex LoRA（6 步，`lcm`＋官方 ManualSigmas）**，FL2VA 與 Ref2VA 都是；A/B 實測畫質較好，FL2VA 快約 17%、Ref2VA 慢約 27%。`-e H3_FLEX=0` 切回 Turbo。來源、設定與實驗紀錄見 [projects/flex-test/README.md](../projects/flex-test/README.md)。11/01 之前做好的各篇都是 Turbo 生成，重跑舊段會變成 Flex，接縫處留意畫風差異
 - 獨立段用 t2va（`H3_T2VA=1`）；續接段用 ffmpeg 取前段末幀當 `H3_INPUT_IMAGE`
 - 段落表在 `config.json` 的 `shots`：`[段, 秒數, 首幀來源]`，首幀來源 `-`＝t2va、圖檔路徑（如 `frames/S01.png`，選定的 seed 複製改名）＝用該圖、段名＝續接該段末幀
@@ -259,6 +260,8 @@
   - 跑完不重開其他服務、不推播；使用者回來後由 Claude 讀 status 接續
 - 在 Spark 上排隊等前一批跑完：`pgrep -f`／`pkill -f` 會比對到自己所在的 `bash -c` 或 ssh 指令（字串裡就有那個關鍵字），等待迴圈永遠不結束、或把自己的 ssh 砍掉。關鍵字寫成 `"[r]un_series.sh rainbow"` 這種形式避開；本機監看用 `timeout` 包住每次 ssh，長時間工作一律在 Spark 上 `setsid nohup … &` 啟動
 - `run_jobs.sh`：單獨重跑指定段或其他工作，格式 `名稱 prompt檔 seed 秒數 首幀|-`
+- **背景啟動的輸出重導只能寫一次**：`setsid nohup bash x.sh > log 2>&1 < /dev/null > /dev/null 2>&1 &` 後面的 `> /dev/null` 會蓋掉前面的 log，log 永遠是空的，等「工作結束」字樣的監看就永遠不結束（第六集配樂重做時發生）。完成與否改看 `out/` 有沒有成品
+- **中途暫停**：在 Spark 上放一支 `until grep -q "SXX 完成" series.log; do sleep 3; done; pkill -f "bash pipeline.sh <篇目>"; pkill -f "run_series.sh <篇目>"` 的背景腳本，會在該段完成後的冷卻空檔停下，不會中斷 H3；續跑時重開 `pipeline.sh`，已有的段跳過
 - 每段完成後抽幾格檢查（接縫、文字、角色外觀）
 
 ### 7. 配樂（H3）
@@ -370,6 +373,10 @@ non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫
 | 混音後掉台詞（《月食》S11 重疊、《影子》S08 最後一句被推出片尾） | DTW 對齊錯位 | 混音版逐段跑 ASR；壞段刪掉 `align.json` 該段或手改 `lipsync.json` 起訖秒再 `mux.py` |
 | 一段裡要呈現兩種狀態（《月食》S05 偏食＋半影月食），後半變紅 | 一張首幀只能定一種狀態，H3 自己演變 | 拆成兩段（S05A／S05B），各有首幀 |
 | 日環食畫成小黑點、日偏食像月牙、月偏食缺口鋸齒 | prompt 描述不夠具體 | 日環食寫「黑色月球幾乎和太陽一樣大，停在正中央，只露出外圈細亮環」，不寫 corona；月偏食寫「影子邊緣是平滑的大圓弧」 |
+| 漫畫格順序調換後，8006 分鏡同一事件寫兩次、漏掉另一格（第六集紙飛機寫兩次、沿途風景不見） | `draft_storyboard.py` 依 `panel_notes` 的格號送原圖 `panel-NN.png`，notes 換了內容但原圖沒換，8006 照原圖又寫一次 | 調換格序時，連 `panel_dir` 的原圖檔名一起對調，或手修分鏡；分鏡交出前核對每格都有出現 |
+| 台詞被截斷成「…第五枚印章「科學印」（`<d>` 少了後半句） | 台詞裡有巢狀引號，`expand.py`／`tts.py` 的正則以第一個 `」` 結尾 | 台詞內層一律用『』（『科學印』）；`storyboard.md` 與 `lines.json` 一起改 |
+| 只有地圖的段落畫出月台和列車（第六集 S19） | 首幀 prompt 開頭固定帶 config 的 `style`，裡面寫了高鐵站場景 | 無人物的地圖／空景段，首幀 prompt 不帶 style 句、不給參考圖，寫「整個畫面被地圖填滿、看不到背景」 |
+| 「台南站大廳」四段都畫成月台（第六集） | `style` 寫了「高鐵站月台」，Qwen-Image 被它帶走 | 使用者接受月台；要室內大廳得從 `style` 拿掉月台字樣再重跑 |
 | 獨立段畫風不一致（部分偏 3D） | t2va 段落沒有共用參考 | 尚未解決：可改為每段都用 Qwen-Image 首幀 |
 
 ## 時間參考（本例）

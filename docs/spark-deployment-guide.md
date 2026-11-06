@@ -38,7 +38,7 @@
 3. 從 `Comfy-Org/Qwen-Image-2.1` 下載模型到 `ComfyUI/models/`（diffusion_models、text_encoders、vae）
 4. `docker compose up -d`。參考機的 `qwen-image-comfyui` 是 `restart: "no"`，按需啟動；Gradio 前端是 `restart: always`
 
-`qwen_frame.py` 直接打 `:8188`，所以生首幀前要先 `docker start qwen-image-comfyui`。
+`qwen_frame.py` 直接打 `:8188`。參考機的 8188 由 systemd --user `comfy-ondemand.service`（`~/qwen-image/comfy_ondemand.py`）管理，閒置 15 分鐘自動停；生首幀前要在 Spark 上 `curl -X POST http://127.0.0.1:8190/ensure`（8190 只聽本機、只收 POST，從遠端用 `ssh … "curl …"`）。不要直接 `docker start qwen-image-comfyui`，幾秒後就會被閒置機制砍掉（exit 137）。
 
 ## 3. MiniMax H3（`~/h3-bench`）
 
