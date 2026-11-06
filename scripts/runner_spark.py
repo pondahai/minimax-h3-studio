@@ -63,8 +63,19 @@ except Exception:
   if [ "$busy" = "1" ]; then echo "Spark 忙碌：Qwen-Image 正在生圖"; exit 3; fi
   docker stop qwen-image-comfyui > /dev/null && echo "[*] 已停掉 qwen-image-comfyui"
 fi
-docker ps --format '{{.Names}}' | grep -qx qwen3.8-nvfp4 && docker stop qwen3.8-nvfp4 > /dev/null && echo "[*] 已停掉 qwen3.8-nvfp4"
+# 8006（qwen3.8-nvfp4）常駐不停（2026-11-06 起），改停 8002 讓出記憶體；H3 跑完由 RESTORE 拉回來
+pgrep -f "[l]lama-server.*--port 8002" > /dev/null && pkill -f "[l]lama-server.*--port 8002" && echo "[*] 已停掉 8002（llama.cpp）"
 pgrep -f "[c]hinese_tts_server.py" > /dev/null && pkill -f "[c]hinese_tts_server.py" && echo "[*] 已停掉 TTS"
+"""
+
+
+# H3 跑完（正常或中止）：拉回 8002，8006 若不在也順手啟動（與 pipeline.sh 的 restore_services 一致）
+RESTORE = r"""
+if ! pgrep -f "[l]lama-server.*--port 8002" > /dev/null && [ -x ~/models/qwen3.6-abliterated/start.sh ]; then
+  setsid -f ~/models/qwen3.6-abliterated/start.sh >> ~/models/qwen3.6-abliterated/llama-server.log 2>&1 < /dev/null
+fi
+docker ps --format '{{.Names}}' | grep -qx qwen3.8-nvfp4 || docker start qwen3.8-nvfp4 > /dev/null 2>&1
+true
 """
 
 
@@ -100,12 +111,12 @@ class SparkTransport:
             print(output, flush=True)
 
     def stop(self, session: str) -> None:
-        _ssh(f"rm -rf {shlex.quote(self._dir(session))}\n" + _busy_flag(False), timeout=60)
+        _ssh(f"rm -rf {shlex.quote(self._dir(session))}\n" + _busy_flag(False) + RESTORE, timeout=60)
 
     def emergency_stop(self, session: str) -> None:
         try:
             _ssh(f"docker kill {shlex.quote(self._container(session))} > /dev/null 2>&1\n"
-                 f"rm -rf {shlex.quote(self._dir(session))}\n" + _busy_flag(False), timeout=60)
+                 f"rm -rf {shlex.quote(self._dir(session))}\n" + _busy_flag(False) + RESTORE, timeout=60)
         except Exception as exc:
             print(f"[!] 中止 Spark 容器失敗：{exc}", flush=True)
 

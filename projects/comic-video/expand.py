@@ -3,6 +3,9 @@
 用法：python expand.py <篇目> [段落...]   （不帶段落 = 全部）
 config 的 prompt_format：
   official（預設）＝H3 官方英文結構化格式（integrated_multimodal_description／overall_soundscape／non_diegetic_music）。
+    分鏡表每列一個官方分鏡：第 1 列是 [Shot 1]（不寫時間戳），之後每列「[Shot N] At 00:0X.000, the shot cuts to …」
+    （官方指南只在切鏡處寫時間戳，2026-11-06 改；之前是全部塞在 [Shot 1] 裡逐句寫 At 00:0X.000）
+  official_inline＝2026-11-06 以前的寫法（一個 [Shot 1]，句中逐列 At 00:0X.000），重跑舊段要保持一致時用
     LLM 只寫英文畫面描述（JSON），時間戳、<d>[Chinese] 台詞</d>、旁白 off-screen voiceover＋角色閉嘴由程式組，
     讓 H3 照台詞對嘴；config 的 last_frames 列出有尾幀（frames/SXX_end.png）的段，會加官方尾幀句；H3 原生音軌合成時仍整條靜音、換成 TTS
   legacy＝《蝴蝶》當時的中文自由格式（H3 會自己編非中文人聲，不要再用）
@@ -48,6 +51,9 @@ Reply with JSON only, no markdown:
   Follow the storyboard for actions and timing; do not add characters or events that are not in the storyboard."""
 
 INSTRUCTION_FIRST_FRAME = "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced."
+# 官方首尾幀開頭句（FL2VA）：尾幀對齊最後一個分鏡、片長秒數
+INSTRUCTION_FIRST_LAST = ("How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark "
+                          "of the target video; Picture 2 (from Shot {n}) aligns with the {sec:.2f}-second mark of the target video.")
 
 
 def official(cfg):
@@ -74,11 +80,18 @@ def rows(block):
 
 
 def assemble(cfg, sid, block, parts):
-    """組成官方格式 prompt：每列一句「At 00:0X.000, 描述」，台詞放 <d>，旁白寫 voiceover 並讓角色閉嘴。"""
+    """組成官方格式 prompt：每列一個分鏡（[Shot N] At 00:0X.000, the shot cuts to …），台詞放 <d>，旁白寫 voiceover 並讓角色閉嘴。"""
+    inline = cfg.get("prompt_format") == "official_inline"
     speakers = {}
-    sentences = [parts["intro"].strip()]
-    for (start, _, sound), text in zip(rows(block), parts["ranges"]):
-        line = f"At {stamp(start)}, {text.strip()}"
+    lines = []
+    for i, ((start, _, sound), text) in enumerate(zip(rows(block), parts["ranges"])):
+        text = text.strip()
+        if inline:
+            line = f"At {stamp(start)}, {text}"
+        elif i == 0:
+            line = text
+        else:  # 官方：時間戳只寫在切鏡處；換段＝新的狀態／時刻
+            line = f"[Shot {i + 1}] At {stamp(start)}, the shot cuts to the next moment of the same scene: {text}"
         if m := re.match(r"(\S+?)：「(.+?)」", sound):
             who, said = m[1], m[2]
             if who == "旁白":
@@ -91,24 +104,32 @@ def assemble(cfg, sid, block, parts):
                 others = [n for n in cfg.get("looks_en", {}) if n != name and re.search(rf"\b{re.escape(n)}\b", parts["intro"] + " ".join(parts["ranges"]))]
                 if others:
                     line += f" Only {name} is speaking; {', '.join(others)} keep their mouths closed."
-        sentences.append(line)
+        lines.append(line)
+    intro = [parts["intro"].strip()]
     if speakers:  # H3 預設講很快（一句 1.5 秒），TTS 對不上嘴；要它慢慢講，每句約佔滿時段
-        sentences.insert(1, SLOW)
+        intro.append(SLOW)
     # 只寫英文名 H3 不知道誰是誰，會讓畫面最顯眼的角色開口（《現代西遊》第二集 S01 悟淨的台詞變悟空嘴動）：
     # 每個角色第一次出現時補上定裝圖外觀
-    text = " ".join(sentences)
+    text = " ".join(intro + lines)
     for name, look in cfg.get("looks_en", {}).items():
         text = re.sub(rf"\b{re.escape(name)}\b", f"{name} ({look})", text, count=1)
-    sentences = [text]
-    if sid in cfg.get("last_frames", []):  # 官方尾幀句：Picture 2 錨定在片長秒數
-        sentences.append(f"<Picture 2> (from [Shot 1]) aligns with the {comic.durations(cfg)[sid]:.2f}-second mark of the target video.")
+    last = sid in cfg.get("last_frames", [])
+    tail = []
+    if last and inline:  # 舊寫法：尾幀句寫在描述裡
+        tail.append(f"<Picture 2> (from [Shot 1]) aligns with the {comic.durations(cfg)[sid]:.2f}-second mark of the target video.")
     if parts.get("final_frame"):
-        sentences.append(parts["final_frame"].strip())
-    body = (f"integrated_multimodal_description: [Shot 1] {' '.join(sentences)}\n\n"
+        tail.append(parts["final_frame"].strip())
+    body = (f"integrated_multimodal_description: [Shot 1] {' '.join([text] + tail)}\n\n"
             f"overall_soundscape: {parts['soundscape'].strip()}\n\n"
             "non_diegetic_music: N/A")
     has_frame = dict((s, f) for s, _, f in cfg["shots"]).get(sid, "-") != "-"
-    return f"{INSTRUCTION_FIRST_FRAME}\n\n{body}" if has_frame else body  # 有首幀（Qwen-Image 圖或前段末幀）才加官方開頭句
+    if not has_frame:
+        return body
+    if last and not inline:  # 官方首尾幀開頭句：Picture 2 對齊最後一個分鏡、片長秒數
+        head = INSTRUCTION_FIRST_LAST.format(n=1 if inline else len(lines), sec=comic.durations(cfg)[sid])
+    else:
+        head = INSTRUCTION_FIRST_FRAME  # 有首幀（Qwen-Image 圖或前段末幀）才加官方開頭句
+    return f"{head}\n\n{body}"
 
 
 def shots(d):

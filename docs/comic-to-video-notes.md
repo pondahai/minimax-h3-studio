@@ -336,6 +336,8 @@ overall_soundscape: 1–4 句英文，環境音、動作聲、非語言人聲；
 non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫抽象情緒；沒有配樂填 N/A
 ```
 
+- **時間戳只寫在切鏡處（2026-11-06 再查證官方指南）**：`[Shot 1]` 不寫時間戳，之後 `[Shot N] At 00:0X.000, the shot cuts to …`；官方沒有「同一鏡頭內第 X 秒」的寫法。Studio T2VA 實測：散文寫「at the four-second mark / by the eight-second mark」，H3 在第 2 秒就爆炸、第 8 秒的第二次爆炸整個沒演；改成每個指定秒數各一個 `[Shot N] At …` 後照時間演出。`expand.py` 因此改為分鏡表每列一個 `[Shot N]`（`the shot cuts to the next moment of the same scene: …`），舊寫法（全塞在 `[Shot 1]` 逐句 `At 00:0X.000`）保留為 `prompt_format: official_inline`；有尾幀的段改用官方首尾幀開頭句 `How the reference pictures align with the target video — …`。**新寫法尚未用 H3 實跑漫畫段落驗證，第一次用時先跑一段看有沒有真的硬切**
+- Ref2VA（全參考模式）另有官方指南 `VIDEO_PROMPT_WRITING_GUIDE_ref_en.md`：六段 `subject_definitions／summary／retention_analysis／detailed_description／overall_soundscape／non_diegetic_music`，主體用 `<Subject N>`；Studio 導演分鏡與 story-film-studio 都是這個格式
 - 英文書寫；台詞保留原文放在 `<d>[Chinese] …</d>`，說話者編號 `(S1)` 寫在標籤外
 - 只有 H3 要英文：Qwen-Image 首幀／尾幀 prompt 用中文就很準（《蝴蝶》《密度》全部中文），出錯多半是描述不夠具體（例：「浮在水面」要寫成「一半露出水面」），不是語言問題
 - **只有 `<d>` 裡的內容會被唸出來**；不說話的角色不給說話者編號。官方沒有「無人聲」的寫法，寫了也沒用

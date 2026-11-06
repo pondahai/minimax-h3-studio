@@ -24,11 +24,13 @@ def check_official(cfg, sid, block, prompt):
     if -1 in pos or pos != sorted(pos):
         issues.append("缺欄位或順序不對（integrated_multimodal_description → overall_soundscape → non_diegetic_music）")
     has_frame = dict((s, f) for s, _, f in cfg["shots"]).get(sid, "-") != "-"
-    if has_frame != prompt.startswith(INSTRUCTION_FIRST_FRAME):
+    if has_frame != prompt.startswith((INSTRUCTION_FIRST_FRAME, "How the reference pictures align")):
         issues.append("首幀開頭句" + ("缺少" if has_frame else "多出來（t2va 不該有）"))
     desc = prompt[pos[0]:pos[1]] if -1 not in pos else prompt
     rows = re.findall(r"^\| (\d+)–(\d+) \|(.*?)\| ([^|]*) \|$", block, re.M)
     stamps = [int(m) for m in re.findall(r"At 00:(\d\d)\.\d{3}", desc)]
+    if "[Shot 2]" in desc or len(rows) == 1:  # 官方多分鏡：第 1 列（[Shot 1]）不寫時間戳
+        stamps = [int(rows[0][0])] + stamps if rows else stamps
     if stamps != [int(a) for a, *_ in rows]:
         issues.append(f"時間戳不符：分鏡 {[int(a) for a, *_ in rows]}，prompt {stamps}")
     spoken = re.findall(r"<d>\[Chinese\]\s*(.*?)\s*</d>", desc)
@@ -46,7 +48,9 @@ def check_official(cfg, sid, block, prompt):
     if extra:
         issues.append(f"多出角色：{'、'.join(extra)}")
     for a, b in zip(stamps, stamps[1:] + [None]):
-        seg = desc[desc.find(f"At 00:{a:02d}"):desc.find(f"At 00:{b:02d}") if b is not None else len(desc)]
+        lo = desc.find(f"At 00:{a:02d}")
+        lo = lo if lo >= 0 else desc.find("[Shot 1]")
+        seg = desc[lo:desc.find(f"At 00:{b:02d}") if b is not None else len(desc)]
         if len(seg) < 80 or (STILL_EN.search(seg) and not re.search(r"\b(mov|push|pan|tilt|drop|sink|float|rais|lift|turn|wave|point|nod|lean|bob|ripple|bubbl|sway|jiggl|vibrat|pour|settl)", seg, re.I)):
             issues.append(f"{a} 秒起 動作太少")
     return issues
