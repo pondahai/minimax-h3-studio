@@ -28,15 +28,39 @@ def make_speakable(cfg):
     return speakable
 
 
+_ready = False
+
+
 def preflight():
-    """服務沒開時馬上報錯，不要讓 600 秒逾時的請求靜靜卡住。"""
+    """TTS 沒開就在 Spark 上啟動並等它就緒（最多 3 分鐘），不要讓 600 秒逾時的請求靜靜卡住。"""
+    global _ready
+    if _ready:
+        return
+    import socket, subprocess, time
+    if not _port_open():
+        print("TTS（Spark :8792）沒開，啟動中…", flush=True)
+        # setsid -f 自己 fork 脫離；用「setsid nohup … &」ssh 有時掛住不回來
+        subprocess.run(["ssh", "-n", "-o", "ConnectTimeout=10", "funsteam@100.89.149.50",
+                        "cd ~/dgx-voxcpm-eval && . .venv/bin/activate && "
+                        "setsid -f python chinese_tts_server.py > tts.log 2>&1 < /dev/null"],
+                       timeout=30, check=True)
+        for _ in range(36):
+            time.sleep(5)
+            if _port_open():
+                break
+        else:
+            raise SystemExit("TTS 啟動 3 分鐘仍沒就緒，看 Spark ~/dgx-voxcpm-eval/tts.log")
+        print("TTS 已就緒", flush=True)
+    _ready = True
+
+
+def _port_open():
     import socket
     try:
         socket.create_connection(("100.89.149.50", 8792), timeout=5).close()
+        return True
     except OSError:
-        raise SystemExit("VoxCPM2 TTS（Spark :8792）沒開。啟動：ssh funsteam@100.89.149.50 "
-                         "'cd ~/dgx-voxcpm-eval && source .venv/bin/activate && "
-                         "setsid nohup python chinese_tts_server.py > tts.log 2>&1 < /dev/null &'")
+        return False
 
 
 def post_json(payload):

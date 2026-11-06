@@ -20,7 +20,21 @@ set_busy_status() {
     -H 'Content-Type: application/json' \
     -d "{\"busy\": $1, \"reason\": \"H3（$NAME）正在運作\"}" > /dev/null 2>&1 || true
 }
-trap 'set_busy_status false' EXIT
+# 跑完（DONE、ABORT、被 pkill 暫停都算）把開跑前停掉的服務開回來；8002 不歸 pipeline 管，但掛了也順手拉起來。
+# ComfyUI 是 comfy-ondemand 按需啟動，不還原。
+RESTORE_LLM=""; RESTORE_TTS=""
+restore_services() {
+  [ -n "$RESTORE_LLM" ] && docker start qwen3.8-nvfp4 > /dev/null 2>&1 && echo "$(date '+%F %T') 還原 8006（qwen3.8-nvfp4）" >> "$ST"
+  if [ -n "$RESTORE_TTS" ]; then
+    (cd ~/dgx-voxcpm-eval && . .venv/bin/activate && setsid -f python chinese_tts_server.py > tts.log 2>&1 < /dev/null)
+    echo "$(date '+%F %T') 還原 TTS（:8792）" >> "$ST"
+  fi
+  if ! pgrep -f "[l]lama-server.*--port 8002" > /dev/null && [ -x ~/models/qwen3.6-abliterated/start.sh ]; then
+    setsid -f ~/models/qwen3.6-abliterated/start.sh >> ~/models/qwen3.6-abliterated/llama-server.log 2>&1 < /dev/null
+    echo "$(date '+%F %T') 8002 沒在跑，已重新啟動" >> "$ST"
+  fi
+}
+trap 'set_busy_status false; restore_services' EXIT
 set_busy_status true
 
 # 等 Qwen-Image 手上的工作做完才交班，不強制中斷進行中的生圖任務。
@@ -54,8 +68,8 @@ if docker ps --format '{{.Names}}' | grep -qx qwen-image-comfyui; then
   say "停掉 qwen-image-comfyui"
   docker stop qwen-image-comfyui > /dev/null
 fi
-docker ps --format '{{.Names}}' | grep -qx qwen3.8-nvfp4 && { say "停掉 qwen3.8-nvfp4"; docker stop qwen3.8-nvfp4 > /dev/null; }
-pgrep -f "[c]hinese_tts_server.py" > /dev/null && { say "停掉 TTS"; pkill -f "[c]hinese_tts_server.py"; }
+docker ps --format '{{.Names}}' | grep -qx qwen3.8-nvfp4 && { say "停掉 qwen3.8-nvfp4（跑完會還原）"; docker stop qwen3.8-nvfp4 > /dev/null; RESTORE_LLM=1; }
+pgrep -f "[c]hinese_tts_server.py" > /dev/null && { say "停掉 TTS（跑完會還原）"; pkill -f "[c]hinese_tts_server.py"; RESTORE_TTS=1; }
 if docker ps --format '{{.Names}}' | grep -qE '^h3-|^demucs'; then say "ABORT 已有 H3／Demucs 在跑"; exit 1; fi
 for f in config.json prompts/music_official.txt audio/lines.json; do [ -f "$f" ] || { say "ABORT 缺 $f"; exit 1; }; done
 SIDS=$(python3 -c 'import json; print(" ".join(s for s, _, _ in json.load(open("config.json"))["shots"]))')

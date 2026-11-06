@@ -43,8 +43,8 @@
 |---|---|---|
 | vLLM `qwen3.8-nvfp4`（SuperQwen3.8-27B abliterated NVFP4，`Jiunsong/SuperQwen3.8-27b-abliterated-NVFP4-DGX-Spark`，無審查，多模態） | Spark `100.89.149.50:8006` | **2026-11-04 起工作流唯一 LLM**：分鏡草稿、首幀 prompt、擴寫、外觀、對嘴檢查（`comic.llm()`；平常可停著，第一次呼叫自動 `docker start`） |
 | llama.cpp（多模態） | Spark `100.89.149.50:8002` | 2026-11-04 前的工作流 LLM；`LLM_PORT=8002` 可改回。下文歷史紀錄裡的「8002」指它 |
-| VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑；8006 冷啟動或 pipeline 互斥會把它停掉） | 角色配音。啟動：`ssh … 'cd ~/dgx-voxcpm-eval && source .venv/bin/activate && setsid nohup python chinese_tts_server.py > tts.log 2>&1 < /dev/null &'`；`tts.py` 呼叫前 5 秒檢查埠，沒開立即報錯（第六集曾靜靜卡 600 秒逾時） |
-| Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`，按需） | 生成首幀。沒開時要叫醒 `comfy_ondemand.py`：它只聽 `127.0.0.1:8190`，必須 `ssh … "curl -X POST http://127.0.0.1:8190/ensure"`（從本機打或用 GET 都不行），回 `{"ok": true}` 後 8188 就可用 |
+| VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑；8006 冷啟動或 pipeline 互斥會把它停掉） | 角色配音。啟動：`ssh -n … 'cd ~/dgx-voxcpm-eval && . .venv/bin/activate && setsid -f python chinese_tts_server.py > tts.log 2>&1 < /dev/null'`（用 `setsid nohup … &` 有時 ssh 掛住不回來，`setsid -f` 自己 fork、0.4 秒返回）。`tts.py` 呼叫前檢查埠，沒開會自動用這個指令啟動並等就緒（第六集曾靜靜卡 600 秒逾時） |
+| Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`，按需） | 生成首幀。沒開時要叫醒 `comfy_ondemand.py`：它只聽 `127.0.0.1:8190`，必須 `ssh … "curl -X POST http://127.0.0.1:8190/ensure"`（從本機打或用 GET 都不行），回 `{"ok": true}` 後 8188 就可用；`qwen_frame.py` 開頭會自動做這一步 |
 | MiniMax H3 | Spark `~/h3-bench`（docker image `h3-bench`） | 生成影片／配樂 |
 | Breeze ASR（**預設**，按需） | Spark `~/breeze-asr-hub`（whisper.cpp CUDA＋`ggml-breeze-asr-26.bin`），由 `asr_spark.sh` 啟動 | 核對 TTS 有沒有唸對 |
 | Breeze ASR（備援，常駐） | Xavier `100.108.74.45:8013`，SSH 帳號 `nvidia` | Spark 資源檢查不通過時自動改用 |
@@ -257,7 +257,8 @@
 - **離線排隊（《電池》起）**：`pipeline.sh <篇目>` 在 Spark 上一次跑完 H3 與後處理，本機可以關機。素材（config、storyboard、prompts、`frames/SXX.png`、`audio/` 台詞與 `lines.json`）先 tar 經 ssh 傳上去，再 `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（一定要 `< /dev/null`，否則 ssh 掛住不回來）
   - 流程：互斥檢查（停 Qwen／TTS，H3 或 Demucs 在跑就 ABORT）→ music1（`asr_spark.sh` 檢查人聲，自動設成 `bgm.wav`）→ 各段 `ONLY=SXX run_series.sh`，失敗重試 1 次、仍失敗就跳過（失敗的 run 目錄改名 `SXX_fail1`）→ `out/` 複製到 `video/` → `sfx.sh` → `lipsync_measure.py` → `align_dtw.py` → `mux.py` 出 `mixed/` 試聽版；不做全片、字幕、分享版
   - 進度看 `<篇目>/pipeline.status`（每階段一行，最後一行 `DONE` 或 `ABORT`）；細節在 `series.log`、`post.log`
-  - 跑完不重開其他服務、不推播；使用者回來後由 Claude 讀 status 接續
+  - 跑完（DONE、ABORT、被暫停都算，EXIT trap）自動還原開跑前停掉的 8006 與 TTS，8002 若沒在跑也順手拉起來；ComfyUI 按需不還原。不推播；使用者回來後由 Claude 讀 status 接續
+  - 8006 的 container 是 `unless-stopped`：開機會自己起來，但被 `docker stop` 後就一直停著，所以要靠上面的還原（2026-11-06 前沒有還原，跑完 8006／TTS 都停著；同時發現 8002 在 11-05 15:15 被不明原因正常結束，已手動拉起）
 - 在 Spark 上排隊等前一批跑完：`pgrep -f`／`pkill -f` 會比對到自己所在的 `bash -c` 或 ssh 指令（字串裡就有那個關鍵字），等待迴圈永遠不結束、或把自己的 ssh 砍掉。關鍵字寫成 `"[r]un_series.sh rainbow"` 這種形式避開；本機監看用 `timeout` 包住每次 ssh，長時間工作一律在 Spark 上 `setsid nohup … &` 啟動
 - `run_jobs.sh`：單獨重跑指定段或其他工作，格式 `名稱 prompt檔 seed 秒數 首幀|-`
 - **背景啟動的輸出重導只能寫一次**：`setsid nohup bash x.sh > log 2>&1 < /dev/null > /dev/null 2>&1 &` 後面的 `> /dev/null` 會蓋掉前面的 log，log 永遠是空的，等「工作結束」字樣的監看就永遠不結束（第六集配樂重做時發生）。完成與否改看 `out/` 有沒有成品
