@@ -34,6 +34,8 @@
 ## 3. config.json
 - **做**：以前一集為底：`title`、`source`、`style`／`style_en`（只寫畫風與大場景，不寫道具）、新角色的 `voices`、`ref_transcript`、`names_en`、`looks_en`、`characters(_en)`、`char_refs`、`panel_cast`、`panel_dir`（指 `source/`）、`tagline`
 - **做**：`panel_notes` 每格寫：場景、誰在畫面、逐句台詞＋說話者、【時間表】（4 字／秒，童聲 3.5；12 秒一段，超過就拆兩段）
+- 鏡頭欄：同一場戲統一寫「中景」，真的要換視角（特寫、仰拍、背影、越肩）才寫，H3 會把景別變化當成切鏡；說話的鸚鵡不要停在別人肩上
+- 數字讀法（例 101→一零一）寫進 `pronounce`
 - 台詞內層引號一律用『』；畫面上不能有字（海報、螢幕、印章都寫「沒有字」）；格序調換時連 `source/` 檔名一起對調
 
 ## 4. 新角色立繪
@@ -63,8 +65,8 @@
 
 ## 8. H3 prompt
 - **做**：`python expand.py <篇目>` → `python check_prompts.py <篇目>`；人工看多出的角色、畫面文字、無人段有沒有被寫進人物
-- 格式（2026-11-06 起）：分鏡表每列一個 `[Shot N] At 00:0X.000, the shot cuts to the next moment of the same scene: …`（`[Shot 1]` 不寫時間戳）；有尾幀的段用官方首尾幀開頭句。舊寫法是 `prompt_format: official_inline`
-- **新格式還沒在漫畫段落實跑過**：第一次用時先只跑一段 H3，看有沒有在每列真的硬切，再決定整集用哪個格式
+- 格式：新篇目用 `prompt_format: official_mixed`（一場戲換視角才開 `[Shot N]`，同視角用秒數；第七集起）。`official`＝分鏡表每列一個 `[Shot N] At 00:0X.000, the shot cuts to the next moment of the same scene: …`（`[Shot 1]` 不寫時間戳）；有尾幀的段用官方首尾幀開頭句。舊寫法是 `prompt_format: official_inline`
+- `official` 實測每列都硬切（第七集 S01），漫畫篇不要用
 - **做**：配樂 prompt `prompts/music_official.txt`（官方格式，空景＋樂器）
 
 ## 9. H3 影片（Spark 離線）
