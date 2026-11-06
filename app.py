@@ -286,8 +286,8 @@ LLM_API_KEY = os.environ.get("H3_LLM_API_KEY", "")
 LLM_TIMEOUT = float(os.environ.get("H3_LLM_TIMEOUT", "180"))
 LLM_THINKING = os.environ.get("H3_LLM_THINKING", "1") == "1"  # Qwen3 等推理模型先推理再作答
 
-EXPAND_SYSTEM_PROMPT = """You write prompts for MiniMax H3, a reference-to-video model that generates video with synchronized audio.
-Output ONLY the final prompt in English: one paragraph, no title, no markdown, no explanation.
+EXPAND_SYSTEM_PROMPT = """You write prompts for MiniMax H3, a video model that generates video with synchronized audio from text and optional reference assets.
+Output ONLY the final prompt in English: one paragraph (plus the sound lines when asked), no title, no markdown, no explanation.
 
 Rules:
 - Refer to reference images exactly as <Picture 1> ... <Picture N>, reference videos as <Video 1> ... <Video N>, reference audio as <Audio 1> ... <Audio N>. Only use tags for assets that exist.
@@ -298,6 +298,14 @@ Rules:
 - Write the user's idea faithfully; add concrete visual detail, never change its intent.
 - When frames of a reference video are attached, describe its setting, subjects, camera and action exactly as the frames show them; never relocate or reinvent what <Video N> contains.
 - When no frames of a reference video are attached, you cannot see it: do not invent its setting, subjects or action; describe it only as the user's idea does."""
+
+# 換人模式保留原片音軌，不加；其餘模式不寫配樂時 H3 會自己猜音軌（易混人聲）
+EXPAND_SOUND_RULES = """Sound: after the paragraph, add two lines exactly in this form:
+Soundscape: 1-2 sentences of the sounds people in the scene can hear: concrete sources and textures (wind in leaves, footsteps on gravel, a drum struck twice), tied to the actions above. Do not repeat dialogue here.
+Music: 1-3 sentences of background music only the audience hears: instruments, tempo, rhythm and dynamics (e.g. light acoustic guitar and glockenspiel, around 100 BPM, bouncy staccato, soft). Never abstract moods alone. Instrumental only, no vocals or singing. Write N/A if the user's idea asks for no music.
+If the user's idea has no spoken lines, end the Soundscape line with: No dialogue, no human voice."""
+
+EXPAND_T2VA_RULES = """Text-only mode: there are no reference assets. Do not use any <Picture>, <Video> or <Audio> tags. Introduce every subject with a concrete visual description (age, look, clothing) and keep it consistent through the clip, and describe the full setting yourself."""
 
 EXPAND_SWAP_RULES = """Character swap mode: <Video 1> is the source performance, <Picture 1> is the new character.
 - Start with: Replace the [describe the person in <Video 1>] in <Video 1> with the character from <Picture 1>.
@@ -327,6 +335,7 @@ class ExpandPromptRequest(BaseModel):
     video_count: int = 0
     audio_count: int = 0
     character_swap: bool = False
+    t2va: bool = False
     duration_seconds: float = 12
     image_paths: Optional[List[str]] = []
     video_path: Optional[str] = None
@@ -453,7 +462,9 @@ def expand_prompt(req: ExpandPromptRequest):
               f"{req.audio_count} audio clip(s). Requested duration: {req.duration_seconds:g} seconds.")
     if video_seconds:
         assets += f" <Video 1> is {video_seconds:.1f} seconds long."
-    system = EXPAND_SYSTEM_PROMPT + ("\n\n" + EXPAND_SWAP_RULES if req.character_swap else "")
+    system = EXPAND_SYSTEM_PROMPT + ("\n\n" + EXPAND_SWAP_RULES if req.character_swap else "\n\n" + EXPAND_SOUND_RULES)
+    if req.t2va:
+        system += "\n\n" + EXPAND_T2VA_RULES
     if req.character_swap and req.audio_count > 0:
         system += "\n\n" + EXPAND_SWAP_VOICE_RULES
         video = _upload_file(req.video_path)

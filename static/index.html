@@ -185,6 +185,8 @@
         <p>• 音色於提示詞中使用 <code class="text-emerald-300">&lt;Audio 1～3&gt;</code> 標註，可在分鏡台詞旁指定</p>
         <p>• 影片於提示詞中使用 <code class="text-amber-300">&lt;Video 1&gt;</code> 標註（換人模式以它為原片）</p>
         <p>• 對話台詞自動封裝為 <code class="text-purple-300">&lt;d&gt;[Chinese] ...&lt;/d&gt;</code></p>
+        <p>• 音效寫在 <code class="text-sky-300">Soundscape:</code>：具體聲源與質感，對應畫面動作；不重寫台詞</p>
+        <p>• 配樂寫在 <code class="text-sky-300">Music:</code>：樂器、速度、節奏、力度，純音樂不要人聲；沒有填 N/A</p>
       </div>
 
       <!-- 素材使用說明 -->
@@ -957,8 +959,8 @@ ${concept}
 4. shots：分鏡時序（總長約 12 秒，請切分成 2~3 個分鏡，起始秒數建議為 0.0s、5.0s/6.0s 等）：
    - 運鏡與動作：請使用專業電影語彙（如 Dolly In、Tracking Shot、Close-up、Low Angle 等）。
    - 角色對白：若角色有台詞，請在 description 中使用標準封裝語法：<d>[Chinese] 台詞內容 </d>，並單獨列出 dialogue 純台詞。
-5. overall_soundscape：客觀環境音場（例如：雨滴落地、街頭車流、風聲吹拂、沉重腳步等）。
-6. non_diegetic_music：非劇情配樂風格（例如：cinematic strings, low pulsing synthwave, ambient piano 等）。
+5. overall_soundscape：場內聽得到的聲音，用英文寫具體聲源與質感並對應分鏡動作（例如：rain tapping on a tin roof, footsteps on gravel, a drum struck twice）；不重複台詞；沒有台詞時結尾加 No dialogue, no human voice.
+6. non_diegetic_music：只有觀眾聽得到的配樂，1～3 句英文寫樂器、速度、節奏、力度（例如：light acoustic guitar and glockenspiel, around 100 BPM, bouncy staccato, soft），不要只寫情緒，純音樂不要人聲；不要配樂填 N/A。
 ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 description 中具體描述 <Video 1> 原片人物的動作、姿勢與表情（模型不會自動照抄動作）；retention_analysis 要列出保留 <Video 1> 的鏡頭、背景、服裝與節奏；${hasAudio ? '角色台詞以 <Audio 1> 的音色說出（用 <d>[Chinese] 台詞</d>，時間點對齊原片的說話節奏），overall_soundscape 只寫環境音、不要寫沿用原聲。' : 'overall_soundscape 寫明沿用 <Video 1> 的原聲。'}
 ` : ''}
 請直接輸出以下標準 JSON 格式（包含在 \`\`\`json 區塊中，不要額外寒暄，以利程式自動解析）：
@@ -1279,6 +1281,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
             video_count: t2va ? 0 : uploadedVideos.length,
             audio_count: t2va ? 0 : uploadedAudios.length,
             character_swap: !t2va && swapToggle.checked,
+            t2va: t2va,
             duration_seconds: parseFloat(document.getElementById('durRange').value),
             // 讓支援看圖的 LLM 看到參考圖與原片畫面，避免憑空編造影片內容
             image_paths: t2va ? [] : uploadedImages.map(img => img.path),
