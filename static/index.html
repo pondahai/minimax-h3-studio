@@ -56,10 +56,10 @@
         <i data-lucide="git-commit" class="w-3.5 h-3.5"></i>
         <span>🎬 FL2VA 首幀生成</span>
       </button>
-      <!-- T2VA 尚未接上後端（仍要求至少 1 張圖，且會被當成 Ref2VA），先停用 -->
-      <button id="modeTabT2V" disabled title="尚未支援：請改用 Ref2VA 並上傳一張風格參考圖" class="px-3.5 py-1.5 rounded-lg text-zinc-600 cursor-not-allowed transition flex items-center space-x-1.5">
+      <!-- T2VA：FL2VA 主模型不接首幀，只用文字；已上傳的素材都不會送出 -->
+      <button id="modeTabT2V" onclick="setWorkflowMode('t2va')" title="只用文字生成，不使用參照圖片和影片" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
         <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-        <span>✍️ T2VA 純文字（未支援）</span>
+        <span>✍️ T2VA 純文字</span>
       </button>
     </div>
 
@@ -624,12 +624,12 @@
 
       tRef.className = mode === 'ref2va' ? activeClass : inactiveClass;
       tFL.className = mode === 'fl2va' ? activeClass : inactiveClass;
+      document.getElementById('modeTabT2V').className = mode === 't2va' ? activeClass : inactiveClass;
 
+      // T2VA 沒有 <Picture N> 可用：導演分鏡會引用圖片，改用自由 Prompt
       if (mode === 't2va') {
-        document.getElementById('rawPromptArea').classList.remove('hidden');
-        document.getElementById('ref2vaCanvas').classList.add('hidden');
-      } else {
-        document.getElementById('ref2vaCanvas').classList.remove('hidden');
+        setPromptSource('free');
+        showRawPrompt();
       }
       renderAssetLists();
     }
@@ -1257,8 +1257,9 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       const orig = btn.innerText;
       const idea = document.getElementById('expandIdeaInput').value;
       const swapToggle = document.getElementById('characterSwapToggle');
+      const t2va = workflowMode === 't2va';
       // 想換人卻沒開換人模式：一般模式會把「換掉」寫成變身劇情，而不是照原片換人
-      if (uploadedVideos.length > 0 && !swapToggle.checked && /換|替換|取代|replace|swap/i.test(idea)) {
+      if (!t2va && uploadedVideos.length > 0 && !swapToggle.checked && /換|替換|取代|replace|swap/i.test(idea)) {
         if (confirm('構想看起來是要換人，但「換人模式」沒有勾選。\n\n要開啟換人模式再擴寫嗎？（取消則照一般模式擴寫）')) {
           swapToggle.checked = true;
           setWorkflowMode('ref2va');
@@ -1273,14 +1274,15 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
           body: JSON.stringify({
             idea: idea,
             current_prompt: area.value,
-            image_count: uploadedImages.length,
-            video_count: uploadedVideos.length,
-            audio_count: uploadedAudios.length,
-            character_swap: swapToggle.checked,
+            // T2VA 不送圖、音訊和影片，擴寫時也當作沒有，避免寫出 <Picture N>
+            image_count: t2va ? 0 : uploadedImages.length,
+            video_count: t2va ? 0 : uploadedVideos.length,
+            audio_count: t2va ? 0 : uploadedAudios.length,
+            character_swap: !t2va && swapToggle.checked,
             duration_seconds: parseFloat(document.getElementById('durRange').value),
             // 讓支援看圖的 LLM 看到參考圖與原片畫面，避免憑空編造影片內容
-            image_paths: uploadedImages.map(img => img.path),
-            video_path: uploadedVideos.length > 0 ? uploadedVideos[0].path : null
+            image_paths: t2va ? [] : uploadedImages.map(img => img.path),
+            video_path: !t2va && uploadedVideos.length > 0 ? uploadedVideos[0].path : null
           })
         });
         const d = await res.json();
@@ -1298,17 +1300,18 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
 
     // Launch Generation
     async function launchGeneration() {
-      if (uploadedImages.length === 0) {
-        alert('請先上傳至少 1 張參照圖片！');
+      const t2va = workflowMode === 't2va';
+      if (!t2va && uploadedImages.length === 0) {
+        alert('請先上傳至少 1 張參照圖片！（只用文字的話請切到「✍️ T2VA 純文字」）');
         return;
       }
-      const characterSwap = document.getElementById('characterSwapToggle').checked;
+      const characterSwap = !t2va && document.getElementById('characterSwapToggle').checked;
       if (characterSwap && (uploadedVideos.length === 0 || workflowMode !== 'ref2va')) {
         alert('換人模式需在 Ref2VA 分頁使用，並上傳一支原片作為 <Video 1>。');
         return;
       }
       const longVideo = uploadedVideos.find(v => v.duration > 15);
-      const longSwap = !!longVideo;
+      const longSwap = !t2va && !!longVideo;
       if (longSwap && (!characterSwap || uploadedVideos.length !== 1 || uploadedVideos[0] !== longVideo)) {
         alert('超過 15 秒的原片只能用於換人模式，且只能上傳這一支影片（會自動分段處理）。');
         return;
@@ -1345,9 +1348,9 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       const reqBody = {
         title: "MiniMax Studio Generation",
         mode: workflowMode,
-        reference_images: uploadedImages.map(img => img.path),
-        reference_audios: uploadedAudios.map(aud => aud.path),
-        reference_videos: uploadedVideos.map(vid => vid.path),
+        reference_images: t2va ? [] : uploadedImages.map(img => img.path),
+        reference_audios: t2va ? [] : uploadedAudios.map(aud => aud.path),
+        reference_videos: t2va ? [] : uploadedVideos.map(vid => vid.path),
         character_swap: characterSwap,
         prompt: prompt,
         duration_seconds: parseInt(document.getElementById('durRange').value),
