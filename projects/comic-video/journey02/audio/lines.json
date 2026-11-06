@@ -1,0 +1,362 @@
+[
+  {
+    "file": "S01_00_悟空.wav",
+    "sid": "S01",
+    "start": 0,
+    "end": 5,
+    "who": "悟空",
+    "text": "這次我們要去高雄大樹的佛光山！",
+    "audio_sec": 2.56
+  },
+  {
+    "file": "S01_05_悟淨.wav",
+    "sid": "S01",
+    "start": 5,
+    "end": 9,
+    "who": "悟淨",
+    "text": "聽說那裡有很大的佛像，很壯觀！",
+    "audio_sec": 2.72
+  },
+  {
+    "file": "S01_09_八戒.wav",
+    "sid": "S01",
+    "start": 9,
+    "end": 12,
+    "who": "八戒",
+    "text": "可以學到很多東西喔！",
+    "audio_sec": 2.4
+  },
+  {
+    "file": "S02_00_悟空.wav",
+    "sid": "S02",
+    "start": 0,
+    "end": 3,
+    "who": "悟空",
+    "text": "哇～好大！",
+    "audio_sec": 1.12
+  },
+  {
+    "file": "S02_03_八戒.wav",
+    "sid": "S02",
+    "start": 3,
+    "end": 7,
+    "who": "八戒",
+    "text": "好莊嚴的感覺！",
+    "audio_sec": 1.6
+  },
+  {
+    "file": "S02_07_悟淨.wav",
+    "sid": "S02",
+    "start": 7,
+    "end": 12,
+    "who": "悟淨",
+    "text": "這裡不只是觀光景點，也是學習的地方。",
+    "audio_sec": 3.2
+  },
+  {
+    "file": "S03_00_悟空.wav",
+    "sid": "S03",
+    "start": 0,
+    "end": 3,
+    "who": "悟空",
+    "text": "哇！好高大！好壯觀！",
+    "audio_sec": 2.4
+  },
+  {
+    "file": "S03_03_八戒.wav",
+    "sid": "S03",
+    "start": 3,
+    "end": 6,
+    "who": "八戒",
+    "text": "看到這麼大的佛像，心裡好平靜。",
+    "audio_sec": 3.04
+  },
+  {
+    "file": "S03_06_悟淨.wav",
+    "sid": "S03",
+    "start": 6,
+    "end": 10,
+    "who": "悟淨",
+    "text": "它提醒我們要做好事、幫助別人。",
+    "audio_sec": 2.88
+  },
+  {
+    "file": "S03_10_鸚鵡.wav",
+    "sid": "S03",
+    "start": 10,
+    "end": 12,
+    "who": "鸚鵡",
+    "text": "煩惱都變小了！",
+    "audio_sec": 1.92
+  },
+  {
+    "file": "S04_00_悟淨.wav",
+    "sid": "S04",
+    "start": 0,
+    "end": 5,
+    "who": "悟淨",
+    "text": "四大主題館，介紹佛教的故事和藝術。",
+    "audio_sec": 3.36
+  },
+  {
+    "file": "S04_05_八戒.wav",
+    "sid": "S04",
+    "start": 5,
+    "end": 7,
+    "who": "八戒",
+    "text": "好多有趣的展覽！",
+    "audio_sec": 1.76
+  },
+  {
+    "file": "S04_07_悟空.wav",
+    "sid": "S04",
+    "start": 7,
+    "end": 12,
+    "who": "悟空",
+    "text": "原來佛教還有文化、教育和慈善！",
+    "audio_sec": 2.56
+  },
+  {
+    "file": "S05_00_悟空.wav",
+    "sid": "S05",
+    "start": 0,
+    "end": 3,
+    "who": "悟空",
+    "text": "來試試抄經，練習專注！",
+    "audio_sec": 2.24
+  },
+  {
+    "file": "S05_03_八戒.wav",
+    "sid": "S05",
+    "start": 3,
+    "end": 6,
+    "who": "八戒",
+    "text": "寫字也能讓心變平靜！",
+    "audio_sec": 1.92
+  },
+  {
+    "file": "S05_06_悟淨.wav",
+    "sid": "S05",
+    "start": 6,
+    "end": 9,
+    "who": "悟淨",
+    "text": "一筆一畫，時間變慢了。",
+    "audio_sec": 2.56
+  },
+  {
+    "file": "S05_09_悟空.wav",
+    "sid": "S05",
+    "start": 9,
+    "end": 12,
+    "who": "悟空",
+    "text": "我竟然坐得住耶！",
+    "audio_sec": 1.44
+  },
+  {
+    "file": "S06_00_法師.wav",
+    "sid": "S06",
+    "start": 0,
+    "end": 4,
+    "who": "法師",
+    "text": "心存善念，生活會更快樂。",
+    "audio_sec": 3.36
+  },
+  {
+    "file": "S06_04_悟空.wav",
+    "sid": "S06",
+    "start": 4,
+    "end": 10,
+    "who": "悟空",
+    "text": "原來做好事不只是幫助別人，也會讓自己更開心。",
+    "audio_sec": 3.36
+  },
+  {
+    "file": "S07_00_悟淨.wav",
+    "sid": "S07",
+    "start": 0,
+    "end": 4,
+    "who": "悟淨",
+    "text": "站在觀景台，可以看到八座寶塔。",
+    "audio_sec": 3.2
+  },
+  {
+    "file": "S07_04_悟空.wav",
+    "sid": "S07",
+    "start": 4,
+    "end": 6,
+    "who": "悟空",
+    "text": "好美的景色！",
+    "audio_sec": 1.28
+  },
+  {
+    "file": "S07_06_悟淨.wav",
+    "sid": "S07",
+    "start": 6,
+    "end": 12,
+    "who": "悟淨",
+    "text": "就像八條路，提醒我們走向更好的自己。",
+    "audio_sec": 3.36
+  },
+  {
+    "file": "S08_00_悟空.wav",
+    "sid": "S08",
+    "start": 0,
+    "end": 3,
+    "who": "悟空",
+    "text": "好好吃！",
+    "audio_sec": 0.96
+  },
+  {
+    "file": "S08_03_悟淨.wav",
+    "sid": "S08",
+    "start": 3,
+    "end": 8,
+    "who": "悟淨",
+    "text": "原來素食也可以這麼豐富！健康又美味。",
+    "audio_sec": 3.52
+  },
+  {
+    "file": "S08_08_八戒.wav",
+    "sid": "S08",
+    "start": 8,
+    "end": 12,
+    "who": "八戒",
+    "text": "我可以再來一碗嗎？",
+    "audio_sec": 1.28
+  },
+  {
+    "file": "S09_00_悟空.wav",
+    "sid": "S09",
+    "start": 0,
+    "end": 3,
+    "who": "悟空",
+    "text": "我們一起來整理環境吧！",
+    "audio_sec": 1.92
+  },
+  {
+    "file": "S09_03_悟空.wav",
+    "sid": "S09",
+    "start": 3,
+    "end": 8,
+    "who": "悟空",
+    "text": "做一點小小的事，也能讓這裡更乾淨。",
+    "audio_sec": 2.72
+  },
+  {
+    "file": "S09_08_悟淨.wav",
+    "sid": "S09",
+    "start": 8,
+    "end": 12,
+    "who": "悟淨",
+    "text": "幫助別人，感覺很棒！",
+    "audio_sec": 2.24
+  },
+  {
+    "file": "S10_00_悟空.wav",
+    "sid": "S10",
+    "start": 0,
+    "end": 3,
+    "who": "悟空",
+    "text": "我學到了專注和耐心。",
+    "audio_sec": 1.92
+  },
+  {
+    "file": "S10_03_八戒.wav",
+    "sid": "S10",
+    "start": 3,
+    "end": 7,
+    "who": "八戒",
+    "text": "我學到要尊重不同的文化和信仰。",
+    "audio_sec": 2.72
+  },
+  {
+    "file": "S10_07_悟淨.wav",
+    "sid": "S10",
+    "start": 7,
+    "end": 12,
+    "who": "悟淨",
+    "text": "旅行不只是玩，還能學到很多東西！",
+    "audio_sec": 2.88
+  },
+  {
+    "file": "S11_00_悟空.wav",
+    "sid": "S11",
+    "start": 0,
+    "end": 5,
+    "who": "悟空",
+    "text": "我在佛光山的階梯旁邊，撿到這個舊信封……",
+    "audio_sec": 2.88
+  },
+  {
+    "file": "S11_05_八戒.wav",
+    "sid": "S11",
+    "start": 5,
+    "end": 8,
+    "who": "八戒",
+    "text": "這是什麼？誰的啊？",
+    "audio_sec": 1.76
+  },
+  {
+    "file": "S11_08_鸚鵡.wav",
+    "sid": "S11",
+    "start": 8,
+    "end": 12,
+    "who": "鸚鵡",
+    "text": "打開來看看吧！",
+    "audio_sec": 2.08
+  },
+  {
+    "file": "S12_00_悟空.wav",
+    "sid": "S12",
+    "start": 0,
+    "end": 4,
+    "who": "悟空",
+    "text": "哇——！台灣各地的名勝景點！",
+    "audio_sec": 2.72
+  },
+  {
+    "file": "S12_04_悟淨.wav",
+    "sid": "S12",
+    "start": 4,
+    "end": 7,
+    "who": "悟淨",
+    "text": "這是什麼神奇的地圖？",
+    "audio_sec": 2.56
+  },
+  {
+    "file": "S12_07_八戒.wav",
+    "sid": "S12",
+    "start": 7,
+    "end": 9,
+    "who": "八戒",
+    "text": "集滿有獎品嗎？",
+    "audio_sec": 1.12
+  },
+  {
+    "file": "S13_00_悟空.wav",
+    "sid": "S13",
+    "start": 0,
+    "end": 4,
+    "who": "悟空",
+    "text": "所以……我們要去收集十二個印章嗎？",
+    "audio_sec": 3.04
+  },
+  {
+    "file": "S13_04_鸚鵡.wav",
+    "sid": "S13",
+    "start": 4,
+    "end": 7,
+    "who": "鸚鵡",
+    "text": "第一枚，靜心印！",
+    "audio_sec": 2.88
+  },
+  {
+    "file": "S13_07_鸚鵡.wav",
+    "sid": "S13",
+    "start": 7,
+    "end": 12,
+    "who": "鸚鵡",
+    "text": "下一站，尋找第二枚求知印！",
+    "audio_sec": 4.96
+  }
+]

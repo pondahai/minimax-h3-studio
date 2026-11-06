@@ -185,9 +185,48 @@
         <p>• 音色於提示詞中使用 <code class="text-emerald-300">&lt;Audio 1～3&gt;</code> 標註，可在分鏡台詞旁指定</p>
         <p>• 影片於提示詞中使用 <code class="text-amber-300">&lt;Video 1&gt;</code> 標註（換人模式以它為原片）</p>
         <p>• 對話台詞自動封裝為 <code class="text-purple-300">&lt;d&gt;[Chinese] ...&lt;/d&gt;</code></p>
-        <p>• 音效寫在 <code class="text-sky-300">Soundscape:</code>：具體聲源與質感，對應畫面動作；不重寫台詞</p>
-        <p>• 配樂寫在 <code class="text-sky-300">Music:</code>：樂器、速度、節奏、力度，純音樂不要人聲；沒有填 N/A</p>
+        <p>• 音效寫在 <code class="text-sky-300">overall_soundscape:</code>：具體聲源與質感，照播放順序對應分鏡事件；不寫台詞</p>
+        <p>• 配樂寫在 <code class="text-sky-300">non_diegetic_music:</code>：樂器、速度、節奏、力度，純音樂；沒有填 N/A。指定秒數的事件各自一個 <code class="text-sky-300">[Shot N] At 00:0X.000</code></p>
       </div>
+
+      <!-- 素材使用說明 -->
+      <details class="rounded-xl border border-zinc-800/60 bg-surface-850/40 p-3 text-[11px] text-zinc-400 group">
+        <summary class="cursor-pointer select-none text-zinc-300 font-semibold flex items-center justify-between">
+          <span>📖 素材使用說明</span>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition group-open:rotate-180"></i>
+        </summary>
+        <div class="mt-2 space-y-3 leading-relaxed">
+          <div>
+            <p class="font-semibold text-brand-300">🖼️ 參考圖 &lt;Picture 1～9&gt;</p>
+            <p>• <b class="text-zinc-200">必填</b>，1～9 張，依上傳順序編號；可直接貼截圖。</p>
+            <p>• <b class="text-zinc-200">Ref2VA</b>：每張都是外觀參考（角色、服裝、風格），構圖會重新生成。</p>
+            <p>• <b class="text-zinc-200">FL2VA</b>：第 1 張是首幀，影片第 0 秒就是這張圖；第 2 張起才是一般參考。比例不符時依「首幀比例不符時」處理。</p>
+            <p>• 「擷取最後一幀」會拿上一支影片的最後一格當首幀，並自動切到 FL2VA，用來接續多鏡。</p>
+          </div>
+          <div>
+            <p class="font-semibold text-emerald-300">🎙️ 參考聲音 &lt;Audio 1～3&gt;</p>
+            <p>• 選填，最多 3 段，MP3/WAV，建議 2～15 秒的乾淨人聲。用途是複製<b class="text-zinc-200">音色</b>，不是背景音樂。</p>
+            <p>• 多角色時可每人分配一段：分鏡台詞旁的音色選單選「Audio N」，或在主體定義寫明「S1 用 &lt;Audio 1&gt; 的音色說話」。</p>
+            <p>• 沒上傳時用模型預設的聲音和環境音。</p>
+          </div>
+          <div>
+            <p class="font-semibold text-amber-300">🎞️ 參考影片 &lt;Video 1～3&gt;</p>
+            <p>• 選填，最多 3 支，MP4/MOV，每支 2～15 秒，原片聲音會一起帶入。</p>
+            <p>• <b class="text-zinc-200">多支影片加起來總長不能超過 15 秒</b>（官方限制，超過會無法送出）。</p>
+            <p>• 第 1 支會決定輸出秒數（對齊原片，限 4～15 秒）；直式原片會自動改成直式輸出。</p>
+            <p>• 有影片時推論明顯較慢（只有圖片的約 5 倍）。</p>
+            <p>• 官方說明的用途是<b class="text-zinc-200">編輯原片</b>：以 &lt;Video 1&gt; 為底，改台詞或內容，構圖與場景保留。</p>
+            <p>• 第 2、3 支分工（例如一支給動作、一支給運鏡）是社群建議，官方沒有範例，效果未經驗證；要用的話在提示詞裡逐支寫明用途。LLM 擴寫只看得到 &lt;Video 1&gt; 的畫面。</p>
+          </div>
+          <div>
+            <p class="font-semibold text-amber-300">🔁 換人模式</p>
+            <p>• 只能在 <b class="text-zinc-200">Ref2VA</b> 使用，且必須有 &lt;Video 1&gt;。效果是把 &lt;Video 1&gt; 裡的人換成 &lt;Picture 1&gt;，鏡頭、背景、其他人和動作節奏照原片。</p>
+            <p>• 有上傳 &lt;Audio 1&gt; 時連聲音一起換，不保留原片人聲。</p>
+            <p>• 建議 4～5 秒連續鏡頭、一次一人；超過 6 秒容易漂移，超過 10 秒容易超時。分鏡要具體描述原片動作，模型不會自動照抄。</p>
+            <p>• 長片（超過 15 秒）只能用換人模式，且只能上傳這一支：會自動切成每段 8 秒以內，逐段換人再接成一支；此時參考圖最多 8 張。</p>
+          </div>
+        </div>
+      </details>
 
     </div>
 
@@ -522,7 +561,7 @@
             <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
           </button>
         </div>
-        <div id="historyList" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+        <div id="historyList" class="space-y-1.5 max-h-96 overflow-y-auto pr-1">
           <!-- Populated dynamically -->
         </div>
       </div>
@@ -918,9 +957,10 @@ ${concept}
 2. retention_analysis：說明保留特徵（例如臉部輪廓、五官比例、服裝材質、髮型細節）。
 3. summary：整體劇情精要（1~2 句話，富含鏡頭張力）。
 4. shots：分鏡時序（總長約 12 秒，請切分成 2~3 個分鏡，起始秒數建議為 0.0s、5.0s/6.0s 等）：
+   - 使用者有指定秒數的事件（例如「第 4 秒」「第 8 秒」），每個事件各自一個分鏡，start_seconds 就是那個秒數；不可合併、不可提前，事件發生前的分鏡要寫明當時仍平靜；鏡頭固定時，description 寫 the shot cuts to the same fixed framing, where …
    - 運鏡與動作：請使用專業電影語彙（如 Dolly In、Tracking Shot、Close-up、Low Angle 等）。
    - 角色對白：若角色有台詞，請在 description 中使用標準封裝語法：<d>[Chinese] 台詞內容 </d>，並單獨列出 dialogue 純台詞。
-5. overall_soundscape：場內聽得到的聲音，用英文寫具體聲源與質感並對應分鏡動作（例如：rain tapping on a tin roof, footsteps on gravel, a drum struck twice）；不重複台詞；沒有台詞時結尾加 No dialogue, no human voice.
+5. overall_soundscape：場內聽得到的聲音，用英文寫具體聲源與質感並對應分鏡動作（例如：rain tapping on a tin roof, footsteps on gravel, a drum struck twice）；不重複台詞；沒有台詞時不要加 no dialogue 之類的句子（官方沒有這種寫法）
 6. non_diegetic_music：只有觀眾聽得到的配樂，1～3 句英文寫樂器、速度、節奏、力度（例如：light acoustic guitar and glockenspiel, around 100 BPM, bouncy staccato, soft），不要只寫情緒，純音樂不要人聲；不要配樂填 N/A。
 ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 description 中具體描述 <Video 1> 原片人物的動作、姿勢與表情（模型不會自動照抄動作）；retention_analysis 要列出保留 <Video 1> 的鏡頭、背景、服裝與節奏；${hasAudio ? '角色台詞以 <Audio 1> 的音色說出（用 <d>[Chinese] 台詞</d>，時間點對齊原片的說話節奏），overall_soundscape 只寫環境音、不要寫沿用原聲。' : 'overall_soundscape 寫明沿用 <Video 1> 的原聲。'}
 ` : ''}
@@ -1243,6 +1283,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
             audio_count: t2va ? 0 : uploadedAudios.length,
             character_swap: !t2va && swapToggle.checked,
             t2va: t2va,
+            mode: workflowMode,
             duration_seconds: parseFloat(document.getElementById('durRange').value),
             // 讓支援看圖的 LLM 看到參考圖與原片畫面，避免憑空編造影片內容
             image_paths: t2va ? [] : uploadedImages.map(img => img.path),
@@ -1278,6 +1319,11 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       const longSwap = !t2va && !!longVideo;
       if (longSwap && (!characterSwap || uploadedVideos.length !== 1 || uploadedVideos[0] !== longVideo)) {
         alert('超過 15 秒的原片只能用於換人模式，且只能上傳這一支影片（會自動分段處理）。');
+        return;
+      }
+      const videoTotal = uploadedVideos.reduce((s, v) => s + (v.duration || 0), 0);
+      if (!longSwap && uploadedVideos.length > 1 && videoTotal > 15.1) {
+        alert(`參照影片總長 ${videoTotal.toFixed(1)} 秒，超過官方 15 秒上限。請裁短或減少支數。`);
         return;
       }
       if (longSwap && uploadedImages.length > 8) {
@@ -1485,14 +1531,21 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         const res = await fetch('/api/history');
         const data = await res.json();
         const list = document.getElementById('historyList');
-        if (data.videos && data.videos.length > 0) {
-          list.innerHTML = data.videos.map(v => `
-            <div onclick="playVideo('${v.url}', '${v.filename}')" class="p-2 rounded-xl bg-surface-850 hover:bg-surface-800 border border-zinc-800 cursor-pointer flex items-center justify-between text-xs transition">
-              <div class="flex items-center space-x-2 overflow-hidden">
-                <i data-lucide="play-circle" class="w-3.5 h-3.5 text-brand-400 shrink-0"></i>
-                <div class="truncate text-[11px] text-zinc-300">${escapeHtml(v.filename)}</div>
+        historyVideos = data.videos || [];
+        if (historyVideos.length > 0) {
+          list.innerHTML = historyVideos.map((v, i) => `
+            <div class="rounded-xl bg-surface-850 border border-zinc-800 text-xs">
+              <div onclick="playVideo('${v.url}', '${v.filename}')" class="p-2 rounded-xl hover:bg-surface-800 cursor-pointer flex items-center justify-between transition">
+                <div class="flex items-center space-x-2 overflow-hidden">
+                  <i data-lucide="play-circle" class="w-3.5 h-3.5 text-brand-400 shrink-0"></i>
+                  <div class="truncate text-[11px] text-zinc-300">${escapeHtml(v.filename)}</div>
+                </div>
+                <div class="flex items-center space-x-2 shrink-0">
+                  <span class="text-[10px] text-zinc-500 font-mono">${v.size_mb} MB</span>
+                  ${v.metadata ? `<button onclick="event.stopPropagation(); toggleHistoryMeta(${i})" title="提示詞與參數" class="text-zinc-500 hover:text-white"><i data-lucide="info" class="w-3.5 h-3.5"></i></button>` : ''}
+                </div>
               </div>
-              <span class="text-[10px] text-zinc-500 font-mono shrink-0">${v.size_mb} MB</span>
+              <div id="historyMeta${i}" class="hidden px-2 pb-2"></div>
             </div>
           `).join('');
           lucide.createIcons();
@@ -1502,6 +1555,53 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
       } catch (e) {
         console.error(e);
       }
+    }
+
+    let historyVideos = [];
+
+    // 展開某支歷史影片當時的提示詞與生成參數
+    function toggleHistoryMeta(i) {
+      const box = document.getElementById(`historyMeta${i}`);
+      if (!box.classList.contains('hidden')) { box.classList.add('hidden'); return; }
+      const meta = historyVideos[i].metadata || {};
+      const rows = Object.entries(meta)
+        .filter(([k, v]) => k !== 'prompt' && v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0))
+        .map(([k, v]) => `<div class="flex gap-2"><span class="text-zinc-500 shrink-0">${escapeHtml(k)}</span><span class="text-zinc-300 break-all">${escapeHtml(typeof v === 'object' ? JSON.stringify(v) : String(v))}</span></div>`)
+        .join('');
+      box.innerHTML = `
+        ${meta.prompt ? `<pre class="whitespace-pre-wrap break-words bg-surface-950 border border-zinc-800 rounded-lg p-2 text-[10px] text-zinc-200 font-mono max-h-40 overflow-y-auto">${escapeHtml(meta.prompt)}</pre>` : ''}
+        <div class="mt-1.5 space-y-0.5 text-[10px] font-mono">${rows}</div>
+        <button onclick="applyHistorySettings(${i})" class="mt-2 w-full px-2 py-1 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-[11px]">套用此提示詞與設定</button>
+      `;
+      box.classList.remove('hidden');
+    }
+
+    // 把歷史影片的提示詞與設定填回表單（參考素材只存檔名，需重新上傳）
+    function applyHistorySettings(i) {
+      const meta = historyVideos[i].metadata || {};
+      if (meta.mode === 'ref2va' || meta.mode === 'fl2va') setWorkflowMode(meta.mode);
+      const setSelect = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val != null && [...el.options].some(o => o.value === String(val))) el.value = String(val);
+      };
+      setSelect('resolutionSelect', meta.resolution);
+      setSelect('aspectSelect', meta.aspect);
+      setSelect('textEncoderSelect', meta.text_encoder);
+      setSelect('firstFrameFitSelect', meta.first_frame_fit);
+      if (meta.requested_seconds) {
+        const dur = document.getElementById('durRange');
+        dur.value = meta.requested_seconds;
+        dur.dispatchEvent(new Event('input'));
+      }
+      const swap = document.getElementById('characterSwapToggle');
+      if (swap) { swap.checked = !!meta.character_swap; swap.dispatchEvent(new Event('change')); }
+      if (meta.prompt) {
+        setPromptSource('free');
+        showRawPrompt();
+        document.getElementById('rawPromptArea').value = meta.prompt;
+      }
+      const refs = [...(meta.reference_images || []), ...(meta.reference_audios || []), ...(meta.reference_videos || [])];
+      if (refs.length) alert(`已套用提示詞與設定。\n參考素材需自行重新上傳：\n${refs.join('\n')}`);
     }
 
     // HTML5 Background Desktop Notification

@@ -1,0 +1,67 @@
+{
+ "S01": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey02/frames/char_parrot.png"
+ ],
+ "S02": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey01/frames/char_wujing.png",
+  "journey02/frames/char_parrot.png"
+ ],
+ "S03": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey01/frames/char_wujing.png"
+ ],
+ "S04": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey02/frames/char_parrot.png"
+ ],
+ "S06": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_wujing.png"
+ ],
+ "S07": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey04/frames/char_ama.png"
+ ],
+ "S09": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey01/frames/char_wujing.png"
+ ],
+ "S10": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey01/frames/char_wujing.png",
+  "journey02/frames/char_parrot.png"
+ ],
+ "S11": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey01/frames/char_wujing.png"
+ ],
+ "S13": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey01/frames/char_wujing.png",
+  "journey02/frames/char_parrot.png"
+ ],
+ "S16": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey01/frames/char_wujing.png",
+  "journey02/frames/char_parrot.png",
+  "journey04/frames/char_ama.png"
+ ],
+ "S18": [
+  "journey01/frames/char_wukong.png",
+  "journey01/frames/char_bajie.png",
+  "journey01/frames/char_wujing.png",
+  "journey02/frames/char_parrot.png"
+ ]
+}

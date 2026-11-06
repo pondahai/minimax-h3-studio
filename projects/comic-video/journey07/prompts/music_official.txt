@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Bright Japanese shonen anime style. A static wide shot of a modern city skyline with a tall green-glass skyscraper under a clear blue afternoon sky, seen from a quiet observation deck railing. No people or animals appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A calm afternoon with a light breeze and a faint distant city hum.
+
+non_diegetic_music: A cheerful, curious and playful instrumental piece for a children's technology adventure, led by a bright marimba and soft synth-bell melody over light pizzicato strings and warm piano chords, with gentle electronic blips and a soft, steady, bouncy rhythm, at a moderate tempo and soft, even dynamics.

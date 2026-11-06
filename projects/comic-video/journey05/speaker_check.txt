@@ -1,0 +1,60 @@
+8006 沒在跑，docker start qwen3.8-nvfp4（冷啟動數分鐘）
+OK  S01_00_悟空.wav 0.3–4.5s 應為 Wukong，LLM 看到 Wukong
+OK  S01_05_悟淨.wav 5.1–9.0s 應為 Wujing，LLM 看到 Wujing
+OK  S01_09_八戒.wav 9.4–12.0s 應為 Bajie，LLM 看到 Bajie
+OK  S02_00_悟空.wav 0.3–2.8s 應為 Wukong，LLM 看到 Wukong
+OK  S02_03_八戒.wav 3.5–6.1s 應為 Bajie，LLM 看到 Bajie
+OK  S02_08_悟淨.wav 6.7–11.8s 應為 Wujing，LLM 看到 Wujing
+OK  S03_00_八戒.wav 0.4–3.5s 應為 Bajie，LLM 看到 Bajie
+OK  S03_04_悟淨.wav 4.1–8.4s 應為 Wujing，LLM 看到 Wujing
+??  S04_00_老闆.wav 0.4–4.5s 應為 the shop owner，LLM 看到 unclear
+     {"shop owner": "Open in all four frames, smiling broadly.", "Wukong": "Closed in all four frames.", "Bajie": "Open in all four frames, smiling.", "the parrot": "Beak open in all four frames."}
+OK  S04_05_悟空.wav 5.5–6.5s 應為 Wukong，LLM 看到 Wukong
+OK  S04_07_八戒.wav 7.3–12.2s 應為 Bajie，LLM 看到 Bajie
+OK  S05_00_阿姨.wav 0.5–7.4s 應為 the auntie，LLM 看到 the auntie
+??  S06_00_八戒.wav 0.6–4.7s 應為 Bajie，LLM 看到 Wukong
+     {"Wukong": "open, open, closed, closed", "Bajie": "closed, closed, closed, closed", "Wujing": "closed, closed, closed, closed"}
+OK  S06_06_悟淨.wav 7.2–8.9s 應為 Wujing，LLM 看到 Wujing
+OK  S07_00_八戒.wav 0.4–4.6s 應為 Bajie，LLM 看到 Bajie
+OK  S07_05_悟淨.wav 5.7–9.2s 應為 Wujing，LLM 看到 Wujing
+OK  S08_00_悟空.wav 0.5–5.0s 應為 Wukong，LLM 看到 Wukong
+OK  S09_00_悟空.wav 0.3–5.0s 應為 Wukong，LLM 看到 Wukong
+OK  S09_06_八戒.wav 5.9–11.8s 應為 Bajie，LLM 看到 Bajie
+OK  S10_00_悟淨.wav 0.5–3.9s 應為 Wujing，LLM 看到 Wujing
+OK  S11_00_悟淨.wav 0.5–10.4s 應為 Wujing，LLM 看到 Wujing
+OK  S12_00_悟空.wav 0.5–5.3s 應為 Wukong，LLM 看到 Wukong
+OK  S12_06_八戒.wav 6.0–11.7s 應為 Bajie，LLM 看到 Bajie
+OK  S13_00_爸爸.wav 0.5–5.9s 應為 the dad，LLM 看到 the dad
+OK  S13_07_悟空.wav 8.2–11.8s 應為 Wukong，LLM 看到 Wukong
+OK  S14_00_媽媽.wav 0.4–2.1s 應為 the mom，LLM 看到 the mom
+OK  S15_00_悟空.wav 0.5–3.2s 應為 Wukong，LLM 看到 Wukong
+??  S15_04_八戒.wav 3.8–9.2s 應為 Bajie，LLM 看到 unclear
+     {"Wukong": "mouth is closed in all four frames.", "Bajie": "mouth is closed in all four frames.", "Wujing": "mouth is closed in all four frames.", "the parrot": "mouth is closed in all four frames."}
+??  S16_00_悟淨.wav 0.7–5.3s 應為 Wujing，LLM 看到 the parrot
+     {"Wujing": "Closed in all four frames", "the parrot": "Beak open in frames 2 and 3, closed in frames 1 and 4"}
+??  S17_00_鸚鵡.wav 0.0–4.0s 應為 the parrot，LLM 看到 Wukong
+     {"Wukong": "Open in frames 1 and 3, closed in frames 2 and 4.", "Bajie": "Closed smile in all four frames.", "Wujing": "Closed smile in all four frames.", "the parrot": "Beak open in frames 1 and 3, closed in frames 2 and 4."}
+??  S17_04_鸚鵡.wav 5.3–11.8s 應為 the parrot，LLM 看到 Wukong
+     {"Wukong": "mouth open in some frames, closed in others", "Bajie": "mouth closed, smiling", "Wujing": "mouth closed, neutral expression", "the parrot": "mouth open in some frames, closed in others"}
+??  S18_00_鸚鵡.wav 0.0–6.0s 應為 the parrot，LLM 看到 Wukong（H3 沒生成人聲，用分鏡時段）
+     {"Wukong": "mouth is closed, then opens wide in later frames.", "Bajie": "mouth remains closed and smiling in all frames.", "Wujing": "mouth stays closed and neutral in all frames.", "the parrot": "mouth is closed in all frames."}
+??  S18_06_悟空.wav 6.0–9.0s 應為 Wukong，LLM 看到 Wukong（H3 沒生成人聲，用分鏡時段）
+     {"Wukong": "Open in all four frames, shape varies slightly.", "Bajie": "Closed smile in top frames; opens in bottom frames.", "Wujing": "Mouth remains closed and still in all frames.", "the parrot": "Beak is closed and fixed in all frames."}
+OK  S18_09_八戒.wav 10.2–11.9s 應為 Bajie，LLM 看到 Bajie
+??  S19_00_悟淨.wav 0.4–2.5s 應為 Wujing，LLM 看到 unclear
+     {}
+OK  S19_03_鸚鵡.wav 3.5–9.1s 應為 the parrot，LLM 看到 the parrot
+??  S19_08_鸚鵡.wav 8.0–12.0s 應為 the parrot，LLM 看到 the parrot（H3 沒生成人聲，用分鏡時段）
+     {"the parrot": "mouth is open in all four frames"}
+
+要人聽：10 句
+  S04_00_老闆.wav
+  S06_00_八戒.wav
+  S15_04_八戒.wav
+  S16_00_悟淨.wav
+  S17_00_鸚鵡.wav
+  S17_04_鸚鵡.wav
+  S18_00_鸚鵡.wav
+  S18_06_悟空.wav
+  S19_00_悟淨.wav
+  S19_08_鸚鵡.wav

@@ -16,7 +16,7 @@ import comic
 SR, HOP = 16000, 160
 PAD = 0.3  # H3 那句前後多取一點，避免開口量測切掉字頭字尾
 ANCHOR = 0.25
-RATIO = (0.6, 1.8)  # 每段 TTS 時長／影片時長的上下限，超過就壓回來，避免怪聲
+RATIO = (0.7, 1.4)  # 每段 TTS 時長／影片時長的上下限，超過就壓回來，避免怪聲
 
 
 def feats(y):
@@ -57,7 +57,10 @@ if __name__ == "__main__":
     result = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     vocals = {}
     for ln in lines:
-        if (only and ln["sid"] not in only) or ln["file"] not in lips:
+        if only and ln["sid"] not in only:
+            continue
+        if ln["file"] not in lips:  # lipsync_measure 判定不對齊的句子，清掉舊錨點
+            result.pop(ln["file"], None)
             continue
         sid = ln["sid"]
         if sid not in vocals:

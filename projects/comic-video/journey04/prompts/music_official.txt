@@ -1,0 +1,6 @@
+
+integrated_multimodal_description: [Shot 1] Bright Japanese shonen anime style. A static wide shot of an empty old mountain-town street at dusk, with rows of red paper lanterns glowing softly along stone steps and the sea faintly visible in the distance. No people or animals appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A quiet hillside evening with a gentle breeze and the faint rustle of lanterns.
+
+non_diegetic_music: A warm, curious and lightly adventurous instrumental piece for a children's travel adventure, led by a gentle erhu and bamboo flute melody over soft acoustic guitar and warm piano chords, with light hand percussion keeping an easy wandering beat, at a relaxed tempo and soft, even dynamics.

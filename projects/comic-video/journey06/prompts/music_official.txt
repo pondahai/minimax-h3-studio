@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Bright Japanese shonen anime style. A static wide shot of green countryside fields and distant blue mountains under a clear afternoon sky, with an elevated railway track running straight across the scene. No people, animals or trains appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A calm afternoon with a light breeze over the fields.
+
+non_diegetic_music: A cheerful, bright and curious instrumental piece for a children's science adventure on a high-speed train, led by a bouncy glockenspiel and flute melody over light pizzicato strings and warm piano chords, with soft shaker and a steady, gently driving rhythm like wheels on a track, at a moderate-brisk tempo and soft, even dynamics.

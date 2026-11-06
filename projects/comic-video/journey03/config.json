@@ -1,0 +1,269 @@
+{
+  "title": "現代西遊大冒險 第三集：悟空夜闖故宮",
+  "source": "https://shezi.org.tw/modern-journey/#weekly-journey-ep03（header＋panel-01～12）",
+  "style": "明亮日系校園少年漫畫動畫風、色彩飽和；博物館夜景段落為溫暖金色燈光",
+  "no_text_rule": "不要在畫面中出現任何文字、標籤、招牌字、黑板字、狀聲詞或圖示",
+  "ref_text": "大家好，今天天氣真好，我們一起去森林裡看看吧！",
+  "ref_transcript": {
+    "悟空": "我是孫悟空，今天下課想去體育館看看，你們要不要一起來？",
+    "八戒": "什麼？有食堂嗎？我……過不去！",
+    "悟淨": "你們兩個的判斷標準，是不是有問題？",
+    "鸚鵡": "打開來看看吧！下一站，尋找第二枚求知印！",
+    "學者": "完成三個問題，才能獲得求知印！你們不只是看見，而是看懂了。",
+    "青銅鼎": "歡迎來到故宮！我是青銅鼎，我見證了古代的智慧。",
+    "翠玉白菜": "我是翠玉白菜，代表工藝的精細。",
+    "青花瓷瓶": "每一件文物都有一段故事，你們願意聽嗎？"
+  },
+  "t2s": true,
+  "pronounce": {
+    "箍": "姑"
+  },
+  "lang": "zh",
+  "panel_dir": "C:/Users/USER/AppData/Local/Temp/claude/C--Users-USER--claude-spares-spare-fUWmVw/dcc7b9ee-6228-4723-9da2-5706dc780e09/scratchpad/journey03_panels",
+  "style_en": "bright Japanese school shonen anime, saturated colors; night museum scenes lit by warm golden light",
+  "characters": "悟空＝棕色刺蝟爆炸頭、金色緊箍頭圈、黑底紅邊外套、紅色內搭、黑色背包；八戒＝圓胖男孩、黑色豬鼻圖案鴨舌帽、深藍運動外套、常拿著麵包；悟淨＝黑短髮、黑框眼鏡、淺藍襯衫、灰色背包、表情冷靜；鸚鵡＝紅頭、黃胸、綠藍翅膀的金剛鸚鵡卡通吉祥物，常停在悟空肩上或身邊；學者＝半透明發光的古代學者幻影，長白鬍子、深藍色官帽與官服、手捧書卷的慈祥年長男性；青銅鼎＝有大眼睛和笑臉的卡通青銅鼎，方形鼎身、四隻粗短獸腳、兩個方形耳把、兩側有捲曲的手臂；翠玉白菜＝淡玉綠色半透明的古裝仕女，手捧一棵翠玉白菜；青花瓷瓶＝白底藍花的卡通瓷瓶，有大眼睛和微笑",
+  "characters_en": "Wukong (悟空) = a mischievous boy with spiky brown hair, a golden circlet headband, a black jacket with red trim over a red shirt, and a black backpack; Bajie (八戒) = a chubby boy in a black cap with a pig-snout emblem and a navy track jacket, often holding a bun; Wujing (悟淨) = a calm boy with short black hair, black-rimmed glasses, a light-blue shirt and a grey backpack; the parrot (鸚鵡) = a cartoon macaw mascot with a red head, yellow chest and green-blue wings, usually perched near Wukong; the Scholar (學者) = a translucent glowing ghost of a kindly elderly male ancient scholar with a long white beard, a dark-blue official's hat and robe, holding a book; the Cauldron (青銅鼎) = a cartoon bronze ding cauldron with big eyes and a smiling face, a square body, four stubby legs, two square handles and curly arms; the Jade Lady (翠玉白菜) = a translucent pale jade-green lady in ancient dress holding a jadeite cabbage; the Vase (青花瓷瓶) = a cartoon blue-and-white porcelain vase with big eyes and a smile.",
+  "names_en": {
+    "悟空": "Wukong",
+    "八戒": "Bajie",
+    "悟淨": "Wujing",
+    "鸚鵡": "the parrot",
+    "學者": "the Scholar",
+    "青銅鼎": "the Cauldron",
+    "翠玉白菜": "the Jade Lady",
+    "青花瓷瓶": "the Vase"
+  },
+  "children": [
+    "悟空",
+    "八戒",
+    "悟淨"
+  ],
+  "speakers": [
+    "悟空",
+    "八戒",
+    "悟淨",
+    "鸚鵡",
+    "學者",
+    "青銅鼎",
+    "翠玉白菜",
+    "青花瓷瓶"
+  ],
+  "voices": {
+    "悟空": "十歲調皮男孩，台灣華語口音，聲音明亮有精神、語速偏快",
+    "八戒": "愛吃貪玩的胖小子，台灣國語腔調，聲音偏低、帶點撒嬌",
+    "悟淨": "沉著可靠的少年聲，台灣華語口音，咬字清楚、語速平穩",
+    "鸚鵡": "活潑尖細的卡通鸚鵡聲，台灣華語口音，高音調、語速快、有點聒噪",
+    "學者": "六十多歲的男性古代學者，男聲，台灣華語口音，聲音溫和低沉、語速慢、充滿智慧",
+    "青銅鼎": "厚重渾厚的卡通男性角色，低沉男聲，台灣華語口音，語速慢、威嚴但友善",
+    "翠玉白菜": "溫柔優雅的年輕女性，女聲，台灣華語口音，聲音輕柔清亮、語速慢",
+    "青花瓷瓶": "溫和神秘的說故事阿姨，女聲，台灣華語口音，語速慢、輕聲細語"
+  },
+  "no_text_rule_en": "No text of any kind may appear in the picture: no letters, signs, blackboard writing, labels, numbers, sound-effect lettering or icons.",
+  "prompt_format": "official",
+  "looks_en": {
+    "Wukong": "the boy with spiky brown hair and a golden headband wearing a black jacket over a yellow shirt with red cuffs and red sneakers",
+    "Bajie": "the chubby boy with brown hair wearing a dark blue cap with pig ears, a navy blue zip-up jacket with white stripes, matching navy pants, and white sneakers with navy accents",
+    "Wujing": "the slender boy with messy black hair, black-rimmed glasses, a light blue t-shirt, dark navy pants, white sneakers, and a dark grey backpack",
+    "the parrot": "the small cartoon parrot with a blue crest, red and yellow face, green wings, and a blue belly with yellow and red tail feathers",
+    "the Scholar": "the translucent glowing ghost of a kindly old male scholar with long silver hair, a grey goatee, a tall dark-blue hat and a wide-sleeved dark-blue robe, holding an old book",
+    "the Cauldron": "the living cartoon square bronze ding cauldron, dark gold-green, with big round eyes and a smiling mouth on its front, four stubby legs, two square handles and curly bronze arms",
+    "the Jade Lady": "the living pale jade-green lady in ancient dress with a round hair bun, like a jade carving come to life, holding a small jadeite cabbage",
+    "the Vase": "the living cartoon blue-and-white porcelain vase with a round body, big eyes, a little blue nose, a smile and small white-gloved hands"
+  },
+  "tagline": "下一站：悟空迷路九份，尋找第三枚「探索印」",
+  "panel_cast": {
+    "1": [
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "2": [
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "3": [
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "4": [
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "5": [
+      "悟空",
+      "八戒",
+      "悟淨"
+    ],
+    "6": [
+      "青銅鼎",
+      "翠玉白菜",
+      "青花瓷瓶"
+    ],
+    "7": [
+      "青銅鼎",
+      "翠玉白菜",
+      "悟空",
+      "八戒",
+      "悟淨"
+    ],
+    "8": [
+      "學者",
+      "悟空",
+      "八戒",
+      "悟淨"
+    ],
+    "9": [
+      "悟空",
+      "八戒",
+      "鸚鵡"
+    ],
+    "10": [
+      "學者",
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "11": [
+      "學者",
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ],
+    "12": [
+      "悟空",
+      "八戒",
+      "悟淨",
+      "鸚鵡"
+    ]
+  },
+  "panel_notes": {
+    "1": "寫 1 段。白天，三人和鸚鵡圍著攤開的舊羊皮紙地圖（只畫台灣輪廓、山和小建築圖案，第一個圈裡有紅色蓮花印，第二個圈空著；不准有任何字或數字），悟淨拿著手機。台詞：悟空「佛光山的靜心印，拿到了！」悟淨「第二站：故宮，尋找求知印！」鸚鵡「出發出發！」",
+    "2": "寫 1 段。白天，故宮正館：綠瓦黃牆的宮殿式建築、寬大石階，遊客往裡走；三人背影仰望，鸚鵡在悟淨旁。正門匾額與牌子一律空白、不准有字。台詞：悟空「哇！這就是故宮！」八戒「好壯觀！」悟淨「這裡有好多古代的寶物！」鸚鵡「我們能找到第二枚印章嗎？」",
+    "3": "寫 1 段。展廳內，玻璃展櫃裡的翠玉白菜（白綠漸層的玉雕白菜，上有小蟲）放在木座上發光；三人和鸚鵡靠近看；展櫃旁一張舊紙條，紙上不准有字。台詞：悟空「哇！這就是翠玉白菜！」八戒「看起來好真實，好精緻！」悟淨「你們看，旁邊有一張小紙條！」",
+    "4": "寫 1 段。延續第 3 格展廳，三人和鸚鵡圍著拿起的舊紙條，紙上只畫三個小圖：白菜、鼎、一塊像肉的石頭，不准有字。紙條上的話改由悟淨唸。台詞：悟淨「真正的寶物，不只是看見，而是看懂。」悟空「這是什麼意思？」八戒「難道是第二枚印章的線索？」鸚鵡「上面還畫了三個寶物！」",
+    "5": "寫 1 段。夜晚，故宮閉館後的長廊，展廳燈光還亮著、遠處有金光閃動；三人背影躡手躡腳往前，彎著腰。台詞：悟空「閉館了！但是博物館的燈怎麼還亮著？」八戒「好像有什麼在動……」悟淨「我們小心一點，跟著看看！」悟空「也許線索就在那裡！」",
+    "6": "寫 1 段。金光閃閃的夜晚展廳，文物活起來：卡通方形青銅鼎（大眼笑臉、四隻腳）走出展櫃揮手，玉綠色半透明仕女手捧翠玉白菜，卡通青花瓷瓶眨眼微笑。三人不在畫面。台詞：青銅鼎「歡迎來到故宮！我是青銅鼎，我見證了古代的智慧。」翠玉白菜「我是翠玉白菜，代表工藝的精細。」青花瓷瓶「每一件文物都有一段故事，你們願意聽嗎？」",
+    "7": "寫 2 段，不續接。第一段：青銅鼎和捧著白菜的玉綠仕女對著三人說故事，三人坐在地上聽。台詞：青銅鼎「古代的人用鼎來煮食物，也代表秩序與信任。」翠玉白菜「我看起來像菜，其實是用一整塊玉雕刻的，展現了匠人的細心。」第二段：三人的近景反應。台詞：悟淨「原來如此！看起來簡單，背後有這麼多知識！」八戒「我以前以為只是漂亮的石頭！」悟空「我們總算開始懂它們的價值了！」",
+    "8": "寫 2 段，不續接。第一段：夜晚展廳上空浮現半透明發光的古代學者幻影（長白鬍子、深藍官帽官服、捧書卷），三人仰頭看。原圖題目卡改由學者唸，畫面不准有題目卡或任何字。台詞：學者「完成三個問題，才能獲得求知印！」學者「第一，翠玉白菜的材質是什麼？」學者「第二，古代人為什麼要製作鼎？」第二段：學者「第三，從文物可以學到哪些生活智慧？」悟空「我們一起想想！」八戒「我來查資料！」悟淨「我用筆記整理。」",
+    "9": "寫 2 段，不續接。悟空拿著平板電腦，螢幕上只有一個藍色小機器人圖案、沒有任何字；八戒、鸚鵡在旁。第一段：悟空「我們可以用 AI 幫忙查資料，但不能直接複製答案，要自己思考和整理！」第二段：八戒「我們再確認資料的來源，確保正確！」鸚鵡「原來 AI 是學習夥伴，不是答案機！」",
+    "10": "寫 2 段，不續接。三人和鸚鵡站在學者幻影前輪流回答，原圖答案框改由三人講出、畫面不准有字。第一段：悟空「第一題！翠玉白菜是用一整塊玉石雕刻的！」八戒「第二題！鼎用來煮食物，也代表權力、秩序和誠信。」第二段：悟淨「第三題！我們學到細心、創意、文化傳承，還有珍惜前人的智慧。」學者「答得很好！你們不只是看見，而是看懂了。」",
+    "11": "寫 2 段，不續接。第一段：學者幻影手中升起一枚金光閃閃的圓形印章（印面是一本打開的書的圖案，不准有字），三人背影仰望。台詞：學者「這枚印章，就是求知印。」學者「願你們保持好奇，不斷學習，看見世界更多的故事。」第二段：悟空高舉印章歡呼，八戒、鸚鵡湊過來。台詞：悟空「太好了！我們拿到第二枚印章了！」八戒「下一站是哪裡呢？」鸚鵡「地圖上還有十個地方！」",
+    "12": "寫 1 段。攤開的台灣冒險大地圖（羊皮紙、台灣輪廓、各地小建築圖案），前兩個圈分別有紅色蓮花印和紅色書本印，其餘十個圈空白，右下角一個問號形狀的神秘剪影；三人背影看地圖。地圖上不准有任何字或數字。台詞：悟淨「還剩十枚印章，還有神秘的第十三站……」悟空「下一站：九份！」鸚鵡「尋找第三枚，探索印！」"
+  },
+  "shots": [
+    [
+      "S01",
+      12,
+      "frames/S01.png"
+    ],
+    [
+      "S02",
+      12,
+      "frames/S02.png"
+    ],
+    [
+      "S03",
+      12,
+      "frames/S03.png"
+    ],
+    [
+      "S04",
+      12,
+      "frames/S04.png"
+    ],
+    [
+      "S05",
+      12,
+      "frames/S05.png"
+    ],
+    [
+      "S06",
+      12,
+      "frames/S06.png"
+    ],
+    [
+      "S07",
+      12,
+      "frames/S07.png"
+    ],
+    [
+      "S08",
+      12,
+      "frames/S08.png"
+    ],
+    [
+      "S09",
+      12,
+      "frames/S09.png"
+    ],
+    [
+      "S10",
+      12,
+      "frames/S10.png"
+    ],
+    [
+      "S11",
+      12,
+      "frames/S11.png"
+    ],
+    [
+      "S12",
+      12,
+      "frames/S12.png"
+    ],
+    [
+      "S13",
+      12,
+      "frames/S13.png"
+    ],
+    [
+      "S14",
+      12,
+      "frames/S14.png"
+    ],
+    [
+      "S15",
+      12,
+      "frames/S15.png"
+    ],
+    [
+      "S16",
+      12,
+      "frames/S16.png"
+    ],
+    [
+      "S17",
+      12,
+      "frames/S17.png"
+    ]
+  ],
+  "last_frames": [],
+  "panels": {
+    "S01": "frame-S01",
+    "S02": "frame-S02",
+    "S03": "frame-S03",
+    "S04": "frame-S04",
+    "S05": "frame-S05",
+    "S06": "frame-S06",
+    "S07": "frame-S07",
+    "S08": "frame-S08",
+    "S09": "frame-S09",
+    "S10": "frame-S10",
+    "S11": "frame-S11",
+    "S12": "frame-S12",
+    "S13": "frame-S13",
+    "S14": "frame-S14",
+    "S15": "frame-S15",
+    "S16": "frame-S16",
+    "S17": "frame-S17"
+  }
+}

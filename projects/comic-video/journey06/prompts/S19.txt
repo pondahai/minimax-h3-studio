@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Bright Japanese school shonen anime style, saturated colors. A large, detailed adventure map of Taiwan fills the frame, with no characters present. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, A full-screen, static shot of the adventure map, with five colorful circular seals (lotus, book, compass, heart, high-speed rail) lighting up one by one, while the remaining circles stay blank. At 00:01.000, The camera slowly zooms in on the mountain and lake corner of the map, with a small boat on the shimmering lake. An off-screen cheerful high-pitched cartoon voice says, <d>[Chinese] 下一集：日月潭妖怪大追蹤！尋找第六枚『求證印』！</d> At 00:10.000, The boat on the lake gently rocks, and thin mist drifts across the water.
+
+overall_soundscape: Gentle breeze, birds chirping, soft water lapping, and the rustle of mist.
+
+non_diegetic_music: N/A

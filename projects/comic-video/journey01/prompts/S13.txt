@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese school shonen anime scene with saturated colors and sunny lighting. Three boys stand in the center of a school gate courtyard: Wukong in the middle holding a paper, Wujing on the left, and Bajie on the right. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Wukong excitedly pulls a white paper from his black backpack, revealing a drawing of a golden treasure chest; Wujing and Bajie lean in closely to inspect the drawing. Wukong (S1) says slowly, <d>[Chinese] 計畫二：尋找真正的寶物！</d> At 00:04.000, Bajie's eyes sparkle with excitement as he looks at the chest drawing, his mouth opening wide in a joyous expression. Bajie (S2) says slowly, <d>[Chinese] 寶物？！</d> At 00:06.000, Wujing crosses his arms firmly over his chest and takes a step back, shaking his head with a skeptical expression. Wujing (S3) says slowly, <d>[Chinese] 不可以！</d> At 00:08.000, Wukong rolls the paper into a cylinder, grinning mischievously as the camera slowly zooms out to show their long shadows stretching across the pavement. Wukong (S1) says slowly, <d>[Chinese] 嘿嘿嘿……</d>
+
+overall_soundscape: The rustle of the paper unfolding and rolling, the soft crunch of a bun being eaten, and the distant chirping of crickets in the afternoon breeze.
+
+non_diegetic_music: N/A

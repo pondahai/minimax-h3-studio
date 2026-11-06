@@ -64,9 +64,38 @@ def run(wf, dest):
         dest.write_bytes(r.read())
 
 
+def stop_tts():
+    """TTS（:8792）和 ComfyUI 搶記憶體：開著時第七集立繪一張 436 秒，關掉後 169 秒。生首幀前一律先關（tts.py 用到時會自己重開）。
+    比對字串寫成 [c]hinese_tts，避免 pkill 比對到自己所在的 ssh 指令。"""
+    import subprocess
+    r = subprocess.run(["ssh", "-n", "-o", "ConnectTimeout=10", "funsteam@100.89.149.50",
+                        "pkill -f '[c]hinese_tts_server.py' && echo stopped || true"],
+                       capture_output=True, text=True, timeout=30)
+    if "stopped" in r.stdout:
+        print("已關閉 TTS（:8792），釋放記憶體給 ComfyUI", flush=True)
+
+
+def ensure_comfy():
+    """8188 由 Spark 的 comfy-ondemand.service 按需啟動（閒置 15 分鐘自動停）；沒開就 ssh 上去 POST 127.0.0.1:8190/ensure。"""
+    try:
+        urllib.request.urlopen(f"{COMFY}/system_stats", timeout=5).close()
+        return
+    except OSError:
+        pass
+    print("ComfyUI（:8188）沒開，叫醒中…", flush=True)
+    import subprocess
+    r = subprocess.run(["ssh", "-o", "ConnectTimeout=10", "funsteam@100.89.149.50",
+                        "curl -s -m 280 -X POST http://127.0.0.1:8190/ensure"], capture_output=True, text=True, timeout=300)
+    if '"ok": true' not in r.stdout:
+        raise SystemExit(f"ComfyUI 叫不醒：{r.stdout or r.stderr}")
+    print("ComfyUI 已就緒", flush=True)
+
+
 if __name__ == "__main__":
     import urllib.parse
     cfg, d, args = comic.load()
+    stop_tts()
+    ensure_comfy()
     name, n, refs = args[0], int(args[1]), args[2:]
     prompt = (d / "frame_prompts" / f"{name}.txt").read_text(encoding="utf-8").strip()
     names = [upload(p) for p in refs]

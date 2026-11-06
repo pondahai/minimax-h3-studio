@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Bright Japanese school shonen anime style. A static wide shot of an empty sunny elementary school courtyard with beige two-story buildings, green trees and a blue sky. Leaves sway gently in a light breeze and small white clouds drift slowly across the sky. No people or animals appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A soft breeze rustles the leaves, with faint distant birdsong.
+
+non_diegetic_music: A cheeky, upbeat comedic instrumental piece led by pizzicato strings and a playful clarinet over bouncy piano chords, with light snare brushes and woodblock keeping a quick mischievous beat, at a lively tempo and soft, even dynamics.

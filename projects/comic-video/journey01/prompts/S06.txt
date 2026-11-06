@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright Japanese school shonen anime scene with saturated golden and blue colors under sunny lighting, featuring Wukong standing on the left, Bajaj sitting on the right, and Wujing crouching beside him. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Wukong's fingers brush a golden basketball that flares with intense light and explodes into golden shards spraying outward, while the camera zooms out from a close-up of the impact. Wukong (S1) says slowly, <d>[Chinese] 哇——！</d> At 00:04.000, A long golden staff materializes from the floating debris and Wukong catches it with both hands, hoisting it high above his head in a triumphant pose as the camera tilts up. Wukong (S1) says slowly, <d>[Chinese] 金箍棒！</d> At 00:08.000, Bajie leans back in shock with his eyes wide, dropping a bun that bounces off the ground as he frantically tries to catch it again. Bajie (S2) says slowly, <d>[Chinese] 這是什麼？</d> At 00:10.000, Wujing adjusts his glasses and leans forward to inspect the golden staff with a serious expression. Wujing (S3) says slowly, <d>[Chinese] 看起來像……</d>
+
+overall_soundscape: A loud metallic crash and the sound of bursting energy, followed by the soft thud of a bun hitting the floor and the subtle squeak of rubber glasses.
+
+non_diegetic_music: N/A
