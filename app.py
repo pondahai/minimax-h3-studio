@@ -280,14 +280,81 @@ def ai_copilot(req: AICoPilotRequest):
 
 
 # LLM 提示詞擴寫：OpenAI 相容的 /v1/chat/completions（llama.cpp、Ollama、LM Studio、雲端皆可）
-LLM_BASE_URL = os.environ.get("H3_LLM_BASE_URL", "http://localhost:8080/v1").rstrip("/")
+LLM_BASE_URL = os.environ.get("H3_LLM_BASE_URL", "http://100.89.149.50:8006/v1")  # Spark vLLM qwen3.8，擴寫效果比 8002 好.rstrip("/")
 LLM_MODEL = os.environ.get("H3_LLM_MODEL", "")  # 空白 = 用伺服器第一個模型
 LLM_API_KEY = os.environ.get("H3_LLM_API_KEY", "")
 LLM_TIMEOUT = float(os.environ.get("H3_LLM_TIMEOUT", "180"))
 LLM_THINKING = os.environ.get("H3_LLM_THINKING", "1") == "1"  # Qwen3 等推理模型先推理再作答
 
-EXPAND_SYSTEM_PROMPT = """You write prompts for MiniMax H3, a video model that generates video with synchronized audio from text and optional reference assets.
-Output ONLY the final prompt in English: one paragraph (plus the sound lines when asked), no title, no markdown, no explanation.
+# 擴寫一律照 MiniMax 官方指南（docs/VIDEO_PROMPT_WRITING_GUIDE_base_en.md 與 _ref_en.md，2026-11-06 查證）：
+# T2VA／首幀用三欄位，Ref2VA 用六段；時間點只能用 [Shot N] At MM:SS.mmm 表達（散文寫「第 4 秒」H3 會把事件擠到開頭）
+EXPAND_COMMON_RULES = """General rules:
+- Write the user's idea faithfully; add concrete visual detail, never change its intent. Keep actions physically plausible and paced to fit the requested duration.
+- Camera motion is natural prose (e.g. The camera pushes in with small amplitude at slow speed toward ...), not stacked labels. On-screen text goes in double quotes.
+- Spoken lines go only inside <d>[Chinese] ...</d> (or <d>[English] ...</d>), right after who speaks, e.g. The woman (S1) says, <d>[Chinese] 你好。</d> Give each speaking character a stable speaker ID (S1), (S2); characters who never speak get no ID. The tag is exactly [Chinese], never [Traditional Chinese], but the line itself is Traditional Chinese as used in Taiwan; keep the user's wording. Voiceover: "says in an off-screen voiceover", then state that the on-screen lips remain closed. Never write dialogue in the sound sections.
+- If the user gives no spoken lines, write no <d> tags and no speaker IDs (do not add sentences like "no dialogue").
+
+Shot and timing rules:
+- [Shot 1] opens the clip and has no timestamp. Every later shot is written as [Shot N] At MM:SS.mmm, the shot cuts to ... (8 seconds = 00:08.000), with strictly increasing times inside the requested duration.
+- Every event the user times (e.g. "at 4 seconds", "第8秒") gets its own shot starting exactly at that time. Never merge two timed events, never move an event earlier, and in the earlier shot say what is still calm or unchanged.
+- An event that happens again (a second blast) is written again in full in its own shot, as its own stronger or different event.
+- If the user wants a fixed camera, each timed shot cuts to the same framing (e.g. the shot cuts to the same fixed wide view of the living room, where ...) and describes the new state.
+- Without timed events, use a new shot only when it brings new information (subject, space, state, viewpoint or time); otherwise use camera motion inside one shot.
+
+Sound rules:
+- overall_soundscape: 1-4 English sentences in one paragraph of the sounds people in the scene hear, concrete sources and textures, in playback order and tied to the shot events (e.g. When the second blast hits, ...). Write N/A only if the user asks for complete silence.
+- non_diegetic_music: 1-3 English sentences of music only the audience hears: instruments, tempo, rhythm, dynamics; no abstract mood words; instrumental only. Write N/A if there is no music or the user asks for none."""
+
+EXPAND_BASE_FORMAT = """Output ONLY the final prompt in English, exactly in this structure (no markdown, no explanation):
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic, a medium-wide shot frames ... (style in plain words, then scene, subjects with concrete look, camera and action) [Shot 2] At 00:05.000, the shot cuts to ...
+
+overall_soundscape: ...
+
+non_diegetic_music: ...
+
+Never output angle-bracket placeholders like <style>; the only angle-bracket tags allowed are real asset tags and <d>."""
+
+EXPAND_T2VA_SYSTEM_PROMPT = """You write prompts for MiniMax H3, a video model that generates video with synchronized audio. This is text-only mode (T2VA): there are no reference assets, so never use <Picture>, <Video> or <Audio> tags. Introduce every subject and the setting with concrete visual detail (age, look, clothing, materials) and keep them consistent.
+
+""" + EXPAND_BASE_FORMAT + "\n\n" + EXPAND_COMMON_RULES
+
+# 首幀錨定句由程式加（官方原句），不讓 LLM 抄寫
+FIRST_FRAME_ANCHOR = "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced."
+
+EXPAND_FIRST_FRAME_SYSTEM_PROMPT = """You write prompts for MiniMax H3, a video model that generates video with synchronized audio. This is first-frame mode: <Picture 1> is the exact first frame of [Shot 1]. Start [Shot 1] from what <Picture 1> shows (the subject shown in <Picture 1> ..., preserving appearance, clothing, position and setting), then describe what happens next. Do not write any alignment sentence; it is added automatically. Use no tags other than <Picture 1>.
+
+""" + EXPAND_BASE_FORMAT + "\n\n" + EXPAND_COMMON_RULES
+
+EXPAND_REF_SYSTEM_PROMPT = """You write prompts for MiniMax H3 in full-reference mode (Ref2VA): the video is generated from text plus reference images <Picture N>, videos <Video N> and audio <Audio N>. Only use tags for assets that exist.
+Output ONLY the final prompt in English, exactly these six sections in this order, each label on its own line followed by its text (no markdown, no explanation):
+
+subject_definitions:
+<one line per item, e.g. "<Subject 1> is the young woman in <Picture 1>, with long dark hair, a blue cardigan, and a thin silver necklace." / "<Video 1> is the source video for the target video edit." / "<Audio 1> is the voice-timbre reference for <Subject 1> (S1).">
+
+summary:
+<the task type in square brackets, then one or two sentences, e.g. "[reference generation] The target video shows ..."; types: reference generation, keyframe completion, video editing (only when a <Video N> is edited), video continuation, audio reuse, audio reference, combined with " + " inside the brackets>
+
+retention_analysis:
+<one line per subject or asset, e.g. "<Subject 1> (appears in [Shot 1], [Shot 2]): fully_preserved - ..."; visual markers fully_preserved / partially_preserved / attribute_transfer / weak_reference; audio markers fully_copy / partially_copy / reference / weak_reference>
+
+detailed_description:
+<one or two sentences of style, then [Shot 1] ... [Shot 2] At MM:SS.mmm, the shot cuts to ... ; refer to subjects as <Subject N> with a short reminder of their look; 350-500 words>
+
+overall_soundscape:
+<...>
+
+non_diegetic_music:
+<...>
+
+- When frames of a reference video are attached, describe its setting, subjects, camera and action exactly as the frames show them; never relocate or reinvent what <Video N> contains.
+- When no frames of a reference video are attached, you cannot see it: do not invent its setting, subjects or action; describe it only as the user's idea does.
+
+""" + EXPAND_COMMON_RULES
+
+# 換人模式維持原本的段落寫法（已驗證可用），保留原片音軌，不加音效段
+EXPAND_SYSTEM_PROMPT = """You write prompts for MiniMax H3, a video model that generates video with synchronized audio from reference assets.
+Output ONLY the final prompt in English: one paragraph, no title, no markdown, no explanation.
 
 Rules:
 - Refer to reference images exactly as <Picture 1> ... <Picture N>, reference videos as <Video 1> ... <Video N>, reference audio as <Audio 1> ... <Audio N>. Only use tags for assets that exist.
@@ -298,14 +365,6 @@ Rules:
 - Write the user's idea faithfully; add concrete visual detail, never change its intent.
 - When frames of a reference video are attached, describe its setting, subjects, camera and action exactly as the frames show them; never relocate or reinvent what <Video N> contains.
 - When no frames of a reference video are attached, you cannot see it: do not invent its setting, subjects or action; describe it only as the user's idea does."""
-
-# 換人模式保留原片音軌，不加；其餘模式不寫配樂時 H3 會自己猜音軌（易混人聲）
-EXPAND_SOUND_RULES = """Sound: after the paragraph, add two lines exactly in this form:
-Soundscape: 1-2 sentences of the sounds people in the scene can hear: concrete sources and textures (wind in leaves, footsteps on gravel, a drum struck twice), tied to the actions above. Do not repeat dialogue here.
-Music: 1-3 sentences of background music only the audience hears: instruments, tempo, rhythm and dynamics (e.g. light acoustic guitar and glockenspiel, around 100 BPM, bouncy staccato, soft). Never abstract moods alone. Instrumental only, no vocals or singing. Write N/A if the user's idea asks for no music.
-If the user's idea has no spoken lines, end the Soundscape line with: No dialogue, no human voice."""
-
-EXPAND_T2VA_RULES = """Text-only mode: there are no reference assets. Do not use any <Picture>, <Video> or <Audio> tags. Introduce every subject with a concrete visual description (age, look, clothing) and keep it consistent through the clip, and describe the full setting yourself."""
 
 EXPAND_SWAP_RULES = """Character swap mode: <Video 1> is the source performance, <Picture 1> is the new character.
 - Start with: Replace the [describe the person in <Video 1>] in <Video 1> with the character from <Picture 1>.
@@ -336,6 +395,7 @@ class ExpandPromptRequest(BaseModel):
     audio_count: int = 0
     character_swap: bool = False
     t2va: bool = False
+    mode: Optional[str] = None  # ref2va / fl2va / t2va
     duration_seconds: float = 12
     image_paths: Optional[List[str]] = []
     video_path: Optional[str] = None
@@ -462,9 +522,16 @@ def expand_prompt(req: ExpandPromptRequest):
               f"{req.audio_count} audio clip(s). Requested duration: {req.duration_seconds:g} seconds.")
     if video_seconds:
         assets += f" <Video 1> is {video_seconds:.1f} seconds long."
-    system = EXPAND_SYSTEM_PROMPT + ("\n\n" + EXPAND_SWAP_RULES if req.character_swap else "\n\n" + EXPAND_SOUND_RULES)
-    if req.t2va:
-        system += "\n\n" + EXPAND_T2VA_RULES
+    mode = "t2va" if req.t2va else (req.mode or "ref2va")
+    first_frame = mode == "fl2va" and req.image_count > 0 and not req.character_swap
+    if req.character_swap:
+        system = EXPAND_SYSTEM_PROMPT + "\n\n" + EXPAND_SWAP_RULES
+    elif mode == "t2va":
+        system = EXPAND_T2VA_SYSTEM_PROMPT
+    elif first_frame:
+        system = EXPAND_FIRST_FRAME_SYSTEM_PROMPT
+    else:
+        system = EXPAND_REF_SYSTEM_PROMPT
     if req.character_swap and req.audio_count > 0:
         system += "\n\n" + EXPAND_SWAP_VOICE_RULES
         video = _upload_file(req.video_path)
@@ -491,6 +558,8 @@ def expand_prompt(req: ExpandPromptRequest):
             prompt = _llm_chat(text_only)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"LLM 擴寫失敗（{LLM_BASE_URL}）：{exc}")
+    if first_frame and FIRST_FRAME_ANCHOR not in prompt:
+        prompt = FIRST_FRAME_ANCHOR + "\n\n" + prompt
     return {"ok": True, "prompt": prompt, "used_vision": used_vision}
 
 
