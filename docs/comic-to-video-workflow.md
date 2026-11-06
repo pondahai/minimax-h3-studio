@@ -266,6 +266,11 @@
 - **prompt 一定要用官方格式**（見下方「H3 prompt 格式」）：`[Shot 1]` 寫空景、`overall_soundscape` 只寫風聲鳥鳴、`non_diegetic_music` 寫樂器、節奏、力度。範例 `density/prompts/music_official.txt`
   - 《密度》先用中文自由格式（結尾「純音樂，無對白、無人聲」）跑 seed 1、2，兩首都混進說話聲；改官方格式後同一個 seed 1 就乾淨。《蝴蝶》當時 3 首也有 1 首混人聲，原因相同
 - 跑 1 首、ASR 檢查（轉不出文字，只回 `<|7.55|>` 之類的時間戳＝乾淨）→ 給使用者聽；有人聲再換 seed。選定的存成 `music/bgm.wav`
+- **官方格式仍是抽卡**（第六集）：seed 1 混類日語人聲（ASR 只標「(日語)」沒擋下）、seed 2 誦經，seed 3、4 乾淨。2026-11-06 起 `pipeline.sh` 的配樂步驟：
+  1. `non_diegetic_music` 自動補一句「Strictly instrumental … no vocals, no singing, no humming, no chanting, no choir, no speech.」（另存 `prompts/music_run.txt`，原檔不動）
+  2. 生成後用 Demucs（`demucs-sfx` 映像檔）拆出伴奏，`bgm.wav`＝`music1_novocals.wav`，人聲軌留 `music1_vocals.wav` 備查。實測第六集 music1／music2 去人聲後，ASR 只剩括號型幻聽
+  3. ASR 判斷先去掉括號內容（whisper 對純音樂常幻聽成「(日語)」「(臺北 新加坡)」「(我愛你)」這類括號短語），括號外有中文才算人聲
+  - 仍要使用者試聽一次；人聲很重的段落去掉後可能留殘響
 
 ### 8. 合成 → `python3 mux.py <篇目>`
 - 先把 H3 成品 `out/SXX.mp4` 複製到 `video/`（mux 只讀 `video/`；《四季》忘了這步，ffmpeg 報 Error opening input）。還沒選配樂時 mux 照樣產出無配樂版，可直接拿 `mixed/SXX.mp4` 給使用者試聽

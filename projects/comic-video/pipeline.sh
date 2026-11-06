@@ -70,13 +70,26 @@ say "開始：$SIDS ＋ music1"
 # 1. 配樂
 mkdir -p music
 if [ ! -f out/music1.mp4 ]; then
-  bash "$ROOT/run_jobs.sh" "$NAME" "music1 prompts/music_official.txt 1 12 -"
+  # H3 配樂是抽卡，常混吟唱／誦經／說話聲（第六集 seed 1、2 都中）。prompt 先明確禁止人聲（降低機率，不保證）
+  NOVOX="Strictly instrumental with no human voice at all: no vocals, no singing, no humming, no chanting, no choir, no speech."
+  sed "/^non_diegetic_music:/ { /no vocals/! s/\$/ $NOVOX/ }" prompts/music_official.txt > prompts/music_run.txt
+  bash "$ROOT/run_jobs.sh" "$NAME" "music1 prompts/music_run.txt 1 12 -"
 fi
 if [ -f out/music1.mp4 ]; then
   ffmpeg -y -loglevel error -i out/music1.mp4 -vn -ar 44100 music/music1.wav && cp music/music1.wav music/bgm.wav
-  tmp=$(mktemp -d); cp music/music1.wav "$tmp/000.wav"
+  # 再用 Demucs 濾掉人聲軌，bgm.wav 改用伴奏（music1_novocals.wav）；原始 music1.wav 保留
+  cp music/music1.wav music/music1_h3.wav
+  if docker run --rm --name demucs-music --gpus all --ipc=host -v "$BASE/music:/w" demucs-sfx music1_h3.wav >> post.log 2>&1 \
+     && [ -f music/music1_novocals.wav ]; then
+    cp music/music1_novocals.wav music/bgm.wav; say "music1 已用 Demucs 去人聲（bgm.wav＝伴奏，人聲軌 music1_vocals.wav）"
+  else
+    say "music1 Demucs 去人聲失敗，bgm.wav 暫用原始 music1（看 post.log）"
+  fi
+  rm -f music/music1_h3.wav
+  tmp=$(mktemp -d); cp music/bgm.wav "$tmp/000.wav"
   asr=$(tar -C "$tmp" -cf - 000.wav | bash "$ROOT/asr_spark.sh" 2>/dev/null | cut -f2-); rm -rf "$tmp"
-  if echo "$asr" | grep -qP '[\x{4e00}-\x{9fff}]'; then say "music1 完成，ASR 聽到人聲：$asr（仍暫用當 bgm，要人聽）"
+  # whisper 對純音樂常幻聽成括號短語（「(日語)」「(臺北 新加坡)」「(我愛你)」），去掉括號內容再判斷
+  if echo "$asr" | sed 's/([^)]*)//g' | grep -qP '[\x{4e00}-\x{9fff}]'; then say "music1 完成，ASR 聽到人聲：$asr（仍暫用當 bgm，要人聽）"
   else say "music1 完成，ASR 沒聽到人聲（${asr:-空白}），已設成 bgm.wav"; fi
 else
   say "music1 失敗，試聽版會沒有配樂"

@@ -28,7 +28,19 @@ def make_speakable(cfg):
     return speakable
 
 
+def preflight():
+    """服務沒開時馬上報錯，不要讓 600 秒逾時的請求靜靜卡住。"""
+    import socket
+    try:
+        socket.create_connection(("100.89.149.50", 8792), timeout=5).close()
+    except OSError:
+        raise SystemExit("VoxCPM2 TTS（Spark :8792）沒開。啟動：ssh funsteam@100.89.149.50 "
+                         "'cd ~/dgx-voxcpm-eval && source .venv/bin/activate && "
+                         "setsid nohup python chinese_tts_server.py > tts.log 2>&1 < /dev/null &'")
+
+
 def post_json(payload):
+    preflight()
     req = urllib.request.Request(f"{BASE}/api/tts", json.dumps(payload).encode(), {"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=600) as r:
         return json.load(r)
@@ -74,6 +86,7 @@ def lines(cfg, d):
 
 if __name__ == "__main__":
     cfg, d, only = comic.load()
+    preflight()
     only = set(only)
     out = d / "audio"
     out.mkdir(exist_ok=True)
