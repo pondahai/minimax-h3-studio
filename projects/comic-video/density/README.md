@@ -1,6 +1,6 @@
 # 《密度是什麼？一樣大，不一定一樣重！》
 
-漫畫轉影片工作流的第二篇（2026-10-29 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-workflow.md](../../../docs/comic-to-video-workflow.md)。
+漫畫轉影片工作流的第二篇（2026-10-29 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-notes.md](../../../docs/comic-to-video-notes.md)。
 
 - 來源：社子文教基金會「科學天地／自然小探險隊」[《密度是什麼？》](https://shezi.org.tw/science/density/)（7 格）
 - 規格：11 段約 130 秒、672×384 草稿等級；S01、S03、S05～S09、S11 用 Qwen-Image 首幀，S02、S04、S10 續接前段末幀；S08、S10 另加 Qwen-Image 尾幀（首尾幀）

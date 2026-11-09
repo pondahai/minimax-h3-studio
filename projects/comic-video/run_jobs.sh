@@ -3,6 +3,7 @@
 # 用法：bash run_jobs.sh <篇目> "S10v2 prompts/S10.txt 164723 12 frames/S10_first.png" "music1 prompts/music.txt 1 12 -" ...
 set -u
 ROOT=$(cd "$(dirname "$0")" && pwd)
+. "$ROOT/wait_cool.sh"
 NAME=$1; shift
 BASE=$ROOT/$NAME
 cd "$BASE" || exit 1
@@ -35,6 +36,6 @@ for job in "$@"; do
   else
     echo "$(date -Is) $name 失敗 rc=$rc"
   fi
-  sleep 60  # 冷卻
+  wait_cool
 done
 echo "$(date -Is) 工作結束"

@@ -1,6 +1,6 @@
 # 《蝴蝶生命循環》
 
-漫畫轉影片工作流的第一篇。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-workflow.md](../../../docs/comic-to-video-workflow.md)。
+漫畫轉影片工作流的第一篇。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-notes.md](../../../docs/comic-to-video-notes.md)。
 
 - 來源：社子文教基金會「科學天地／自然小探險隊」[《蝴蝶生命循環》](https://shezi.org.tw/science/butterfly-life-cycle/)（7 格）
 - 成品：約 119 秒、672×384 草稿等級，10 段（S03、S05、S07 續接前段末幀；S10 用 Qwen-Image 首幀重做）

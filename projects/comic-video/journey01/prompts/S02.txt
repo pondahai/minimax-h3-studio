@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright, sunny Japanese school shonen anime scene set in a classroom with saturated colors. Wukong sits on the left, Bajie in the center, and Wujing on the right at their desks. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Wukong lunges forward from his seat, slamming both hands on the desk and leaning his upper body aggressively toward Bajie and Wujing. Wukong (S1) says slowly, <d>[Chinese] 八戒！悟淨！重大發現！</d> At 00:05.000, Wukong throws his arms wide in an exaggerated gesture, his face beaming with excitement as he shouts the location. Wukong (S1) says slowly, <d>[Chinese] 天宮體育館！</d> At 00:07.000, Close-up on Bajie, who swallows his bun, his eyes sparkling with sudden interest as he looks up with a delighted expression. Bajie (S2) says slowly, <d>[Chinese] 什麼？有食堂嗎？</d> At 00:09.000, Wujing snaps his green book shut and pushes his glasses up with one hand, glancing coldly at the boys while Wukong and Bajie freeze in awkward silence. Wujing (S3) says slowly, <d>[Chinese] 你們兩個的判斷標準，是不是有問題？</d>
+
+overall_soundscape: The sharp thud of Wukong's hands hitting the wooden desk. The sound of a bun being chewed and swallowed. The soft flap of a book closing and the faint squeak of glasses being adjusted.
+
+non_diegetic_music: N/A

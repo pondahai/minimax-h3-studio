@@ -1,0 +1,71 @@
+{
+ "S01": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing",
+  "char_parrot"
+ ],
+ "S02": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing"
+ ],
+ "S03": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing",
+  "char_parrot"
+ ],
+ "S04": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing"
+ ],
+ "S05": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing"
+ ],
+ "S06": [
+  "char_monk",
+  "char_wukong",
+  "char_wujing"
+ ],
+ "S07": [
+  "char_wukong",
+  "char_wujing"
+ ],
+ "S08": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing"
+ ],
+ "S09": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing",
+  "char_parrot"
+ ],
+ "S10": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing"
+ ],
+ "S11": [
+  "char_wukong",
+  "char_bajie",
+  "char_parrot"
+ ],
+ "S12": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing",
+  "char_parrot"
+ ],
+ "S13": [
+  "char_wukong",
+  "char_bajie",
+  "char_wujing",
+  "char_parrot"
+ ]
+}

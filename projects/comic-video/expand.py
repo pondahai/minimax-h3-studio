@@ -1,8 +1,11 @@
-"""把 <篇目>/storyboard.md 每段連同對應漫畫分格送 8002 擴寫成影片 prompt，輸出 <篇目>/prompts/SXX.txt。
+"""把 <篇目>/storyboard.md 每段連同對應漫畫分格送本地 LLM（comic.LLM_URL，預設 8006）擴寫成影片 prompt，輸出 <篇目>/prompts/SXX.txt。
 
 用法：python expand.py <篇目> [段落...]   （不帶段落 = 全部）
 config 的 prompt_format：
   official（預設）＝H3 官方英文結構化格式（integrated_multimodal_description／overall_soundscape／non_diegetic_music）。
+    分鏡表每列一個官方分鏡：第 1 列是 [Shot 1]（不寫時間戳），之後每列「[Shot N] At 00:0X.000, the shot cuts to …」
+    （官方指南只在切鏡處寫時間戳，2026-11-06 改；之前是全部塞在 [Shot 1] 裡逐句寫 At 00:0X.000）
+  official_inline＝2026-11-06 以前的寫法（一個 [Shot 1]，句中逐列 At 00:0X.000），重跑舊段要保持一致時用
     LLM 只寫英文畫面描述（JSON），時間戳、<d>[Chinese] 台詞</d>、旁白 off-screen voiceover＋角色閉嘴由程式組，
     讓 H3 照台詞對嘴；config 的 last_frames 列出有尾幀（frames/SXX_end.png）的段，會加官方尾幀句；H3 原生音軌合成時仍整條靜音、換成 TTS
   legacy＝《蝴蝶》當時的中文自由格式（H3 會自己編非中文人聲，不要再用）
@@ -12,7 +15,6 @@ from pathlib import Path
 
 import comic
 
-URL = "http://100.89.149.50:8002/v1/chat/completions"
 
 SYSTEM = """你是影片生成提示詞擴寫器。輸入是一段 12 秒以內的分鏡表（秒數區間、畫面、鏡頭、聲音）。
 請輸出一段給文生影片模型用的中文提示詞，規則：
@@ -38,6 +40,8 @@ Reply with JSON only, no markdown:
   Describe concrete appearance, motion, expression, light, color and camera movement. Every item needs at least one visible change
   (character action, prop change or camera movement); never leave the picture static.
   If the row's sound is a character line, describe that character speaking: mouth moving, expression and gestures. Do not write the words.
+  In that row every other character on screen listens with mouth closed: write "listens quietly with mouth closed" for each of them,
+  and give them only quiet reactions (nodding, looking, smiling with closed lips), never an open mouth, gasp or exclamation.
   If the row's sound is narration (旁白) or silent, the characters do not speak.
 - final_frame: if the storyboard describes a final frame (末幀), one sentence describing it; otherwise "".
 - soundscape: 1-3 English sentences of ambient and physical action sounds only (breeze, birds, water, objects). Never speech or music.
@@ -47,6 +51,9 @@ Reply with JSON only, no markdown:
   Follow the storyboard for actions and timing; do not add characters or events that are not in the storyboard."""
 
 INSTRUCTION_FIRST_FRAME = "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced."
+# 官方首尾幀開頭句（FL2VA）：尾幀對齊最後一個分鏡、片長秒數
+INSTRUCTION_FIRST_LAST = ("How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark "
+                          "of the target video; Picture 2 (from Shot {n}) aligns with the {sec:.2f}-second mark of the target video.")
 
 
 def official(cfg):
@@ -72,12 +79,56 @@ def rows(block):
     return re.findall(r"^\| (\d+)–(\d+) \|.*\| ([^|]*?) \|$", block, re.M)
 
 
+ANGLES = ["仰拍", "俯拍", "低角度", "高角度", "背影", "越過"]
+
+
+def cameras(block):
+    """分鏡表每列的鏡頭欄。"""
+    return re.findall(r"^\| \d+–\d+ \|[^|]*\| ([^|]*?) \|[^|]*\|$", block, re.M)
+
+
+def view(cam):
+    """視角：換角度的詞直接當自己一類；景別只分三級（全景／中景～近景／特寫），中景、中近景、近景之間只是稍微推近，不算換視角。"""
+    for a in ANGLES:
+        if a in cam:
+            return a
+    if "特寫" in cam:
+        return "特寫"
+    if "全景" in cam:
+        return "全景"
+    if any(s in cam for s in ("中景", "中近景", "近景")):
+        return "中景"
+    return None
+
+
+def is_cut(prev, cur):
+    """mixed 模式：一場戲換視角（景別大跳或換角度，或鏡頭欄寫「切」）才開新的 [Shot]；
+    同一視角裡角色接連做幾個動作 → 留在同一個鏡頭，用 At 00:0X.000 指定秒數（2026-11-06，第七集 S01 每列都切，使用者要畫面流暢）。"""
+    if "切" in cur:
+        return True
+    return view(cur) is not None and view(prev) is not None and view(cur) != view(prev)
+
+
 def assemble(cfg, sid, block, parts):
-    """組成官方格式 prompt：每列一句「At 00:0X.000, 描述」，台詞放 <d>，旁白寫 voiceover 並讓角色閉嘴。"""
+    """組成官方格式 prompt，台詞放 <d>，旁白寫 voiceover 並讓角色閉嘴。分鏡方式看 prompt_format：
+    official＝每列一個 [Shot N]；official_mixed＝只在換景別／角度處開 [Shot N]，其餘同鏡頭內 At 00:0X.000；official_inline＝全在 [Shot 1]。"""
+    fmt = cfg.get("prompt_format", "official")
+    inline = fmt == "official_inline"
+    cams = cameras(block)
     speakers = {}
-    sentences = [parts["intro"].strip()]
-    for (start, _, sound), text in zip(rows(block), parts["ranges"]):
-        line = f"At {stamp(start)}, {text.strip()}"
+    lines = []
+    n_shot = 1
+    for i, ((start, _, sound), text) in enumerate(zip(rows(block), parts["ranges"])):
+        text = text.strip()
+        if inline:
+            line = f"At {stamp(start)}, {text}"
+        elif i == 0:
+            line = text
+        elif fmt == "official_mixed" and not (i < len(cams) and is_cut(cams[i - 1], cams[i])):
+            line = f"At {stamp(start)}, within the same continuous shot, {text}"
+        else:  # 官方：時間戳只寫在切鏡處；換段＝新的狀態／時刻
+            n_shot += 1
+            line = f"[Shot {n_shot}] At {stamp(start)}, the shot cuts to the next moment of the same scene: {text}"
         if m := re.match(r"(\S+?)：「(.+?)」", sound):
             who, said = m[1], m[2]
             if who == "旁白":
@@ -86,18 +137,36 @@ def assemble(cfg, sid, block, parts):
                 speakers.setdefault(who, f"S{len(speakers) + 1}")
                 name = cfg.get("names_en", {}).get(who, who)
                 line += f" {name} ({speakers[who]}) says slowly, <d>[Chinese] {said}</d>"
-        sentences.append(line)
+                # 同畫面其他角色有生動反應時 H3 會讓他開口（第二集 S01 悟淨的台詞變八戒嘴動）；LLM 不一定照規則寫，這裡固定補一句
+                others = [n for n in cfg.get("looks_en", {}) if n != name and re.search(rf"\b{re.escape(n)}\b", parts["intro"] + " ".join(parts["ranges"]))]
+                if others:
+                    line += f" Only {name} is speaking; {', '.join(others)} keep their mouths closed."
+        lines.append(line)
+    intro = [parts["intro"].strip()]
     if speakers:  # H3 預設講很快（一句 1.5 秒），TTS 對不上嘴；要它慢慢講，每句約佔滿時段
-        sentences.insert(1, SLOW)
-    if sid in cfg.get("last_frames", []):  # 官方尾幀句：Picture 2 錨定在片長秒數
-        sentences.append(f"<Picture 2> (from [Shot 1]) aligns with the {comic.durations(cfg)[sid]:.2f}-second mark of the target video.")
+        intro.append(SLOW)
+    # 只寫英文名 H3 不知道誰是誰，會讓畫面最顯眼的角色開口（《現代西遊》第二集 S01 悟淨的台詞變悟空嘴動）：
+    # 每個角色第一次出現時補上定裝圖外觀
+    text = " ".join(intro + lines)
+    for name, look in cfg.get("looks_en", {}).items():
+        text = re.sub(rf"\b{re.escape(name)}\b", f"{name} ({look})", text, count=1)
+    last = sid in cfg.get("last_frames", [])
+    tail = []
+    if last and inline:  # 舊寫法：尾幀句寫在描述裡
+        tail.append(f"<Picture 2> (from [Shot 1]) aligns with the {comic.durations(cfg)[sid]:.2f}-second mark of the target video.")
     if parts.get("final_frame"):
-        sentences.append(parts["final_frame"].strip())
-    body = (f"integrated_multimodal_description: [Shot 1] {' '.join(sentences)}\n\n"
+        tail.append(parts["final_frame"].strip())
+    body = (f"integrated_multimodal_description: [Shot 1] {' '.join([text] + tail)}\n\n"
             f"overall_soundscape: {parts['soundscape'].strip()}\n\n"
             "non_diegetic_music: N/A")
     has_frame = dict((s, f) for s, _, f in cfg["shots"]).get(sid, "-") != "-"
-    return f"{INSTRUCTION_FIRST_FRAME}\n\n{body}" if has_frame else body  # 有首幀（Qwen-Image 圖或前段末幀）才加官方開頭句
+    if not has_frame:
+        return body
+    if last and not inline:  # 官方首尾幀開頭句：Picture 2 對齊最後一個分鏡、片長秒數
+        head = INSTRUCTION_FIRST_LAST.format(n=1 if inline else n_shot, sec=comic.durations(cfg)[sid])
+    else:
+        head = INSTRUCTION_FIRST_FRAME  # 有首幀（Qwen-Image 圖或前段末幀）才加官方開頭句
+    return f"{head}\n\n{body}"
 
 
 def shots(d):
@@ -109,6 +178,9 @@ def shots(d):
 
 def expand(cfg, sid, block, tries=3):
     img = base64.b64encode((Path(cfg["panel_dir"]) / f"{cfg['panels'][sid]}.png").read_bytes()).decode()
+    # config expand_notes：給個別段的審稿意見，接在分鏡後面一起送
+    if note := cfg.get("expand_notes", {}).get(sid):
+        block = f"{block}\n\n審稿意見（一定要照做）：{note}"
     user = [{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img}"}},
             {"type": "text", "text": block}]
     req_body = {
@@ -117,13 +189,10 @@ def expand(cfg, sid, block, tries=3):
         "chat_template_kwargs": {"enable_thinking": False},
     }
     if official(cfg):
-        # 8002 偶爾回不合法的 JSON（《彩虹》S05、S06）：用 llama.cpp 的 JSON 文法限制輸出，段數不符再重試
+        # LLM 偶爾回不合法的 JSON（8002《彩虹》S05、S06）：用 JSON 模式限制輸出（llama.cpp、vLLM 都支援），段數不符再重試
         req_body["response_format"] = {"type": "json_object"}
-    body = json.dumps(req_body).encode()
     for attempt in range(1, tries + 1):
-        req = urllib.request.Request(URL, body, {"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=300) as r:
-            result = json.load(r)["choices"][0]["message"]["content"].strip()
+        result = comic.llm(req_body, timeout=300).strip()
         if not official(cfg):
             return result
         try:

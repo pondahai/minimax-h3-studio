@@ -1,11 +1,11 @@
-"""讓 8002 逐格看漫畫原圖寫分鏡稿草稿 → <篇目>/storyboard_8002.md（試驗：8002 能否接手人工分鏡）。
+"""讓本地 LLM（comic.LLM_URL，預設 8006；原本是 8002）逐格看漫畫原圖寫分鏡稿草稿 → <篇目>/storyboard_8002.md（試驗：8002 能否接手人工分鏡）。
 
 用法：python draft_storyboard.py <篇目>
 一次只送一格（panel_dir 的 panel-01.png、panel-02.png…，網站原圖一格一張），附上該格角色（config 的 panel_cast）
 和前面已寫好的段落摘要；config 有 panel_notes 時，把該格的人工備註（科學更正、安全句、段數）一起送，備註優先於通則。
-每格寫完用 check_storyboard.py 的規則驗收，有問題把清單回饋給 8002 重寫，最多 REVISE 輪。
+每格寫完用 check_storyboard.py 的規則驗收，有問題把清單回饋給 LLM 重寫，最多 REVISE 輪。
 仍沒過的問題寫進檔尾「## 未解決」，交給人看。
-第一版（7 格一次送）的結果見 docs/comic-to-video-workflow.md。
+第一版（7 格一次送）的結果見 docs/comic-to-video-notes.md。
 """
 import base64, json, re, urllib.request
 from pathlib import Path
@@ -13,7 +13,8 @@ from pathlib import Path
 import comic
 from check_storyboard import check_text
 
-URL = "http://100.89.149.50:8002/v1/chat/completions"
+# 輸出檔名帶端點：storyboard_8006.md；LLM_PORT=8002 改回 llama.cpp
+PORT = comic.LLM_PORT
 REVISE = 2
 
 SYSTEM = """你是兒童科普動畫的分鏡師。輸入是一篇分格漫畫的其中一格（圖片），請把這一格改寫成短片分鏡：預設一格一段（12 秒）；只有這一格的台詞與說明 12 秒唸不完時才拆成兩段，不准為了湊長度加戲，用繁體中文、Markdown 輸出。
@@ -46,16 +47,13 @@ def panels(cfg):
 
 
 def ask(messages):
-    body = json.dumps({"messages": messages, "temperature": 0.4, "max_tokens": 3000,
-                       "chat_template_kwargs": {"enable_thinking": False}}).encode()
-    req = urllib.request.Request(URL, body, {"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=600) as r:
-        text = json.load(r)["choices"][0]["message"]["content"].strip()
+    text = comic.llm({"messages": messages, "temperature": 0.4, "max_tokens": 3000,
+                      "chat_template_kwargs": {"enable_thinking": False}}).strip()
     return re.sub(r"^```(?:markdown)?|```$", "", text).strip()
 
 
 def renumber(text, start, ids=None):
-    """8002 的段號不一定對：依序改成 S{start}、S{start+1}…（config 的 panel_shots 有指定就用指定的，
+    """LLM 的段號不一定對：依序改成 S{start}、S{start+1}…（config 的 panel_shots 有指定就用指定的，
     例如共用段＋版本段 S01、S01B），續接引用一起改。回傳 (文字, 這格的段號)。"""
     old = re.findall(r"^### (S\d+[A-Z]?)", text, re.M)
     names = [ids[i] if ids and i < len(ids) else f"S{start + i:02d}" for i in range(len(old))]
@@ -110,8 +108,8 @@ if __name__ == "__main__":
     cfg, d, _ = comic.load()
     text, log = draft(cfg)
     total = sum(int(s) for s in re.findall(r"^### .*?— ?(\d+) ?s", text, re.M))
-    out = f"# {cfg['title']} — 8002 分鏡草稿（逐格）\n\n## 分鏡\n\n{text}\n\n**總長**：{total} 秒\n"
+    out = f"# {cfg['title']} — {PORT} 分鏡草稿（逐格）\n\n## 分鏡\n\n{text}\n\n**總長**：{total} 秒\n"
     if log:
         out += "\n## 未解決（檢查程式重試後仍沒過）\n" + "\n".join(log) + "\n"
-    (d / "storyboard_8002.md").write_text(out, encoding="utf-8")
-    (d / "storyboard_8002_rounds.md").write_text("\n\n".join(raw) + "\n", encoding="utf-8")
+    (d / f"storyboard_{PORT}.md").write_text(out, encoding="utf-8")
+    (d / f"storyboard_{PORT}_rounds.md").write_text("\n\n".join(raw) + "\n", encoding="utf-8")

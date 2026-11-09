@@ -1,6 +1,6 @@
 # 《聲音是怎麼傳播的？》
 
-漫畫轉影片工作流的第四篇（2026-10-30 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-workflow.md](../../../docs/comic-to-video-workflow.md)。
+漫畫轉影片工作流的第四篇（2026-10-30 驗收）。腳本與流程見上層 [`comic-video/README.md`](../README.md)，復盤筆記見 [docs/comic-to-video-notes.md](../../../docs/comic-to-video-notes.md)。
 
 - 來源：社子文教基金會「科學天地／自然小探險隊」[《聲音是怎麼傳播的？》](https://shezi.org.tw/science/sound-transmission/)（7 格）
 - 規格：12 段 144 秒、672×384 草稿等級；全部獨立段，每段用 Qwen-Image 首幀

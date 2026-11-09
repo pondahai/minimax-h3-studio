@@ -1,4 +1,6 @@
-# 漫畫轉影片工作流程（復盤筆記）
+# 漫畫轉影片：踩坑與試驗紀錄（歷史參考）
+
+> 每集照做的步驟在 [comic-to-video-runbook.md](comic-to-video-runbook.md)。本檔是各步驟的來由、試驗經過與踩坑表，平常不用從頭讀；查某一步「為什麼這樣做」時再翻。
 
 首次實作：2026-10-29，社子文教基金會「科學天地／自然小探險隊」《蝴蝶生命循環》（7 格）→ 約 119 秒草稿影片
 程式與素材：[`projects/comic-video/`](../projects/comic-video/)（共用腳本）、[`butterfly/`](../projects/comic-video/butterfly/)（這篇的分鏡、prompt、設定）
@@ -37,11 +39,14 @@
 
 ## 機器與服務
 
+在另一台 Spark 從零建置：見 [spark-deployment-guide.md](spark-deployment-guide.md)。
+
 | 服務 | 位置 | 用途 |
 |---|---|---|
-| llama.cpp（多模態） | Spark `100.89.149.50:8002` | 分鏡擴寫成影片 prompt，可附圖 |
-| VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑） | 角色配音 |
-| Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`） | 生成首幀 |
+| vLLM `qwen3.8-nvfp4`（SuperQwen3.8-27B abliterated NVFP4，`Jiunsong/SuperQwen3.8-27b-abliterated-NVFP4-DGX-Spark`，無審查，多模態） | Spark `100.89.149.50:8006` | **2026-11-04 起工作流唯一 LLM**：分鏡草稿、首幀 prompt、擴寫、外觀、對嘴檢查（`comic.llm()`；平常可停著，第一次呼叫自動 `docker start`） |
+| llama.cpp（多模態） | Spark `100.89.149.50:8002` | 2026-11-04 前的工作流 LLM；`LLM_PORT=8002` 可改回。下文歷史紀錄裡的「8002」指它 |
+| VoxCPM2 TTS | Spark `:8792`（`~/dgx-voxcpm-eval/chinese_tts_server.py`，平常不跑；8006 冷啟動或 pipeline 互斥會把它停掉） | 角色配音。啟動：`ssh -n … 'cd ~/dgx-voxcpm-eval && . .venv/bin/activate && setsid -f python chinese_tts_server.py > tts.log 2>&1 < /dev/null'`（用 `setsid nohup … &` 有時 ssh 掛住不回來，`setsid -f` 自己 fork、0.4 秒返回）。`tts.py` 呼叫前檢查埠，沒開會自動用這個指令啟動並等就緒（第六集曾靜靜卡 600 秒逾時） |
+| Qwen-Image 2.1 ComfyUI | Spark `:8188`（container `qwen-image-comfyui`，按需） | 生成首幀。沒開時要叫醒 `comfy_ondemand.py`：它只聽 `127.0.0.1:8190`，必須 `ssh … "curl -X POST http://127.0.0.1:8190/ensure"`（從本機打或用 GET 都不行），回 `{"ok": true}` 後 8188 就可用；`qwen_frame.py` 開頭會自動做這一步 |
 | MiniMax H3 | Spark `~/h3-bench`（docker image `h3-bench`） | 生成影片／配樂 |
 | Breeze ASR（**預設**，按需） | Spark `~/breeze-asr-hub`（whisper.cpp CUDA＋`ggml-breeze-asr-26.bin`），由 `asr_spark.sh` 啟動 | 核對 TTS 有沒有唸對 |
 | Breeze ASR（備援，常駐） | Xavier `100.108.74.45:8013`，SSH 帳號 `nvidia` | Spark 資源檢查不通過時自動改用 |
@@ -69,7 +74,7 @@
 
 新增工具時要更新這張表。
 
-**記憶體互斥**：TTS、Qwen-Image、H3 三者一次只開一個；跑 H3 時 Spark 上只留 8002（停掉 `qwen3.8-nvfp4`、`qwen-image-comfyui`）。實測 H3 跑時系統用量約 71 GB／121 GB，沒有用到 swap。
+**記憶體互斥**：TTS、Qwen-Image、H3 三者一次只開一個；跑 H3 時 Spark 上只留 8002（停掉 `qwen3.8-nvfp4`、`qwen-image-comfyui`）；工作流改用 8006 後仍照這個規則，H3 跑完再由腳本自動啟動 8006。實測 H3 跑時系統用量約 71 GB／121 GB，沒有用到 swap。
 
 `qwen-gradio-ui` 前端**豁免不停**：它本身很輕（記憶體主要靠 ComfyUI），停掉 `qwen-image-comfyui` 後前端連不到後端，但頁面還能開；`pipeline.sh` 會在停 ComfyUI 前後呼叫前端的 `/busy_status`（通用忙碌旗標，不只給 H3 用）設/清狀態，畫面上顯示「H3 正在運作，請稍等」而不是連線錯誤；`story-film-studio` 送出圖請求前也會查同一個端點排隊等待。細節見 [dgx-spark-ops/notes/h3-qwen-coexistence-plan.md](https://github.com/pondahai/dgx-spark-ops/blob/master/notes/h3-qwen-coexistence-plan.md)。
 
@@ -213,6 +218,7 @@
 - **《四季》起**：立繪只畫這篇會出場的角色（只有小明、小美），用前一篇的 `chars.png` 當參考，3 個 seed 都乾淨；照抄立繪的段落從《聲音》的 6/12 降到 3/12（S01、S03、S05 各一個 seed，多出另一個角色）
 - **《電池》起：每個角色一張獨立立繪**（`frame_prompts/char_<角色>.txt` → `frames/char_<角色>.png`），各段首幀只給該段出場角色的立繪，避免整排立繪被照抄、多出角色。先試的全員一張 `chars` 有兩個問題：人類小孩被畫成和擬人化電池一樣的細線腳（要寫明「正常比例的人類小孩、長褲、運動鞋」）；一張 seed 在電池上畫了「+」號
   - **角色立繪一律用純白素色背景**（沒有地面、草地、天空）：草地背景的立繪會被照抄到首幀的地面，室內桌面、地板變成泥土加草叢紋理，prompt 寫「不要照抄背景」「木頭桌面」也擋不住。用草地版立繪當參考重畫白底版時，seed1 仍帶草叢（qwen_frame.py 的 seed1 特別容易照抄參考圖），選 seed2、seed3
+  - **首幀 prompt 不寫有名角色的名字，只寫外觀（2026-11-02《現代西遊》第二集）**：prompt 寫「悟空」「八戒」時，即使附了立繪，Qwen-Image 仍會照《西遊記》原著畫出豬頭人、猴子，或在原角色旁多畫一個（第一集 S06 3 輪 6 張、第二集首批 39 張中 4 段全滅）；加一句「八戒不是豬頭人」也沒用。改成「棕髮男孩（…）、胖男孩（…）、眼鏡男孩（…）」並寫「畫面裡剛好只有這三個小孩，沒有其他人物」、不寫「豬」「猴子」等字後，4 段 16 張全乾淨。原創角色名（小美、阿柴）沒有既定形象，不受影響
     - 白底立繪的副作用：室內段桌面、地板都正常了，但**戶外／卡通段的背景也跟著變成一片白**（草地世界消失，seed2 還有雜訊點）。卡通段的 prompt 要把場景寫具體（草地、天空、遠山），或卡通段沿用場景版參考；《電池》卡通段沿用草地版立繪做的首幀，室內段用白底版
   - 首幀結果（12 段，草地版立繪）：沒有一張多出角色（《聲音》6/12、《四季》3/12）；但實景室內段（S01、S04、S08、S12）seed1 都把立繪的草地紋理照抄成泥土地板 → 室內段 prompt 要寫明「木地板／木頭桌面」，並排除這類 seed
 - **原圖有擬人化星球（有臉）時，太空、風景段不給任何參考圖**，只靠文字 prompt＋「寫實的地球與太陽，沒有臉」：7 段 21 張只有 1 張太陽隱約像有五官；`qwen_frame.py` 參考圖可以是零張
@@ -240,7 +246,8 @@
 - 使用者審查、選定首幀後才開始跑 H3
 
 ### 6. 影片生成（H3）→ `bash run_series.sh <篇目>`／`bash run_jobs.sh <篇目> ...`
-- 草稿等級：672×384、INT8；每段 12 秒約 5.5 分鐘（含載入，Turbo 8 步時期的數字），段間冷卻 60 秒
+- 草稿等級：672×384、INT8；每段 12 秒約 5.5 分鐘（含載入，Turbo 8 步時期的數字）。Flex 實測（第六集）每段生成約 4 分鐘
+- 段間冷卻由 `wait_cool.sh` 決定：GPU 降到 `COOL_TEMP` 以下就接下一段，最短 10 秒、最長 90 秒。2026-11-05 起預設 58°C（原 55°C 時 GPU 常卡在 55–56°C，每段等 85–90 秒；改 58°C 後約 50 秒，每段省約 40 秒）。每段 `run_series.sh` 都重新 source，改了 Spark 上的檔案下一段就生效
 - **2026-11-01 起 `bench.py` 預設用 Pika H3 Flex LoRA（6 步，`lcm`＋官方 ManualSigmas）**，FL2VA 與 Ref2VA 都是；A/B 實測畫質較好，FL2VA 快約 17%、Ref2VA 慢約 27%。`-e H3_FLEX=0` 切回 Turbo。來源、設定與實驗紀錄見 [projects/flex-test/README.md](../projects/flex-test/README.md)。11/01 之前做好的各篇都是 Turbo 生成，重跑舊段會變成 Flex，接縫處留意畫風差異
 - 獨立段用 t2va（`H3_T2VA=1`）；續接段用 ffmpeg 取前段末幀當 `H3_INPUT_IMAGE`
 - 段落表在 `config.json` 的 `shots`：`[段, 秒數, 首幀來源]`，首幀來源 `-`＝t2va、圖檔路徑（如 `frames/S01.png`，選定的 seed 複製改名）＝用該圖、段名＝續接該段末幀
@@ -252,9 +259,16 @@
 - **離線排隊（《電池》起）**：`pipeline.sh <篇目>` 在 Spark 上一次跑完 H3 與後處理，本機可以關機。素材（config、storyboard、prompts、`frames/SXX.png`、`audio/` 台詞與 `lines.json`）先 tar 經 ssh 傳上去，再 `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（一定要 `< /dev/null`，否則 ssh 掛住不回來）
   - 流程：互斥檢查（停 Qwen／TTS，H3 或 Demucs 在跑就 ABORT）→ music1（`asr_spark.sh` 檢查人聲，自動設成 `bgm.wav`）→ 各段 `ONLY=SXX run_series.sh`，失敗重試 1 次、仍失敗就跳過（失敗的 run 目錄改名 `SXX_fail1`）→ `out/` 複製到 `video/` → `sfx.sh` → `lipsync_measure.py` → `align_dtw.py` → `mux.py` 出 `mixed/` 試聽版；不做全片、字幕、分享版
   - 進度看 `<篇目>/pipeline.status`（每階段一行，最後一行 `DONE` 或 `ABORT`）；細節在 `series.log`、`post.log`
-  - 跑完不重開其他服務、不推播；使用者回來後由 Claude 讀 status 接續
+  - 跑完（DONE、ABORT、被暫停都算，EXIT trap）自動還原開跑前停掉的 8006 與 TTS，8002 若沒在跑也順手拉起來；ComfyUI 按需不還原。不推播；使用者回來後由 Claude 讀 status 接續
+  - **8006 冷啟動拆解（2026-11-06）**：約 5 分鐘＝讀主模型權重 118–136 秒＋MTP 草稿頭 21–24 秒＋編譯（讀快取）約 11 秒＋**FlashInfer fp4_gemm 自動調校 107 秒**＋多模態預熱 11 秒。這版 vLLM 把調校結果的硬碟快取寫死關掉（`vllm/model_executor/warmup/kernel_warmup.py` 的 `_FLASHINFER_USE_PERSISTENT_CACHE = False`），每次重開都重調
+    - 已在 container 裡改成 `True`（原檔 `kernel_warmup.py.orig`），快取存在 `/root/.cache/vllm/flashinfer_autotune_cache/…/autotune_configs.json`。實測調校 107 秒 → 0.45 秒、引擎初始化 130 → 24 秒，整體約 5 分 → 3 分 40 秒，推論正常
+    - 改的是 container 內的檔案：`docker start／restart` 保留；**重建 container 或換 image 要再改一次**（`sed -i 's/^_FLASHINFER_USE_PERSISTENT_CACHE = False/_FLASHINFER_USE_PERSISTENT_CACHE = True/'`）。vLLM 自己標註這個快取還是實驗功能
+    - 剩下最大的是讀權重（19 GB 約 2 分多鐘），尚未處理
+  - 8006 的 container 是 `unless-stopped`：開機會自己起來，但被 `docker stop` 後就一直停著，所以要靠上面的還原（2026-11-06 前沒有還原，跑完 8006／TTS 都停著；同時發現 8002 在 11-05 15:15 被不明原因正常結束，已手動拉起）
 - 在 Spark 上排隊等前一批跑完：`pgrep -f`／`pkill -f` 會比對到自己所在的 `bash -c` 或 ssh 指令（字串裡就有那個關鍵字），等待迴圈永遠不結束、或把自己的 ssh 砍掉。關鍵字寫成 `"[r]un_series.sh rainbow"` 這種形式避開；本機監看用 `timeout` 包住每次 ssh，長時間工作一律在 Spark 上 `setsid nohup … &` 啟動
 - `run_jobs.sh`：單獨重跑指定段或其他工作，格式 `名稱 prompt檔 seed 秒數 首幀|-`
+- **背景啟動的輸出重導只能寫一次**：`setsid nohup bash x.sh > log 2>&1 < /dev/null > /dev/null 2>&1 &` 後面的 `> /dev/null` 會蓋掉前面的 log，log 永遠是空的，等「工作結束」字樣的監看就永遠不結束（第六集配樂重做時發生）。完成與否改看 `out/` 有沒有成品
+- **中途暫停**：在 Spark 上放一支 `until grep -q "SXX 完成" series.log; do sleep 3; done; pkill -f "bash pipeline.sh <篇目>"; pkill -f "run_series.sh <篇目>"` 的背景腳本，會在該段完成後的冷卻空檔停下，不會中斷 H3；續跑時重開 `pipeline.sh`，已有的段跳過
 - 每段完成後抽幾格檢查（接縫、文字、角色外觀）
 
 ### 7. 配樂（H3）
@@ -262,6 +276,13 @@
 - **prompt 一定要用官方格式**（見下方「H3 prompt 格式」）：`[Shot 1]` 寫空景、`overall_soundscape` 只寫風聲鳥鳴、`non_diegetic_music` 寫樂器、節奏、力度。範例 `density/prompts/music_official.txt`
   - 《密度》先用中文自由格式（結尾「純音樂，無對白、無人聲」）跑 seed 1、2，兩首都混進說話聲；改官方格式後同一個 seed 1 就乾淨。《蝴蝶》當時 3 首也有 1 首混人聲，原因相同
 - 跑 1 首、ASR 檢查（轉不出文字，只回 `<|7.55|>` 之類的時間戳＝乾淨）→ 給使用者聽；有人聲再換 seed。選定的存成 `music/bgm.wav`
+- **官方格式仍是抽卡**（第六集）：seed 1 混類日語人聲（ASR 只標「(日語)」沒擋下）、seed 2 誦經，seed 3、4 乾淨。2026-11-06 起 `pipeline.sh` 的配樂步驟：
+  1. `non_diegetic_music` 自動補一句「Strictly instrumental … no vocals, no singing, no humming, no chanting, no choir, no speech.」（另存 `prompts/music_run.txt`，原檔不動）
+  2. 每個 seed 生成後用 Demucs（`demucs-sfx` 映像檔）拆出人聲軌**只做偵測**：人聲軌 RMS／伴奏 RMS > 0.1，或人聲軌 ASR 去掉括號內容後還有中文 → 換下一個 seed（`MUSIC_TRIES`，預設 4）。第一個乾淨的原始配樂設成 `bgm.wav`
+     - 實測第六集：music1 8.35、music2 5.78（有人聲）；music3 0.003、music4 0.011（乾淨），自動選中 music3，和使用者試聽結果一致
+     - **不要用 Demucs 去人聲後的伴奏當配樂**：第六集試過，人聲段落的伴奏受損嚴重，使用者否決
+  3. ASR 判斷先去掉括號內容（whisper 對純音樂常幻聽成「(日語)」「(臺北 新加坡)」「(我愛你)」這類括號短語），括號外有中文才算人聲
+  - 每多一個 seed 多約 5 分鐘；仍要使用者試聽一次
 
 ### 8. 合成 → `python3 mux.py <篇目>`
 - 先把 H3 成品 `out/SXX.mp4` 複製到 `video/`（mux 只讀 `video/`；《四季》忘了這步，ffmpeg 報 Error opening input）。還沒選配樂時 mux 照樣產出無配樂版，可直接拿 `mixed/SXX.mp4` 給使用者試聽
@@ -315,6 +336,8 @@ overall_soundscape: 1–4 句英文，環境音、動作聲、非語言人聲；
 non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫抽象情緒；沒有配樂填 N/A
 ```
 
+- **時間戳只寫在切鏡處（2026-11-06 再查證官方指南）**：`[Shot 1]` 不寫時間戳，之後 `[Shot N] At 00:0X.000, the shot cuts to …`；官方沒有「同一鏡頭內第 X 秒」的寫法。Studio T2VA 實測：散文寫「at the four-second mark / by the eight-second mark」，H3 在第 2 秒就爆炸、第 8 秒的第二次爆炸整個沒演；改成每個指定秒數各一個 `[Shot N] At …` 後照時間演出。`expand.py` 因此改為分鏡表每列一個 `[Shot N]`（`the shot cuts to the next moment of the same scene: …`），舊寫法（全塞在 `[Shot 1]` 逐句 `At 00:0X.000`）保留為 `prompt_format: official_inline`；有尾幀的段改用官方首尾幀開頭句 `How the reference pictures align with the target video — …`。**新寫法尚未用 H3 實跑漫畫段落驗證，第一次用時先跑一段看有沒有真的硬切**
+- Ref2VA（全參考模式）另有官方指南 `VIDEO_PROMPT_WRITING_GUIDE_ref_en.md`：六段 `subject_definitions／summary／retention_analysis／detailed_description／overall_soundscape／non_diegetic_music`，主體用 `<Subject N>`；Studio 導演分鏡與 story-film-studio 都是這個格式
 - 英文書寫；台詞保留原文放在 `<d>[Chinese] …</d>`，說話者編號 `(S1)` 寫在標籤外
 - 只有 H3 要英文：Qwen-Image 首幀／尾幀 prompt 用中文就很準（《蝴蝶》《密度》全部中文），出錯多半是描述不夠具體（例：「浮在水面」要寫成「一半露出水面」），不是語言問題
 - **只有 `<d>` 裡的內容會被唸出來**；不說話的角色不給說話者編號。官方沒有「無人聲」的寫法，寫了也沒用
@@ -326,6 +349,11 @@ non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫
   - 8002 偶爾回不合法的 JSON（《彩虹》S05、S06），舊版 `expand.py` 會整批中斷、後面的段落留著舊檔：已改用 llama.cpp `response_format: json_object` 限制輸出，失敗自動重試 3 次。批次跑完要看 `prompts/` 的修改時間，確定每段都更新了
   - 讓 8002 直接寫整段官方格式時，會把中文風格句、`小明＝…` 定義原樣貼進去、把規則文字照抄、多加時間戳，所以改成程式組裝
   - 角色一律用 config 的英文名（`names_en`，如 Xiao Ming），說話者標籤也用同一個名字；中英混用 H3 可能對不上誰在說話
+  - **角色第一次出現時補外觀（config `looks_en`，2026-11-03《現代西遊》第二集）**：只寫英文名時，H3 不知道哪個名字對應畫面上哪個人，會讓最顯眼的角色開口（第二集 S01 悟淨的台詞變成悟空嘴動）。`looks.py` 讓 8002 看定裝圖寫外觀短語，`expand.py` 在每段每個角色第一次出現時加在名字後面；8002 第一次漏寫悟淨的眼鏡，提示詞改成先從頭到腳逐項檢查（頭臉配件、上衣顏色、背包顏色）才寫齊
+  - **台詞時段其他角色要寫閉嘴（2026-11-03）**：同一句裡其他角色有生動反應（八戒 *leans forward eagerly*），H3 會讓他一起開口（第二集 S01 悟淨的台詞變八戒動嘴）。8002 的規則已加上「其他角色 listens quietly with mouth closed」，但它不一定照寫，所以 `expand.py` 組 prompt 時，在每句台詞後面固定補「Only X is speaking; Y, Z keep their mouths closed.」
+  - **對嘴檢查 `speaker_check.py`（2026-11-03）**：mux 後跑 `python speaker_check.py <篇目> <Spark 的 sfx/lipsync.json>`，8002 看每句開口時段的 4 格（原尺寸 2×2），判斷誰在開口並對照分鏡說話者，只把不一致的句子剪給人聽。用第二集 S01 驗證：新版三句都對，兩個舊版的錯都抓到（但它說的錯誤對象不一定準）。背影、鸚鵡的嘴容易誤判；`lipsync.json` 沒有的句子不會檢查
+  - **H3 沒生成人聲的台詞改移語音（2026-11-03）**：H3 有時畫了嘴在動卻沒生成人聲，`lipsync_measure` 量不到開口時段，台詞只能貼在分鏡時段開頭。`mouth_spans.py` 讓 8002 在分鏡時段每 0.25 秒看說話者嘴巴開不開，找出開口時段，寫進 config `lipsync_manual`，`mux.py` 照這個時段放台詞（只加速不放慢），不用重跑 H3。背對鏡頭的句子 8002 多半回答 hidden，算出來的時段不可信，維持原位
+  - **重跑段落後 `sfx.sh` 要重做底音（2026-11-03）**：`sfx.sh` 原本只要 `sfx/SXX_novocals.wav` 存在就跳過，重跑的新影片會墊上舊影片的音效和 Demucs 沒去乾淨的人聲殘留，時間對不上，聽起來像別人的聲音疊在說話角色身上（第二集 S01 八戒那句）。已改成 novocals 比 `out/SXX.mp4` 舊就重做
   - config 需要 `style_en`、`characters_en`、`names_en`、`no_text_rule_en`
 - 驗證（《密度》S06，2026-10-29）：H3 原聲把三句台詞**一字不差唸成中文**（ASR 逐字相符），小明說話時張嘴、旁白時段閉嘴。合成時仍靜音原聲換 TTS，嘴型跟著真正的台詞時段走
 
@@ -354,6 +382,15 @@ non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫
 | 混音後掉台詞（《月食》S11 重疊、《影子》S08 最後一句被推出片尾） | DTW 對齊錯位 | 混音版逐段跑 ASR；壞段刪掉 `align.json` 該段或手改 `lipsync.json` 起訖秒再 `mux.py` |
 | 一段裡要呈現兩種狀態（《月食》S05 偏食＋半影月食），後半變紅 | 一張首幀只能定一種狀態，H3 自己演變 | 拆成兩段（S05A／S05B），各有首幀 |
 | 日環食畫成小黑點、日偏食像月牙、月偏食缺口鋸齒 | prompt 描述不夠具體 | 日環食寫「黑色月球幾乎和太陽一樣大，停在正中央，只露出外圈細亮環」，不寫 corona；月偏食寫「影子邊緣是平滑的大圓弧」 |
+| 漫畫格順序調換後，8006 分鏡同一事件寫兩次、漏掉另一格（第六集紙飛機寫兩次、沿途風景不見） | `draft_storyboard.py` 依 `panel_notes` 的格號送原圖 `panel-NN.png`，notes 換了內容但原圖沒換，8006 照原圖又寫一次 | 調換格序時，連 `panel_dir` 的原圖檔名一起對調，或手修分鏡；分鏡交出前核對每格都有出現 |
+| 台詞被截斷成「…第五枚印章「科學印」（`<d>` 少了後半句） | 台詞裡有巢狀引號，`expand.py`／`tts.py` 的正則以第一個 `」` 結尾 | 台詞內層一律用『』（『科學印』）；`storyboard.md` 與 `lines.json` 一起改 |
+| 只有地圖的段落畫出月台和列車（第六集 S19） | 首幀 prompt 開頭固定帶 config 的 `style`，裡面寫了高鐵站場景 | 無人物的地圖／空景段，首幀 prompt 不帶 style 句、不給參考圖，寫「整個畫面被地圖填滿、看不到背景」 |
+| 「台南站大廳」四段都畫成月台（第六集） | `style` 寫了「高鐵站月台」，Qwen-Image 被它帶走 | 使用者接受月台；要室內大廳得從 `style` 拿掉月台字樣再重跑 |
+| 每列一個 `[Shot N]` 時每列都硬切（第七集 S01 5 秒切到背影） | 官方 `[Shot N]` 就是切鏡 | `prompt_format: official_mixed`：一場戲換視角才開 `[Shot N]`，同視角用 `At 00:0X.000, within the same continuous shot` |
+| mixed 下 H3 仍自己切（第七集 S01、S04、S07） | 分鏡鏡頭欄寫「近景／中近景」或動作是「轉頭望向遠處」，H3 當成換鏡 | 同一場戲鏡頭欄統一寫「中景」，要特寫才寫特寫；動作寫成原地完成 |
+| 鸚鵡的台詞變成悟空動嘴（第六集、第七集 S16） | 說話的鸚鵡停在悟空肩上，H3 分不清 | prompt 寫鸚鵡說話時先飛離肩膀、悟空全程閉嘴；更好是首幀就讓鸚鵡站在別處 |
+| 生首幀時 TTS 還開著，立繪一張 436 秒（關掉後 169 秒） | 記憶體被搶 | `qwen_frame.py` 開跑前自動關 TTS |
+| 「101」TTS 唸成一百零一 | 數字讀法 | config `pronounce` 加 `101→一零一`（字幕保留 101） |
 | 獨立段畫風不一致（部分偏 3D） | t2va 段落沒有共用參考 | 尚未解決：可改為每段都用 Qwen-Image 首幀 |
 
 ## 時間參考（本例）
@@ -376,3 +413,24 @@ H3 官方支援三種圖片錨定：首幀（I2VA）、尾幀（L2VA）、首尾
 - 用途：續接段的「特寫拉遠」要角色入鏡時，可用「前段末幀＋Qwen 尾幀」鎖住角色外觀；物理結果（浮/沉）也能用尾幀鎖定。
 - 實作：放 `<篇目>/frames/SXX_end.png`、config `last_frames` 列入該段 → expand.py 加尾幀句、run_series.sh 傳 `H3_LAST_FRAME`（Spark bench.py 接到 MiniMaxH3ImageToVideo 的 last_frame）。
 - 尾幀用 Qwen-Image 做，參考圖放該段首幀（或前段末幀＋角色圖）；浮在水面的物體要寫「一半露出水面」，否則 Qwen 會畫成懸在水中，H3 就會讓它沉下去（密度 S08）。
+
+## 單鏡運鏡與分身特效（2026-11-02，工作室開場片實驗）
+
+非漫畫篇目：以參考照風格合成「我在工作室」開場片（快轉分身 → 坐下寫字 → 推近 → 抬頭看鏡頭），素材在 Spark `~/h3-bench/intro/`。學到的事：
+
+- **段與段之間一律尾幀接首幀**：下一段首幀要從上一段影片擷取（`ffmpeg -sseof -0.05 ... -frames:v 1`），不要另外用 Qwen 生一張「差不多」的圖，構圖／姿勢／光線一不同就是跳接。用 Qwen 圖當下一段首幀、再用推近＋溶接掩飾，使用者仍看得出來。
+- **首尾幀景別差太大，H3 會在片中自己跳切**：全景首幀＋特寫尾幀（8 秒）在第 3 秒硬切；全景首幀＋中景尾幀（5 秒）也在 2.4 秒一幀跳到中景。`select=gt(scene,0.2)` 抓得到大跳，小一級景別的跳要看逐幀圖（fps=6 拼圖）。推近要一段只推一級景別，或不給尾幀讓它自由推。
+- **尾幀前會靜止**：H3 快到尾幀時人物停住約 1–1.5 秒；剪接點要用 `freezedetect=n=0.002:d=0.15` 找靜止段、切在靜止前，否則看起來是「停頓一下再跳」。下一段開頭也常有約 0.3 秒靜止，一起剪掉。
+- **不要在草稿上數位推近**：672×384 全景裡臉只有約 15–20 像素，模型逐幀猜五官，再 crop 放大就變形。要特寫就讓 H3 在 1376×768 用特寫首／尾幀原生生成（`H3_RESOLUTION=full`，studio/bench.py；8 秒約 13 分鐘，草稿約 2.5 分鐘）。
+- **Ref2VA 不能和首尾幀同時用**（bench.py 的 `H3_INFERENCE_MODE` 二選一）；要鎖臉就讓首尾幀本身是大臉。
+- **快轉分身做法**：同一張空場首幀＋同一張坐下尾幀＋固定鏡頭，換動作描述與 seed 生成多支（本例 4 支，都在約 9 秒坐下）；背景完全對齊，所以可直接疊。平均混合（`mix`）每人只剩 1/N 透明度太淡；人物比背景暗時用 `blend=all_mode=darken` 逐支疊，人全部是實體，最後一起坐下自然合一。再 `tmix` 拖影＋`setpts=PTS/3` 快轉。缺點：整體略變暗、合一瞬間有約 0.4 秒疊影；要更乾淨需做空場底板＋逐支人物遮罩。
+- **Qwen 改圖（7860 `/send_to_comfy`）**：image1＝底圖（editor background），`/add_single_ref` 加的圖依序成為 image2…；同一個 gradio_client Client 才共用參考圖狀態。改圖會沿用底圖尺寸（1120×637 底圖→1344×768），不照 aspect 選項。要求「鏡頭拉遠」從特寫圖改常常失敗，從全景圖改「鏡頭推近成中景」比較成功。
+- Qwen ComfyUI（8188）和 H3 記憶體互斥：7860 送出失敗（Connection refused）通常是 `qwen-image-comfyui` 被停掉，`docker start` 即可；跑 H3 前再 `docker stop`。
+
+## 日文版（2026-11-02，《凝結》）
+
+- 計畫與各篇進度見 `docs/japanese-version-plan.md`；目錄 `<篇目>_ja/`，Spark 上 `video`、`music` 用 symlink 指回中文版，`sfx/` 只連 `*_novocals.wav`（`lipsync.json`、`align.json` 是對中文台詞量的，不能沿用）
+- **ASR 不能用 Breeze**：Breeze 會把日文直接翻成中文。config 設 `"lang": "ja"`，`asr_check.py` 會改用 Spark 上的 `ggml-large-v3-turbo.bin`（`asr_spark.sh` 的 `ASR_MODEL_FILE`）；Spark 不能跑時直接停，不退回 Xavier
+- 日文 ASR 判讀：同音異字（梅雨＝露）代表字音對；多出音節（水油蒸気）或不同音（超温、女王）是壞句
+- **Whisper 驗不出讀音錯**：它照文意寫字，は 唸成 ha、常温 唸成 ちょうおん 都照樣寫對（《凝結》S04_04、S05_05 都這樣漏掉）。`lang: ja` 時 `asr_check.py` 會接著跑 `phoneme_check.py`：Spark 上 `facebook/wav2vec2-xlsr-53-espeak-cv-ft` 聽實際音素，和 `pronounce` 全假名逐音比對，標出 j↔ch、z↔s、w↔h 對調與整句相似度 < 0.6 的句子。k/t 被聽成 g/d 是正常的清音濁化，不算。標出的句子再人工試聽
+- Windows 上跑 `tts.py`／`asr_check.py` 要設 `PYTHONIOENCODING=utf-8`，否則片假名檔名印出時 cp950 報錯中斷

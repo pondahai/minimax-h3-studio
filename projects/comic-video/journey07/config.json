@@ -1,0 +1,285 @@
+{
+ "title": "現代西遊大冒險 第七集：悟空與AI的奇妙體驗",
+ "source": "https://shezi.org.tw/modern-journey/#weekly-journey-ep07（header＋panel-01～12）",
+ "style": "明亮日系校園少年漫畫動畫風、色彩飽和；台北101與城市天際線、明亮的現代科技展示館室內、大片落地窗",
+ "no_text_rule": "不要在畫面中出現任何文字、標籤、招牌字、黑板字、狀聲詞或圖示",
+ "ref_text": "大家好，今天天氣真好，我們一起去森林裡看看吧！",
+ "t2s": true,
+ "pronounce": {
+  "箍": "姑",
+  "101": "一零一",
+  "埕": "呈"
+ },
+ "lang": "zh",
+ "children": [
+  "悟空",
+  "八戒",
+  "悟淨"
+ ],
+ "no_text_rule_en": "No text of any kind may appear in the picture: no letters, signs, blackboard writing, labels, numbers, sound-effect lettering or icons.",
+ "prompt_format": "official_mixed",
+ "ref_transcript": {
+  "悟空": "我是孫悟空，今天下課想去體育館看看，你們要不要一起來？",
+  "八戒": "什麼？有食堂嗎？我……過不去！",
+  "悟淨": "你們兩個的判斷標準，是不是有問題？",
+  "鸚鵡": "打開來看看吧！下一站，尋找第二枚求知印！",
+  "AI小助手": "大家好！我是AI小助手！我可以回答問題、幫忙查資料、生成圖片，還可以幫忙想點子！"
+ },
+ "panel_dir": "C:/Users/USER/Documents/GitHub/minimax-h3-studio/projects/comic-video/journey07/source",
+ "style_en": "bright Japanese school shonen anime, saturated colors; Taipei 101 and the city skyline, a bright modern technology exhibition hall with large floor-to-ceiling windows",
+ "characters": "悟空＝棕色刺蝟爆炸頭、金色緊箍頭圈、黑底紅邊外套、紅色內搭、黑色背包；八戒＝圓胖男孩、黑色豬鼻圖案鴨舌帽、深藍運動外套、常拿著麵包；悟淨＝黑短髮、黑框眼鏡、淺藍襯衫、灰色背包、表情冷靜；鸚鵡＝紅頭、黃胸、綠藍翅膀的金剛鸚鵡卡通吉祥物，常停在悟空肩上或身邊；AI小助手＝白色小型人形機器人，圓白頭盔、深藍螢幕臉上發亮的淺藍圓眼與微笑、藍色耳機狀圓盤、胸前發光淺藍圓形標誌（無字），身高和十歲小孩差不多",
+ "characters_en": "Wukong (悟空) = a mischievous boy with spiky brown hair, a golden circlet headband, a black jacket with red trim over a red shirt, and a black backpack; Bajie (八戒) = a chubby boy in a black cap with a pig-snout emblem and a navy track jacket, often holding a bun; Wujing (悟淨) = a calm boy with short black hair, black-rimmed glasses, a light-blue shirt and a grey backpack; the parrot (鸚鵡) = a cartoon macaw mascot with a red head, yellow chest and green-blue wings, usually perched near Wukong; the AI robot (AI小助手) = a small friendly white humanoid robot with a round white helmet head, a dark blue screen face with glowing light-blue eyes and a smile, blue ear discs and a glowing light-blue round emblem on its chest (no letters), about as tall as a ten-year-old.",
+ "names_en": {
+  "悟空": "Wukong",
+  "八戒": "Bajie",
+  "悟淨": "Wujing",
+  "鸚鵡": "the parrot",
+  "AI小助手": "the AI robot"
+ },
+ "speakers": [
+  "悟空",
+  "八戒",
+  "悟淨",
+  "鸚鵡",
+  "AI小助手"
+ ],
+ "voices": {
+  "悟空": "十歲調皮男孩，台灣華語口音，聲音明亮有精神、語速偏快",
+  "八戒": "愛吃貪玩的胖小子，台灣國語腔調，聲音偏低、帶點撒嬌",
+  "悟淨": "沉著可靠的少年聲，台灣華語口音，咬字清楚、語速平穩",
+  "鸚鵡": "活潑尖細的卡通鸚鵡聲，台灣華語口音，高音調、語速快、有點聒噪",
+  "AI小助手": "聰明的機器人老師，年輕男聲，台灣華語口音，聲音乾淨明亮、語速平穩、有點一板一眼"
+ },
+ "looks_en": {
+  "Wukong": "the boy with spiky brown hair and a golden headband wearing a black jacket over a yellow shirt with red cuffs and red sneakers",
+  "Bajie": "the chubby boy with brown hair wearing a dark blue cap with pig ears, a navy blue zip-up jacket with white stripes, matching navy pants, and white sneakers with navy accents",
+  "Wujing": "the slender boy with messy black hair, black-rimmed glasses, a light blue t-shirt, dark navy pants, white sneakers, and a dark grey backpack",
+  "the parrot": "the small cartoon parrot with a blue crest, red and yellow face, green wings, and a blue belly with yellow and red tail feathers",
+  "the AI robot": "the small friendly white humanoid robot with a round white helmet head, a dark blue screen face with two glowing light-blue eyes and a smile, blue ear discs, and a glowing light-blue round emblem on its chest"
+ },
+ "tagline": "下一集：校園驚現真假悟空！尋找第七枚『真相印』",
+ "char_refs": {
+  "悟空": "journey01/frames/char_wukong.png",
+  "八戒": "journey01/frames/char_bajie.png",
+  "悟淨": "journey01/frames/char_wujing.png",
+  "鸚鵡": "journey02/frames/char_parrot.png",
+  "AI小助手": "journey07/frames/char_ai.png"
+ },
+ "panel_cast": {
+  "1": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡"
+  ],
+  "2": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡",
+   "AI小助手"
+  ],
+  "3": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡",
+   "AI小助手"
+  ],
+  "4": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡"
+  ],
+  "5": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡"
+  ],
+  "6": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡",
+   "AI小助手"
+  ],
+  "7": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡",
+   "AI小助手"
+  ],
+  "8": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡",
+   "AI小助手"
+  ],
+  "9": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡"
+  ],
+  "10": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡"
+  ],
+  "11": [
+   "悟空",
+   "八戒",
+   "悟淨",
+   "鸚鵡"
+  ],
+  "12": []
+ },
+ "panel_notes": {
+  "1": "本集沒有旁白，所有台詞都要標說話的角色；一列只放一句台詞。台北市區高處的觀景平台，遠方是台北101和城市天際線，鸚鵡停在悟空肩上。台詞：悟空「這次我們來到台北！聽說這裡有很多新的科技和AI應用！」悟淨「台北101好壯觀！也是一個充滿創新的城市！」鸚鵡「我們要尋找第六枚印章！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–5 悟空；5–9 悟淨；9–12 鸚鵡。",
+  "2": "明亮的科技展示館，大片落地窗，白色的AI小助手機器人迎面走來、舉起食指打招呼。台詞：AI小助手「大家好！我是AI小助手！」AI小助手「我可以回答問題、幫忙查資料、生成圖片，還可以幫忙想點子！」八戒「哇！AI好厲害！什麼都會嗎？」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–3 AI小助手；3–9 AI小助手；9–12 八戒。",
+  "3": "展示館桌上一台筆電，三人和鸚鵡圍著看，AI小助手在旁邊。台詞：悟空「我們請AI規劃台北一日遊吧！」AI小助手「推薦行程：台北101、象山步道、永康街美食、華山文創園區、大稻埕。」悟淨「好快！它給了景點、交通方式、美食推薦，還有地圖！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–3 悟空；3–8 AI小助手；8–12 悟淨。",
+  "4": "悟淨拿著手機，螢幕上是一張夢幻得不真實的台北夜景（天空太紫、大樓發光太誇張），八戒和悟空湊過來看。台詞：八戒「哇！這張圖片好漂亮！這是台北的真實景色嗎？」悟淨「看起來很像，但可能是AI生成的，不一定是真的。我們需要查證！」悟空「原來AI也可能出錯，或是編造內容！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–4 八戒；4–9 悟淨；9–12 悟空。",
+  "5": "悟淨對照兩張圖：一張夢幻的假夜景、一張真實的白天台北101，悟空和鸚鵡認真聽。台詞：悟淨「我們可以用不同的方式查證：」悟淨「第一，比較多個網站的資料；第二，看官方網站或可信的來源；」悟淨「第三，檢查圖片是不是真的；第四，想一想內容合不合理。」悟空「原來查證這麼重要！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–3 悟淨；3–9 悟淨；9–12 無台詞。第二段：0–6 悟淨；6–9 悟空；9–12 無台詞。",
+  "6": "展示館大螢幕上出現環保海報（海龜和藍色海浪，沒有字），悟空和八戒興奮地指著，AI小助手在旁邊。台詞：悟空「讓我們用AI來設計一張『台灣環保宣傳海報』吧！」AI小助手「好的！你想要什麼主題？」悟空「守護台灣，從減塑開始！」八戒「太棒了！還可以用來做學校的宣傳活動！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–4 悟空；4–6 AI小助手；6–8 悟空；8–12 八戒。",
+  "7": "三人、鸚鵡和AI小助手站在一起，一人說一點。台詞：悟淨「我們使用AI時，要記得：」AI小助手「第一，把AI當作助手，不是全部依賴。」悟淨「第二，重要的決定要自己思考。」八戒「第三，尊重別人的創作和隱私。」鸚鵡「第四，不輸入個人的重要資料。」悟空「第五，用AI來學習和創造，而不是作弊！」悟空「AI可以讓我們更厲害，但真正的想法和決定，還是要靠我們自己！」鸚鵡「對！腦袋還是我們自己的！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–2 悟淨；2–6 AI小助手；6–9 悟淨；9–12 八戒。第二段：0–3 鸚鵡；3–6 悟空；6–10 悟空；10–12 鸚鵡。",
+  "8": "AI小助手在展示館大螢幕前介紹，螢幕依序是書本、愛心、高鐵、大樹的圖示（沒有字），悟空和鸚鵡在旁邊聽。台詞：AI小助手「AI已經在很多地方幫助我們。」AI小助手「學習上，可以解釋難懂的概念、練習英文；」AI小助手「健康上，可以協助醫生分析，提醒健康習慣；」AI小助手「交通上，可以導航、預測班次；」AI小助手「環境上，可以監測天氣、節能減碳。」悟空「AI可以幫助解決真的問題，讓世界變得更好！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–3 AI小助手；3–8 AI小助手；8–12 AI小助手。第二段：0–3 AI小助手；3–7 AI小助手；7–12 悟空。",
+  "9": "展示館桌邊，三人拿著平板和筆電，鸚鵡停在桌上唸任務。台詞：鸚鵡「小任務：用AI解決一個台北的問題，完成一個小小創意作品！」鸚鵡「選一個主題，用AI收集資料，再加入自己的觀察和創意！」悟空「我們選擇『讓台北更適合小朋友遊玩』！」八戒「我來想點子！」悟淨「我來設計圖片！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–6 鸚鵡；6–12 鸚鵡。第二段：0–5 悟空；5–8 八戒；8–11 悟淨；11–12 無台詞。",
+  "10": "大螢幕上是他們做好的台北親子友善地圖（公園、圖書館、展覽館的小圖示，沒有字），三人和鸚鵡開心展示。台詞：悟空「我們用AI整理資料，再加上自己的想法，做出這張地圖！」悟淨「有適合小朋友的景點、安全的路線，還有好吃又健康的餐廳！」鸚鵡「AI給我們靈感，但真正讓它變得特別的，是我們的觀察和創意！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–5 悟空；5–11 悟淨；11–12 無台詞。第二段：0–7 鸚鵡；7–12 無台詞。",
+  "11": "金光中出現綠色圓形印章（大腦圖案，不寫字），悟空捧著地圖，八戒、悟淨和鸚鵡在旁。台詞：鸚鵡「善用AI，不盲從，保持好奇與思考，」鸚鵡「用創意解決問題，讓科技成為讓世界更好的力量。」悟空「太好了！我們得到第六枚印章『思考印』了！」八戒「原來AI不是魔法，而是工具！」悟淨「只要正確使用，我們就能創造更多可能！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 2 段。第一段：0–4 鸚鵡；4–10 鸚鵡；10–12 無台詞。第二段：0–4 悟空；4–7 八戒；7–11 悟淨；11–12 無台詞。",
+  "12": "台灣冒險地圖，六個彩色圓形印章（蓮花、書本、羅盤、分享、高鐵、大腦），其餘空圈，遠方一座校園剪影；畫面不放數字、不寫站數，沒有人物。台詞：鸚鵡（畫外音）「下一集：校園驚現真假悟空！尋找第七枚『真相印』！」【時間表】秒數照抄，一列一句，列數和秒數都不准改：寫 1 段：0–2 無台詞；2–8 鸚鵡；8–12 無台詞。"
+ },
+ "frame_cast": {},
+ "expand_notes": {
+  "S18": "畫面從頭到尾只有地圖，沒有任何人物、男孩或鸚鵡出現；鸚鵡的台詞是畫面外的旁白（off-screen voiceover），沒有人開口。"
+ },
+ "last_frames": [],
+ "frame_notes": {
+  "S01": "戶外：台北市區高處的觀景平台，白天藍天，遠方是台北101和城市天際線；三個小孩和停在棕髮男孩肩上的鸚鵡都在畫面裡。",
+  "S02": "白色小機器人在畫面深處、離三個小孩還有一段距離；三個小孩和鸚鵡在前景轉頭看它。",
+  "S03": "筆電螢幕上只有幾張風景小圖（高樓、山林、小吃、紅磚老屋），沒有任何字；白色小機器人站在桌旁。",
+  "S04": "手機螢幕上是一張夢幻得不真實的城市夜景（天空紫得發亮、大樓發光誇張），沒有任何字；地點是展示館落地窗邊，不是戶外。",
+  "S05": "地點是展示館落地窗邊；畫面只有眼鏡男孩、棕髮男孩和他肩上的鸚鵡。",
+  "S07": "大螢幕此時是一片空白的淡藍色光（海報還沒出現），沒有任何圖案或字；畫面只有棕髮男孩、胖男孩和白色小機器人。",
+  "S10": "大螢幕此時是空白的淡藍色光，沒有任何圖示或字；畫面只有白色小機器人、棕髮男孩和他肩上的鸚鵡。",
+  "S12": "桌上的平板和筆電螢幕都還是黑的（還沒打開）。",
+  "S14": "大螢幕上是一張彩色的城市地圖，只有公園、樹、小房子、圖書館的小圖示，沒有任何字。",
+  "S18": "只有地圖，沒有任何人物或鸚鵡；六個彩色圓形印章（蓮花、書本、羅盤、兩人分享、高鐵列車、大腦）上沒有字，其餘是空圈，地圖上沒有數字、問號或地名；不要畫展示館。"
+ },
+ "shots": [
+  [
+   "S01",
+   12,
+   "frames/S01.png"
+  ],
+  [
+   "S02",
+   12,
+   "frames/S02.png"
+  ],
+  [
+   "S03",
+   12,
+   "frames/S03.png"
+  ],
+  [
+   "S04",
+   12,
+   "frames/S04.png"
+  ],
+  [
+   "S05",
+   12,
+   "frames/S05.png"
+  ],
+  [
+   "S06",
+   12,
+   "S05"
+  ],
+  [
+   "S07",
+   12,
+   "frames/S07.png"
+  ],
+  [
+   "S08",
+   12,
+   "frames/S08.png"
+  ],
+  [
+   "S09",
+   12,
+   "S08"
+  ],
+  [
+   "S10",
+   12,
+   "frames/S10.png"
+  ],
+  [
+   "S11",
+   12,
+   "S10"
+  ],
+  [
+   "S12",
+   12,
+   "frames/S12.png"
+  ],
+  [
+   "S13",
+   12,
+   "S12"
+  ],
+  [
+   "S14",
+   12,
+   "frames/S14.png"
+  ],
+  [
+   "S15",
+   12,
+   "S14"
+  ],
+  [
+   "S16",
+   12,
+   "frames/S16.png"
+  ],
+  [
+   "S17",
+   12,
+   "S16"
+  ],
+  [
+   "S18",
+   12,
+   "frames/S18.png"
+  ]
+ ],
+ "panels": {
+  "S01": "frame-S01",
+  "S02": "frame-S02",
+  "S03": "frame-S03",
+  "S04": "frame-S04",
+  "S05": "frame-S05",
+  "S06": "frame-S05",
+  "S07": "frame-S07",
+  "S08": "frame-S08",
+  "S09": "frame-S08",
+  "S10": "frame-S10",
+  "S11": "frame-S10",
+  "S12": "frame-S12",
+  "S13": "frame-S12",
+  "S14": "frame-S14",
+  "S15": "frame-S14",
+  "S16": "frame-S16",
+  "S17": "frame-S16",
+  "S18": "frame-S18"
+ }
+}

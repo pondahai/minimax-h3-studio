@@ -1,0 +1,13 @@
+# 生成物不進 git（音檔、影片、圖片、log、review 頁）
+*.wav
+*.mp3
+*.mp4
+*.png
+*.jpg
+*.log
+review*.html
+**/mixed/list.txt
+**/audio/candidates/
+**/sfx/align*.json
+**/sfx/lipsync.json
+**/audio/asr.txt

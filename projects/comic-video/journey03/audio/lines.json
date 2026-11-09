@@ -1,0 +1,488 @@
+[
+ {
+  "file": "S01_00_悟空.wav",
+  "sid": "S01",
+  "start": 0,
+  "end": 4,
+  "who": "悟空",
+  "text": "佛光山的靜心印，拿到了！",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S01_04_悟淨.wav",
+  "sid": "S01",
+  "start": 4,
+  "end": 8,
+  "who": "悟淨",
+  "text": "第二站：故宮，尋找求知印！",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S01_08_鸚鵡.wav",
+  "sid": "S01",
+  "start": 8,
+  "end": 12,
+  "who": "鸚鵡",
+  "text": "出發出發！",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S02_00_悟空.wav",
+  "sid": "S02",
+  "start": 0,
+  "end": 3,
+  "who": "悟空",
+  "text": "哇！這就是故宮！",
+  "audio_sec": 1.44
+ },
+ {
+  "file": "S02_03_八戒.wav",
+  "sid": "S02",
+  "start": 3,
+  "end": 5,
+  "who": "八戒",
+  "text": "好壯觀！",
+  "audio_sec": 0.8
+ },
+ {
+  "file": "S02_05_悟淨.wav",
+  "sid": "S02",
+  "start": 5,
+  "end": 8,
+  "who": "悟淨",
+  "text": "這裡有好多古代的寶物！",
+  "audio_sec": 1.76
+ },
+ {
+  "file": "S02_08_鸚鵡.wav",
+  "sid": "S02",
+  "start": 8,
+  "end": 12,
+  "who": "鸚鵡",
+  "text": "我們能找到第二枚印章嗎？",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S03_00_悟空.wav",
+  "sid": "S03",
+  "start": 0,
+  "end": 4,
+  "who": "悟空",
+  "text": "哇！這就是翠玉白菜！",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S03_04_八戒.wav",
+  "sid": "S03",
+  "start": 4,
+  "end": 8,
+  "who": "八戒",
+  "text": "看起來好真實，好精緻！",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S03_08_悟淨.wav",
+  "sid": "S03",
+  "start": 8,
+  "end": 12,
+  "who": "悟淨",
+  "text": "你們看，旁邊有一張小紙條！",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S04_00_悟淨.wav",
+  "sid": "S04",
+  "start": 0,
+  "end": 5,
+  "who": "悟淨",
+  "text": "真正的寶物，不只是看見，而是看懂。",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S04_05_悟空.wav",
+  "sid": "S04",
+  "start": 5,
+  "end": 7,
+  "who": "悟空",
+  "text": "這是什麼意思？",
+  "audio_sec": 1.28
+ },
+ {
+  "file": "S04_07_八戒.wav",
+  "sid": "S04",
+  "start": 7,
+  "end": 10,
+  "who": "八戒",
+  "text": "是印章的線索嗎？",
+  "audio_sec": 1.44
+ },
+ {
+  "file": "S04_10_鸚鵡.wav",
+  "sid": "S04",
+  "start": 10,
+  "end": 12,
+  "who": "鸚鵡",
+  "text": "畫了三個寶物！",
+  "audio_sec": 1.92
+ },
+ {
+  "file": "S05_00_悟空.wav",
+  "sid": "S05",
+  "start": 0,
+  "end": 5,
+  "who": "悟空",
+  "text": "閉館了！但是博物館的燈怎麼還亮著？",
+  "audio_sec": 4.16
+ },
+ {
+  "file": "S05_05_八戒.wav",
+  "sid": "S05",
+  "start": 5,
+  "end": 7,
+  "who": "八戒",
+  "text": "好像有什麼在動……",
+  "audio_sec": 1.44
+ },
+ {
+  "file": "S05_07_悟淨.wav",
+  "sid": "S05",
+  "start": 7,
+  "end": 10,
+  "who": "悟淨",
+  "text": "我們小心一點，跟著看看！",
+  "audio_sec": 1.6
+ },
+ {
+  "file": "S05_10_悟空.wav",
+  "sid": "S05",
+  "start": 10,
+  "end": 12,
+  "who": "悟空",
+  "text": "線索就在那裡！",
+  "audio_sec": 1.6
+ },
+ {
+  "file": "S06_00_青銅鼎.wav",
+  "sid": "S06",
+  "start": 0,
+  "end": 4,
+  "who": "青銅鼎",
+  "text": "歡迎來到故宮！我是青銅鼎！",
+  "audio_sec": 2.72
+ },
+ {
+  "file": "S06_04_翠玉白菜.wav",
+  "sid": "S06",
+  "start": 4,
+  "end": 8,
+  "who": "翠玉白菜",
+  "text": "我是翠玉白菜，代表精細的工藝。",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S06_08_青花瓷瓶.wav",
+  "sid": "S06",
+  "start": 8,
+  "end": 12,
+  "who": "青花瓷瓶",
+  "text": "每一件文物都有故事，想聽嗎？",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S07_00_青銅鼎.wav",
+  "sid": "S07",
+  "start": 0,
+  "end": 6,
+  "who": "青銅鼎",
+  "text": "古代的人用鼎來煮食物，也代表秩序與信任。",
+  "audio_sec": 4.16
+ },
+ {
+  "file": "S07_06_翠玉白菜.wav",
+  "sid": "S07",
+  "start": 6,
+  "end": 12,
+  "who": "翠玉白菜",
+  "text": "其實我是用一整塊玉雕刻的，展現匠人的細心。",
+  "audio_sec": 4.8
+ },
+ {
+  "file": "S08_00_悟淨.wav",
+  "sid": "S08",
+  "start": 0,
+  "end": 5,
+  "who": "悟淨",
+  "text": "原來如此！看起來簡單，背後有這麼多知識！",
+  "audio_sec": 4.48
+ },
+ {
+  "file": "S08_05_八戒.wav",
+  "sid": "S08",
+  "start": 5,
+  "end": 9,
+  "who": "八戒",
+  "text": "我以前以為只是漂亮的石頭！",
+  "audio_sec": 2.08
+ },
+ {
+  "file": "S08_09_悟空.wav",
+  "sid": "S08",
+  "start": 9,
+  "end": 12,
+  "who": "悟空",
+  "text": "終於懂它們的價值了！",
+  "audio_sec": 1.76
+ },
+ {
+  "file": "S09_00_學者.wav",
+  "sid": "S09",
+  "start": 0,
+  "end": 4,
+  "who": "學者",
+  "text": "完成三個問題，才能獲得求知印！",
+  "audio_sec": 3.84
+ },
+ {
+  "file": "S09_04_學者.wav",
+  "sid": "S09",
+  "start": 4,
+  "end": 8,
+  "who": "學者",
+  "text": "第一，翠玉白菜的材質是什麼？",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S09_08_學者.wav",
+  "sid": "S09",
+  "start": 8,
+  "end": 12,
+  "who": "學者",
+  "text": "第二，古代人為什麼要製作鼎？",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S10_00_學者.wav",
+  "sid": "S10",
+  "start": 0,
+  "end": 5,
+  "who": "學者",
+  "text": "第三，從文物可以學到哪些生活智慧？",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S10_05_悟空.wav",
+  "sid": "S10",
+  "start": 5,
+  "end": 7,
+  "who": "悟空",
+  "text": "我們一起想想！",
+  "audio_sec": 1.28
+ },
+ {
+  "file": "S10_07_八戒.wav",
+  "sid": "S10",
+  "start": 7,
+  "end": 9,
+  "who": "八戒",
+  "text": "我來查資料！",
+  "audio_sec": 1.12
+ },
+ {
+  "file": "S10_09_悟淨.wav",
+  "sid": "S10",
+  "start": 9,
+  "end": 12,
+  "who": "悟淨",
+  "text": "我用筆記整理。",
+  "audio_sec": 1.6
+ },
+ {
+  "file": "S11_00_悟空.wav",
+  "sid": "S11",
+  "start": 0,
+  "end": 4,
+  "who": "悟空",
+  "text": "我們可以用 AI 幫忙查資料，",
+  "audio_sec": 1.92
+ },
+ {
+  "file": "S11_04_悟空.wav",
+  "sid": "S11",
+  "start": 4,
+  "end": 8,
+  "who": "悟空",
+  "text": "但不能直接複製答案，",
+  "audio_sec": 1.6
+ },
+ {
+  "file": "S11_08_悟空.wav",
+  "sid": "S11",
+  "start": 8,
+  "end": 12,
+  "who": "悟空",
+  "text": "要自己思考和整理！",
+  "audio_sec": 1.6
+ },
+ {
+  "file": "S12_00_八戒.wav",
+  "sid": "S12",
+  "start": 0,
+  "end": 5,
+  "who": "八戒",
+  "text": "我們再確認資料的來源，確保正確！",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S12_05_鸚鵡.wav",
+  "sid": "S12",
+  "start": 5,
+  "end": 9,
+  "who": "鸚鵡",
+  "text": "原來 AI 是學習夥伴，",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S12_09_鸚鵡.wav",
+  "sid": "S12",
+  "start": 9,
+  "end": 12,
+  "who": "鸚鵡",
+  "text": "不是答案機！",
+  "audio_sec": 1.76
+ },
+ {
+  "file": "S13_00_悟空.wav",
+  "sid": "S13",
+  "start": 0,
+  "end": 5,
+  "who": "悟空",
+  "text": "第一題！翠玉白菜是用一整塊玉石雕刻的！",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S13_05_八戒.wav",
+  "sid": "S13",
+  "start": 5,
+  "end": 8,
+  "who": "八戒",
+  "text": "第二題！鼎用來煮食物，",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S13_08_八戒.wav",
+  "sid": "S13",
+  "start": 8,
+  "end": 12,
+  "who": "八戒",
+  "text": "也代表權力、秩序和誠信。",
+  "audio_sec": 2.88
+ },
+ {
+  "file": "S14_00_悟淨.wav",
+  "sid": "S14",
+  "start": 0,
+  "end": 4,
+  "who": "悟淨",
+  "text": "第三題！我們學到細心、創意，",
+  "audio_sec": 2.56
+ },
+ {
+  "file": "S14_04_悟淨.wav",
+  "sid": "S14",
+  "start": 4,
+  "end": 8,
+  "who": "悟淨",
+  "text": "文化傳承，還有珍惜前人智慧。",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S14_08_學者.wav",
+  "sid": "S14",
+  "start": 8,
+  "end": 12,
+  "who": "學者",
+  "text": "答得很好！你們不只看見，還看懂了。",
+  "audio_sec": 3.68
+ },
+ {
+  "file": "S15_00_學者.wav",
+  "sid": "S15",
+  "start": 0,
+  "end": 4,
+  "who": "學者",
+  "text": "這枚印章，就是求知印。",
+  "audio_sec": 2.24
+ },
+ {
+  "file": "S15_04_學者.wav",
+  "sid": "S15",
+  "start": 4,
+  "end": 8,
+  "who": "學者",
+  "text": "願你們保持好奇，不斷學習，",
+  "audio_sec": 3.36
+ },
+ {
+  "file": "S15_08_學者.wav",
+  "sid": "S15",
+  "start": 8,
+  "end": 12,
+  "who": "學者",
+  "text": "看見世界更多的故事。",
+  "audio_sec": 3.2
+ },
+ {
+  "file": "S16_00_悟空.wav",
+  "sid": "S16",
+  "start": 0,
+  "end": 4,
+  "who": "悟空",
+  "text": "太好了！我們拿到第二枚印章了！",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S16_04_八戒.wav",
+  "sid": "S16",
+  "start": 4,
+  "end": 7,
+  "who": "八戒",
+  "text": "下一站是哪裡呢？",
+  "audio_sec": 1.28
+ },
+ {
+  "file": "S16_07_鸚鵡.wav",
+  "sid": "S16",
+  "start": 7,
+  "end": 12,
+  "who": "鸚鵡",
+  "text": "地圖上還有十個地方！",
+  "audio_sec": 3.04
+ },
+ {
+  "file": "S17_00_悟淨.wav",
+  "sid": "S17",
+  "start": 0,
+  "end": 5,
+  "who": "悟淨",
+  "text": "還剩十枚印章，還有神秘的第十三站……",
+  "audio_sec": 3.52
+ },
+ {
+  "file": "S17_05_悟空.wav",
+  "sid": "S17",
+  "start": 5,
+  "end": 8,
+  "who": "悟空",
+  "text": "下一站：九份！",
+  "audio_sec": 1.6
+ },
+ {
+  "file": "S17_08_鸚鵡.wav",
+  "sid": "S17",
+  "start": 8,
+  "end": 12,
+  "who": "鸚鵡",
+  "text": "尋找第三枚，探索印！",
+  "audio_sec": 3.68
+ }
+]

@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] A bright, sunny Japanese school shonen anime scene inside a classroom with saturated colors. Wukong sits at a desk drawing a treasure chest, while Teacher Tang leans in from the side to inspect him. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, A close-up shot of Wukong at his desk, hunched over with a mischievous grin as he sketches a chest with his pencil; his shoulders shake with suppressed laughter. Wukong (S1) says slowly, <d>[Chinese] 下一次的計畫……</d> At 00:04.000, Teacher Tang enters the frame from the side, squinting her eyes as she leans in to inspect Wukong's work, her expression stern and suspicious. Teacher Tang (S2) says slowly, <d>[Chinese] 什麼？</d> At 00:07.000, Wukong jumps in surprise, quickly covering the paper with his hand and sitting up straight with a forced innocent smile, pretending to write. Wukong sits rigidly at his desk, hand pressed firmly over his drawing, maintaining a nervous smile as he looks ahead.
+
+overall_soundscape: The scratch of a pencil tip against paper, the rustle of paper being covered, and the distant sound of classroom chatter.
+
+non_diegetic_music: N/A

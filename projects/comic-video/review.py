@@ -1,6 +1,7 @@
 """產出分鏡審查頁 <篇目>/review.html：每段首幀候選（標建議 seed 與理由）＋時間軸、鏡頭、台詞。
 
-用法：python review.py <篇目>
+用法：python review.py <篇目> [--lite]
+  --lite：瘦身版 review_lite.html，每段只放建議的那張首幀（320 寬、JPEG 品質 45），手機傳送用
 圖片內嵌成 base64 JPEG（360 寬縮圖，控制檔案大小讓手機與內建瀏覽器打得開），單獨傳 review.html 也看得到圖。
 首幀段＝config shots 第三欄是圖檔的段，候選為 frames/<名稱>_seedN.png；建議與理由寫在 <篇目>/review.json（{"rec": {段: seed}, "notes": {段: 理由}}）。
 """
@@ -24,11 +25,14 @@ table{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:8px} th,td
 @media (max-width:640px){.frames{grid-template-columns:1fr} .cam{white-space:normal}}"""
 
 
+LITE = False
+
+
 def embed(p):
     im = Image.open(p).convert("RGB")
-    im.thumbnail((360, 360))
+    im.thumbnail((320, 320) if LITE else (360, 360))
     buf = io.BytesIO()
-    im.save(buf, "JPEG", quality=60, optimize=True)
+    im.save(buf, "JPEG", quality=45 if LITE else 60, optimize=True)
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
@@ -41,6 +45,8 @@ def section(d, block, src, rec, note):
     elif src.endswith(".png"):
         stem = Path(src).stem
         seeds = sorted(d.glob(f"frames/{stem}_seed*.png"))
+        if LITE and rec:
+            seeds = [p for p in seeds if p.stem.endswith(f"seed{rec}")]
         figs = "".join(f'<figure class="{"rec" if p.stem.endswith(f"seed{rec}") else ""}"><img src="{embed(p)}" loading="lazy">'
                        f'<figcaption>{p.stem.rsplit("_", 1)[1]}{" ★ 建議" if p.stem.endswith(f"seed{rec}") else ""}</figcaption></figure>'
                        for p in seeds)
@@ -54,7 +60,8 @@ def section(d, block, src, rec, note):
 
 
 if __name__ == "__main__":
-    cfg, d, _ = comic.load()
+    cfg, d, args = comic.load()
+    LITE = "--lite" in args
     rv = json.loads((d / "review.json").read_text(encoding="utf-8")) if (d / "review.json").exists() else {}
     src = {sid: s for sid, _, s in cfg["shots"]}
     blocks = [b.split("\n**總長")[0] for b in re.split(r"\n(?=### S\d+[A-Z]?)", (d / "storyboard.md").read_text(encoding="utf-8"))[1:]]
@@ -63,8 +70,9 @@ if __name__ == "__main__":
     n_cont = sum(s in src for s in src.values())
     total = sum(comic.durations(cfg).values())
     page = (f'<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            f'<title>{html.escape(cfg["id"])} 分鏡審查</title><style>{CSS}</style></head><body><main><h1>{html.escape(cfg["title"])}</h1>'
+            f'<title>{html.escape(cfg["id"])} 分鏡審查</title><style>{CSS}{".frames{grid-template-columns:minmax(0,480px)}" if LITE else ""}</style></head><body><main><h1>{html.escape(cfg["title"])}</h1>'
             f'<p class="sub">分鏡審查稿｜{len(src)} 段約 {total} 秒｜672×384 草稿｜首幀段 {n_frame} 段（每段多個 seed，綠框為建議），'
             f'續接段 {n_cont} 段接前段末幀｜畫面不放字，標語與說明改成台詞／字幕</p>{body}</main></body></html>')
-    (d / "review.html").write_text(page, encoding="utf-8")
-    print("輸出：", d / "review.html")
+    out = d / ("review_lite.html" if LITE else "review.html")
+    out.write_text(page, encoding="utf-8")
+    print("輸出：", out)

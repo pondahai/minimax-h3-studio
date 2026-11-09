@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Bright Japanese school shonen anime style with saturated colors, set on a Tainan historic stone wall overlooking the ocean at sunset, with the city's iconic tower on the right. Continuing the previous shot, seen from behind: Wukong, Bajie, Wujing and the parrot all sit side by side on the wall, gazing at the water as the sun descends. All four stay in frame for the first seven seconds; nobody leaves. Every character speaks slowly and calmly like a patient teacher talking to young children, with a clear pause at each comma; each line fills most of its time slot. At 00:00.000, Medium static shot from behind the group: Wujing, the boy with black hair, black-rimmed glasses and a grey backpack, turns his head slightly and pushes his glasses up; Wukong and Bajie sit quietly beside him watching the sunset; the parrot tilts its head. Wujing (S1) says slowly, <d>[Chinese] 台南真是一個充滿美食、歷史和人情味的地方！</d> Only Wujing is speaking; Wukong, Bajie and the parrot keep their mouths closed. At 00:07.000, Long static shot: the sunset sun sinks slowly into the sea horizon, the sky transitions from orange-red to deep blue, and the ocean surface shimmers with golden light reflections; no characters are present.
+
+overall_soundscape: A gentle ocean breeze and the soft lapping of waves against the shore. Faint distant birdsong over the water.
+
+non_diegetic_music: N/A

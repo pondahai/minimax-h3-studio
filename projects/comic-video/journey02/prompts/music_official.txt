@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Bright Japanese shonen anime style. A static wide shot of an empty sunny temple courtyard on a green hillside, with beige stone walls, traditional curved roofs and a tall pagoda under a blue sky. Leaves sway gently in a light breeze and small white clouds drift slowly across the sky. No people or animals appear in the scene, and the camera stays still for the whole shot.
+
+overall_soundscape: A soft breeze rustles the leaves, with faint distant birdsong.
+
+non_diegetic_music: A warm, gentle and cheerful instrumental piece for a school field trip, led by a light guzheng melody and soft flute over warm acoustic guitar and piano chords, with soft hand percussion keeping an easy, unhurried walking beat, at a relaxed tempo and soft, even dynamics.

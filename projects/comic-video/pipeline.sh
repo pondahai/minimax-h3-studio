@@ -20,7 +20,22 @@ set_busy_status() {
     -H 'Content-Type: application/json' \
     -d "{\"busy\": $1, \"reason\": \"H3（$NAME）正在運作\"}" > /dev/null 2>&1 || true
 }
-trap 'set_busy_status false' EXIT
+# 跑完（DONE、ABORT、被 pkill 暫停都算）把開跑前停掉的服務開回來。
+# 2026-11-06 起 8006（qwen3.8-nvfp4）常駐、跑 H3 時改停 8002：跑完拉回 8002，8006 若不在也順手拉起。
+# ComfyUI 是 comfy-ondemand 按需啟動，不還原。
+RESTORE_TTS=""
+restore_services() {
+  docker ps --format '{{.Names}}' | grep -qx qwen3.8-nvfp4 || { docker start qwen3.8-nvfp4 > /dev/null 2>&1 && echo "$(date '+%F %T') 8006 沒在跑，已啟動" >> "$ST"; }
+  if [ -n "$RESTORE_TTS" ]; then
+    (cd ~/dgx-voxcpm-eval && . .venv/bin/activate && setsid -f python chinese_tts_server.py > tts.log 2>&1 < /dev/null)
+    echo "$(date '+%F %T') 還原 TTS（:8792）" >> "$ST"
+  fi
+  if ! pgrep -f "[l]lama-server.*--port 8002" > /dev/null && [ -x ~/models/qwen3.6-abliterated/start.sh ]; then
+    setsid -f ~/models/qwen3.6-abliterated/start.sh >> ~/models/qwen3.6-abliterated/llama-server.log 2>&1 < /dev/null
+    echo "$(date '+%F %T') 還原 8002（llama.cpp）" >> "$ST"
+  fi
+}
+trap 'set_busy_status false; restore_services' EXIT
 set_busy_status true
 
 # 等 Qwen-Image 手上的工作做完才交班，不強制中斷進行中的生圖任務。
@@ -44,7 +59,7 @@ except Exception:
   return 1
 }
 
-# 0. 互斥檢查：只留 8002，TTS／Qwen-Image／Demucs／其他 H3 都不能開
+# 0. 互斥檢查：TTS／Qwen-Image／Demucs／其他 H3／8002 都不能開；8006 常駐（2026-11-06 起，H3＋8006 約 90 GB／121 GB）
 # qwen-gradio-ui 豁免不停：前端很輕（透過 ComfyUI 才佔記憶體），停掉 qwen-image-comfyui 後
 # 它只是連不到後端、頁面顯示讀取中，不會額外佔用 H3 需要的記憶體；保留它讓使用者至少能看到
 # 頁面還在、知道「現在不能生圖」，而不是整個 8443 直接斷線。
@@ -54,28 +69,53 @@ if docker ps --format '{{.Names}}' | grep -qx qwen-image-comfyui; then
   say "停掉 qwen-image-comfyui"
   docker stop qwen-image-comfyui > /dev/null
 fi
-docker ps --format '{{.Names}}' | grep -qx qwen3.8-nvfp4 && { say "停掉 qwen3.8-nvfp4"; docker stop qwen3.8-nvfp4 > /dev/null; }
-pgrep -f "[c]hinese_tts_server.py" > /dev/null && { say "停掉 TTS"; pkill -f "[c]hinese_tts_server.py"; }
+pgrep -f "[l]lama-server.*--port 8002" > /dev/null && { say "停掉 8002（跑完會還原）"; pkill -f "[l]lama-server.*--port 8002"; }
+pgrep -f "[c]hinese_tts_server.py" > /dev/null && { say "停掉 TTS（跑完會還原）"; pkill -f "[c]hinese_tts_server.py"; RESTORE_TTS=1; }
 if docker ps --format '{{.Names}}' | grep -qE '^h3-|^demucs'; then say "ABORT 已有 H3／Demucs 在跑"; exit 1; fi
 for f in config.json prompts/music_official.txt audio/lines.json; do [ -f "$f" ] || { say "ABORT 缺 $f"; exit 1; }; done
 SIDS=$(python3 -c 'import json; print(" ".join(s for s, _, _ in json.load(open("config.json"))["shots"]))')
-for sid in $SIDS; do [ -f "prompts/$sid.txt" ] && [ -f "frames/$sid.png" ] || { say "ABORT 缺 $sid 的 prompt 或首幀"; exit 1; }; done
+# 首幀來源是圖檔才檢查圖；續接段（來源＝前段名）只要 prompt，首幀由 run_series.sh 取前段末幀
+python3 -c 'import json
+for s, _, src in json.load(open("config.json"))["shots"]: print(s, src)' | while read -r sid src; do
+  [ -f "prompts/$sid.txt" ] || { say "ABORT 缺 $sid 的 prompt"; exit 1; }
+  case "$src" in *.png) [ -f "$src" ] || { say "ABORT 缺 $sid 的首幀 $src"; exit 1; } ;; esac
+done || exit 1
 say "開始：$SIDS ＋ music1"
 
-# 1. 配樂
+# 1. 配樂：H3 配樂是抽卡，常混吟唱／誦經／說話聲（第六集 seed 1、2 都中）。
+#   prompt 補禁止人聲句（降低機率）；每個 seed 生成後用 Demucs 拆人聲軌「只做偵測」，
+#   人聲軌 RMS／伴奏 RMS > 0.1 或人聲軌 ASR（去掉括號幻聽）有中文 → 換下一個 seed，最多 MUSIC_TRIES 個。
+#   bgm.wav 一律用原始配樂（Demucs 去人聲後伴奏受損嚴重，第六集使用者試聽否決）。
+#   實測：有人聲 8.4、5.6；乾淨 0.002、0.011。
 mkdir -p music
-if [ ! -f out/music1.mp4 ]; then
-  bash "$ROOT/run_jobs.sh" "$NAME" "music1 prompts/music_official.txt 1 12 -"
-fi
-if [ -f out/music1.mp4 ]; then
-  ffmpeg -y -loglevel error -i out/music1.mp4 -vn -ar 44100 music/music1.wav && cp music/music1.wav music/bgm.wav
-  tmp=$(mktemp -d); cp music/music1.wav "$tmp/000.wav"
+NOVOX="Strictly instrumental with no human voice at all: no vocals, no singing, no humming, no chanting, no choir, no speech."
+sed "/^non_diegetic_music:/ { /no vocals/! s/\$/ $NOVOX/ }" prompts/music_official.txt > prompts/music_run.txt
+music_ok=""
+for seed in $(seq 1 ${MUSIC_TRIES:-4}); do
+  m=music$seed
+  [ -f out/$m.mp4 ] || bash "$ROOT/run_jobs.sh" "$NAME" "$m prompts/music_run.txt $seed 12 -"
+  [ -f out/$m.mp4 ] || { say "$m 生成失敗"; continue; }
+  ffmpeg -y -loglevel error -i out/$m.mp4 -vn -ar 44100 music/$m.wav
+  cp music/$m.wav music/${m}_h3.wav
+  docker run --rm --name demucs-music --gpus all --ipc=host -v "$BASE/music:/w" demucs-sfx ${m}_h3.wav >> post.log 2>&1
+  rm -f music/${m}_h3.wav
+  if [ ! -f music/${m}_vocals.wav ]; then say "$m Demucs 失敗，無法偵測人聲，暫用（看 post.log）"; music_ok=$m; break; fi
+  ratio=$(python3 -c "
+import wave, array, math
+def rms(f):
+    w = wave.open(f); a = array.array('h', w.readframes(w.getnframes())); return math.sqrt(sum(x*x for x in a) / max(len(a), 1))
+print(round(rms('music/${m}_vocals.wav') / max(rms('music/${m}_novocals.wav'), 1e-6), 3))")
+  tmp=$(mktemp -d); cp music/${m}_vocals.wav "$tmp/000.wav"
   asr=$(tar -C "$tmp" -cf - 000.wav | bash "$ROOT/asr_spark.sh" 2>/dev/null | cut -f2-); rm -rf "$tmp"
-  if echo "$asr" | grep -qP '[\x{4e00}-\x{9fff}]'; then say "music1 完成，ASR 聽到人聲：$asr（仍暫用當 bgm，要人聽）"
-  else say "music1 完成，ASR 沒聽到人聲（${asr:-空白}），已設成 bgm.wav"; fi
-else
-  say "music1 失敗，試聽版會沒有配樂"
-fi
+  # whisper 對純音樂常幻聽成括號短語（「(日語)」「(我愛你)」），去掉括號內容再判斷
+  if python3 -c "import sys; sys.exit(0 if float('$ratio') > 0.1 else 1)" || echo "$asr" | sed 's/([^)]*)//g' | grep -qP '[\x{4e00}-\x{9fff}]'; then
+    say "$m 有人聲（人聲／伴奏 $ratio，人聲軌 ASR：${asr:-空白}），換下一個 seed"
+  else
+    say "$m 乾淨（人聲／伴奏 $ratio），設成 bgm.wav"; music_ok=$m; break
+  fi
+done
+if [ -n "$music_ok" ]; then cp music/$music_ok.wav music/bgm.wav
+else say "配樂 ${MUSIC_TRIES:-4} 個 seed 都有人聲，試聽版沒有配樂，要人處理"; rm -f music/bgm.wav; fi
 
 # 2. 各段 H3：失敗重試 1 次，仍失敗就跳過
 failed=""
