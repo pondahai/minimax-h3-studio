@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>鏡頭換人 · MiniMax H3 Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: {
+      brand: { 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5' },
+      surface: { 800: '#18181b', 850: '#141416', 900: '#0c0c0e', 950: '#060608' } } } } }
+  </script>
+  <style>
+    body { font-family: system-ui, 'Microsoft JhengHei', sans-serif; }
+    .btn { padding: .3rem .65rem; border-radius: .5rem; font-size: .75rem; font-weight: 600; border: 1px solid #3f3f46; background: #18181b; color: #e4e4e7; }
+    .btn:hover:not(:disabled) { background: #27272a; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-primary { background: #4f46e5; border-color: #6366f1; color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #6366f1; }
+    .btn-ok { border-color: #059669; color: #6ee7b7; }
+    .btn-warn { border-color: #b45309; color: #fcd34d; }
+    .tag { font-size: .65rem; font-weight: 700; padding: .05rem .4rem; border-radius: 9999px; border: 1px solid; white-space: nowrap; }
+    textarea, input, select { background: #0c0c0e; border: 1px solid #3f3f46; border-radius: .5rem; color: #e4e4e7; font-size: .8rem; padding: .4rem .55rem; }
+    video { background: #000; border-radius: .5rem; width: 100%; }
+  </style>
+</head>
+<body class="bg-surface-950 text-zinc-100 min-h-screen">
+  <header class="border-b border-zinc-800 bg-surface-900 px-4 md:px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+    <div>
+      <h1 class="font-bold text-base">🎬 鏡頭分段換人 <span class="text-xs text-zinc-400 font-normal">v2 · 依鏡頭切換分段、逐段提示詞、逐段驗收</span></h1>
+      <p id="queueLine" class="text-[11px] text-zinc-400 mt-0.5">排隊器閒置</p>
+    </div>
+    <a href="/" class="btn">← 回 Studio</a>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 md:px-6 py-5 space-y-6">
+    <!-- 建立專案 -->
+    <section id="createBox" class="rounded-xl border border-zinc-800 bg-surface-900 p-4 space-y-3">
+      <h2 class="font-semibold text-sm">新增專案</h2>
+      <div class="grid md:grid-cols-2 gap-3 text-xs">
+        <label class="space-y-1 block"><span class="text-zinc-400">原片（任意長度）</span>
+          <input id="srcFile" type="file" accept="video/*" class="w-full"></label>
+        <label class="space-y-1 block"><span class="text-zinc-400">角色圖（1～9 張，第一張為 &lt;Picture 1&gt;）</span>
+          <input id="imgFiles" type="file" accept="image/*" multiple class="w-full"></label>
+        <label class="space-y-1 block md:col-span-2"><span class="text-zinc-400">全域構想（每段擴寫都會用到，例如「把穿灰外套的男人換成參考圖的女生，連服裝一起換」）</span>
+          <textarea id="newIdea" rows="2" class="w-full"></textarea></label>
+        <label class="space-y-1 block"><span class="text-zinc-400">後端</span>
+          <select id="newBackend" class="w-full"><option value="spark">DGX Spark</option><option value="colab">Google Colab A100</option></select></label>
+        <label class="space-y-1 block"><span class="text-zinc-400">解析度（Spark 才有草稿；Colab 一律 full）</span>
+          <select id="newRes" class="w-full"><option value="draft">草稿 672×384</option><option value="full">full 1376×768</option></select></label>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="createBtn" class="btn btn-primary" onclick="createProject()">上傳並分析鏡頭</button>
+        <span id="createMsg" class="text-xs text-zinc-400"></span>
+      </div>
+    </section>
+
+    <section class="rounded-xl border border-zinc-800 bg-surface-900 p-4">
+      <h2 class="font-semibold text-sm mb-2">既有專案</h2>
+      <div id="projectList" class="flex flex-wrap gap-2 text-xs"></div>
+    </section>
+
+    <!-- 專案 -->
+    <section id="projectBox" class="hidden space-y-4">
+      <div class="rounded-xl border border-zinc-800 bg-surface-900 p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="pTitle" class="font-semibold"></h2>
+          <span id="pMeta" class="text-xs text-zinc-400"></span>
+        </div>
+        <div class="flex flex-wrap items-start gap-3 text-xs">
+          <label class="flex-1 min-w-[280px] space-y-1"><span class="text-zinc-400">全域構想</span>
+            <textarea id="pIdea" rows="2" class="w-full" onchange="saveSettings()"></textarea></label>
+          <label class="space-y-1"><span class="text-zinc-400">後端</span><br>
+            <select id="pBackend" onchange="saveSettings()"><option value="spark">DGX Spark</option><option value="colab">Colab A100</option></select></label>
+          <label class="space-y-1"><span class="text-zinc-400">解析度</span><br>
+            <select id="pRes" onchange="saveSettings()"><option value="draft">草稿</option><option value="full">full</option></select></label>
+        </div>
+        <div class="text-[11px] text-zinc-400 leading-relaxed">
+          流程：<b class="text-zinc-200">① 確認分鏡</b>（合併／在播放位置拆分／標成保留原片）→
+          <b class="text-zinc-200">② 確認提示詞</b>（逐段擴寫後可修改）→
+          <b class="text-zinc-200">③ 送出生成</b>（依序排隊，一次一段）→
+          <b class="text-zinc-200">④ 逐段驗收</b>（通過／重跑／保留原片）→ 合併輸出（音軌用原片）。
+          <span class="text-amber-300">黃色＝強制接縫（同一鏡頭中途切開，驗收時注意接縫）</span>；
+          <span class="text-rose-300">紅色＝這段裡含一次切鏡（手動合併過）</span>；
+          <span class="text-sky-300">放慢 ×N＝短於 4 秒的鏡頭放慢到 4 秒生成，再加速回原長</span>；短於 1 秒的鏡頭預設保留原片。
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button class="btn" onclick="expandAll()">✨ 擴寫所有空白提示詞</button>
+          <button class="btn btn-primary" onclick="runAll()">▶ 送出所有未生成的段落</button>
+          <button class="btn btn-ok" onclick="mergeAll()">🎞 合併輸出</button>
+          <span id="pSummary" class="text-xs text-zinc-400 self-center"></span>
+        </div>
+        <div id="finalBox" class="hidden space-y-1">
+          <p class="text-xs text-emerald-300">已合併：<a id="finalLink" class="underline" target="_blank"></a></p>
+          <p id="mergeNotes" class="text-[11px] text-zinc-400"></p>
+          <video id="finalVideo" controls class="max-w-xl"></video>
+        </div>
+      </div>
+      <div id="shotList" class="space-y-3"></div>
+    </section>
+  </main>
+
+<script>
+let P = null;            // 目前專案
+let dirty = {};          // 正在編輯、還沒存的提示詞（避免輪詢覆蓋）
+let pollTimer = null;
+
+async function api(path, body) {
+  const opt = body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
+  const r = await fetch(path, opt);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.detail || r.statusText);
+  return data;
+}
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = t => { const m = Math.floor(t / 60); return `${m}:${(t - m * 60).toFixed(2).padStart(5, '0')}`; };
+
+async function upload(files) {
+  const fd = new FormData();
+  for (const f of files) fd.append('files', f);
+  const r = await fetch('/api/upload', { method: 'POST', body: fd });
+  if (!r.ok) throw new Error('上傳失敗');
+  return (await r.json()).files;
+}
+
+async function createProject() {
+  const src = document.getElementById('srcFile').files[0];
+  const imgs = [...document.getElementById('imgFiles').files];
+  const msg = document.getElementById('createMsg');
+  if (!src || !imgs.length) { msg.textContent = '請選原片和至少一張角色圖。'; return; }
+  if (imgs.length > 9) { msg.textContent = '角色圖最多 9 張。'; return; }
+  const btn = document.getElementById('createBtn'); btn.disabled = true;
+  try {
+    msg.textContent = '上傳中…';
+    const [v] = await upload([src]);
+    const im = await upload(imgs);
+    msg.textContent = '分析鏡頭並切出各段原片中（長片可能要一分鐘）…';
+    const d = await api('/api/shotswap', {
+      source_video: v.path, reference_images: im.map(x => x.path), title: src.name.replace(/\.[^.]+$/, ''),
+      idea: document.getElementById('newIdea').value, backend: document.getElementById('newBackend').value,
+      resolution: document.getElementById('newRes').value });
+    msg.textContent = `完成：${d.project.shots.length} 段。`;
+    show(d.project); loadList();
+  } catch (e) { msg.textContent = '失敗：' + e.message; }
+  finally { btn.disabled = false; }
+}
+
+async function loadList() {
+  const d = await api('/api/shotswap');
+  document.getElementById('projectList').innerHTML = d.projects.length ? d.projects.map(p =>
+    `<button class="btn" onclick="openProject('${p.id}')">${esc(p.title || p.id)} · ${p.done}/${p.shots} 段已定</button>`).join('')
+    : '<span class="text-zinc-500">還沒有專案</span>';
+}
+
+async function openProject(id) {
+  dirty = {};
+  const d = await api(`/api/shotswap/${id}`);
+  show(d.project);
+  history.replaceState(null, '', `/shotswap?p=${id}`);
+}
+
+function badge(text, cls) { return `<span class="tag ${cls}">${text}</span>`; }
+
+function statusBadge(s) {
+  const map = {
+    idle: ['未送出', 'border-zinc-600 text-zinc-400'], queued: [`排隊中${s.queue_position ? ' #' + s.queue_position : ''}`, 'border-sky-600 text-sky-300'],
+    running: ['生成中…', 'border-indigo-500 text-indigo-300'], done: ['已生成', 'border-emerald-600 text-emerald-300'],
+    failed: ['失敗', 'border-rose-600 text-rose-300'] };
+  const [t, c] = map[s.status] || [s.status, 'border-zinc-600'];
+  return badge(t, c);
+}
+
+function shotRow(s) {
+  const keep = s.action === 'keep';
+  const busy = s.status === 'queued' || s.status === 'running';
+  const tags = [
+    s.seam_before ? badge('強制接縫', 'border-amber-500 text-amber-300') : '',
+    s.contains_cut ? badge('含切鏡', 'border-rose-500 text-rose-300') : '',
+    !keep && s.stretch > 1 ? `<span class="tag border-sky-500 text-sky-300" title="短於 ${P.limits.min} 秒：放慢到 ${P.limits.min} 秒送 H3，生成後再加速回原長">放慢 ×${s.stretch}</span>` : '',
+    s.long_warning ? badge(`超過 ${P.limits.max} 秒`, 'border-amber-500 text-amber-300') : '',
+    keep ? badge('保留原片', 'border-zinc-500 text-zinc-300') : statusBadge(s),
+    s.review === 'pass' ? badge('✔ 已通過', 'border-emerald-500 text-emerald-300') : '',
+    s.review === 'keep' ? badge('改用原片', 'border-zinc-500 text-zinc-300') : '',
+  ].join(' ');
+  const prompt = dirty[s.id] !== undefined ? dirty[s.id] : s.prompt;
+  const result = s.output_url ? `<video src="${s.output_url}" controls preload="metadata"></video>
+      <p class="text-[10px] text-zinc-500">seed ${s.seed}${s.elapsed ? ` · ${s.elapsed} 秒` : ''}</p>` :
+    `<div class="min-h-[120px] rounded-lg border border-dashed border-zinc-700 flex items-center justify-center text-xs text-zinc-500">${keep ? '這段保留原片' : '尚無生成結果'}</div>`;
+  return `<div id="shot_${s.id}" class="rounded-xl border ${s.contains_cut && !keep ? 'border-rose-800' : s.seam_before ? 'border-amber-800' : 'border-zinc-800'} bg-surface-900 p-3">
+    <div class="flex flex-wrap items-center gap-2 mb-2 text-xs">
+      <b class="text-sm">#${s.index}</b><span class="font-mono text-zinc-400">${fmt(s.start)} – ${fmt(s.end)}（${s.length} 秒）</span>${tags}
+      ${s.problem ? `<span class="text-rose-300">⚠ ${esc(s.problem)}</span>` : ''}
+      ${s.error && s.status !== 'done' ? `<span class="text-rose-300">${esc(s.error)}</span>` : ''}
+    </div>
+    <div class="grid md:grid-cols-[1fr_1.3fr_1fr] gap-3">
+      <div class="space-y-1.5">
+        <video id="clip_${s.id}" src="${s.clip_url || ''}" poster="${s.thumb_url || ''}" controls preload="none"></video>
+        <div class="flex flex-wrap gap-1.5">
+          <button class="btn" ${busy ? 'disabled' : ''} onclick="edit('${s.id}', {op:'action', action:'${keep ? 'swap' : 'keep'}'})">${keep ? '改成換人' : '保留原片'}</button>
+          <button class="btn" ${busy ? 'disabled' : ''} onclick="splitHere('${s.id}')" title="在左邊原片目前的播放位置切開">✂ 在播放位置拆分</button>
+          ${s.index < P.shots.length ? `<button class="btn" ${busy ? 'disabled' : ''} onclick="edit('${s.id}', {op:'merge'})">⇣ 與下一段合併</button>` : ''}
+        </div>
+      </div>
+      <div class="space-y-1.5 ${keep ? 'opacity-40' : ''}">
+        <textarea id="prompt_${s.id}" rows="8" class="w-full font-mono text-[11px]" ${busy || keep ? 'disabled' : ''}
+          oninput="dirty['${s.id}']=this.value" onchange="savePrompt('${s.id}')"
+          placeholder="這段的英文提示詞（可按「擴寫」自動產生）">${esc(prompt)}</textarea>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button class="btn" ${busy || keep || s.expanding ? 'disabled' : ''} onclick="expandOne('${s.id}')">${s.expanding ? '擴寫中…' : '✨ 擴寫'}</button>
+          ${s.expand_error ? `<span class="text-[11px] text-rose-300">${esc(s.expand_error)}</span>` : ''}
+        </div>
+      </div>
+      <div class="space-y-1.5">
+        ${result}
+        <div class="flex flex-wrap gap-1.5">
+          ${keep ? '' : s.status === 'queued' ? `<button class="btn" onclick="dequeue('${s.id}')">取消排隊</button>` :
+            `<button class="btn btn-primary" ${busy || s.problem ? 'disabled' : ''} onclick="runOne('${s.id}')">${s.status === 'idle' ? '▶ 生成' : '↻ 重跑'}</button>`}
+          ${!keep && s.status === 'done' && s.review !== 'pass' ? `<button class="btn btn-ok" onclick="review('${s.id}','pass')">✔ 通過</button>` : ''}
+          ${!keep && s.review !== 'keep' && !busy ? `<button class="btn btn-warn" onclick="review('${s.id}','keep')">改用原片</button>` : ''}
+          ${s.review ? `<button class="btn" onclick="review('${s.id}','reset')">取消驗收</button>` : ''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function show(p) {
+  // 保留正在播放的影片與正在輸入的欄位：只在結構或狀態改變時重畫該列
+  P = p;
+  document.getElementById('projectBox').classList.remove('hidden');
+  document.getElementById('pTitle').textContent = p.title || p.id;
+  document.getElementById('pMeta').textContent = `${p.source_name} · ${p.duration.toFixed(2)} 秒 · ${p.aspect === 'portrait' ? '直式' : '橫式'} · 角色圖 ${p.images.length} 張 · 單段上限 ${p.limits.max} 秒`;
+  const idea = document.getElementById('pIdea');
+  if (document.activeElement !== idea) idea.value = p.idea || '';
+  document.getElementById('pBackend').value = p.backend;
+  document.getElementById('pRes').value = p.resolution;
+  const swap = p.shots.filter(s => s.action === 'swap');
+  const settled = p.shots.filter(s => s.action === 'keep' || s.review).length;
+  document.getElementById('pSummary').textContent =
+    `${p.shots.length} 段：換人 ${swap.length}、已生成 ${swap.filter(s => s.status === 'done').length}、已驗收 ${settled}/${p.shots.length}`;
+  const fb = document.getElementById('finalBox');
+  if (p.final_url) {
+    fb.classList.remove('hidden');
+    const link = document.getElementById('finalLink');
+    link.href = p.final_url; link.textContent = p.final_url.split('/').pop();
+    const fv = document.getElementById('finalVideo');
+    if (!fv.src.endsWith(p.final_url)) fv.src = p.final_url;
+    document.getElementById('mergeNotes').textContent = (p.merge_notes || []).length ? '已統一規格：' + p.merge_notes.join('；') : '';
+  } else fb.classList.add('hidden');
+
+  const list = document.getElementById('shotList');
+  const ids = p.shots.map(s => s.id).join(',');
+  if (list.dataset.ids !== ids) {
+    list.innerHTML = p.shots.map(shotRow).join('');
+    list.dataset.ids = ids;
+    list.dataset.sig = '';
+  }
+  for (const s of p.shots) {
+    const sig = JSON.stringify([s.status, s.review, s.action, s.output_url, s.expanding, s.expand_error, s.error, s.queue_position, s.problem,
+                                dirty[s.id] === undefined ? s.prompt : null]);
+    const el = document.getElementById('shot_' + s.id);
+    if (el && el.dataset.sig !== sig) {
+      const playing = [...el.querySelectorAll('video')].some(v => !v.paused);
+      const typing = document.activeElement && document.activeElement.id === 'prompt_' + s.id;
+      if (!playing && !typing) { el.outerHTML = shotRow(s); document.getElementById('shot_' + s.id).dataset.sig = sig; }
+    }
+  }
+  if (!pollTimer) pollTimer = setInterval(poll, 3000);
+}
+
+async function poll() {
+  try {
+    if (P) { const d = await api(`/api/shotswap/${P.id}`); show(d.project); }
+    const st = await api('/api/status');
+    const w = P && P.worker;
+    document.getElementById('queueLine').textContent =
+      w ? `排隊器：${w}` : st.is_running ? `GPU 使用中（${st.stage_label}）` : '排隊器閒置';
+  } catch (e) { /* 伺服器重啟中 */ }
+}
+
+async function act(fn) { try { const d = await fn(); if (d && d.project) show(d.project); } catch (e) { alert(e.message); } }
+const edit = (id, body) => act(() => api(`/api/shotswap/${P.id}/edit`, { shot_id: id, ...body }));
+async function savePrompt(id) {
+  const v = document.getElementById('prompt_' + id).value;
+  await act(() => api(`/api/shotswap/${P.id}/edit`, { shot_id: id, op: 'prompt', prompt: v }));
+  delete dirty[id];
+}
+function splitHere(id) {
+  const s = P.shots.find(x => x.id === id);
+  const v = document.getElementById('clip_' + id);
+  const at = s.start + (v ? v.currentTime : 0);
+  if (!v || v.currentTime < 0.2) { alert('先在左邊原片播放到要切開的位置（暫停在那裡）再按。'); return; }
+  if (!confirm(`在 ${fmt(at)} 切開第 ${s.index} 段？`)) return;
+  edit(id, { op: 'split', at });
+}
+async function flushPrompts() { for (const id of Object.keys(dirty)) await savePrompt(id); }
+const expandOne = id => act(async () => { await flushPrompts(); await api(`/api/shotswap/${P.id}/expand`, { shot_ids: [id] }); return api(`/api/shotswap/${P.id}`); });
+const expandAll = () => act(async () => { await flushPrompts(); const d = await api(`/api/shotswap/${P.id}/expand`, {}); if (!d.count) alert('沒有需要擴寫的段落（已有提示詞的段落請個別按「擴寫」）。'); return api(`/api/shotswap/${P.id}`); });
+const runOne = id => act(async () => { await flushPrompts(); return api(`/api/shotswap/${P.id}/run`, { shot_ids: [id] }); });
+const runAll = () => act(async () => { await flushPrompts(); const d = await api(`/api/shotswap/${P.id}/run`, {}); if (!d.queued) alert('沒有待生成的段落。'); return d; });
+const dequeue = id => act(() => api(`/api/shotswap/${P.id}/dequeue`, { shot_ids: [id] }));
+const review = (id, verdict) => act(() => api(`/api/shotswap/${P.id}/review`, { shot_id: id, verdict }));
+const mergeAll = () => act(() => api(`/api/shotswap/${P.id}/merge`, {}));
+const saveSettings = () => act(() => api(`/api/shotswap/${P.id}/settings`, {
+  idea: document.getElementById('pIdea').value, backend: document.getElementById('pBackend').value,
+  resolution: document.getElementById('pRes').value }));
+
+loadList();
+const pid = new URLSearchParams(location.search).get('p');
+if (pid) openProject(pid);
+setInterval(() => { if (!P) poll(); }, 5000);
+</script>
+</body>
+</html>

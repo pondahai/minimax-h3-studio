@@ -110,7 +110,8 @@ TTS、Qwen-Image、H3 互斥（記憶體），一次只開一個。它和上面�
    - 後端自動疊加社群 [MiniMax H3 Character Swap LoRA](https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA)（`h3_character_swap_v1.5.safetensors`，強度 1.0），並在提示詞加入換人指示。
    - 使用建議：4～5 秒的連續鏡頭（不要有剪接）、一次只換一個人，並在分鏡中具體描述原片人物的動作（模型不會自動照抄動作）。特寫時的表情可能跟不上原片。
    - **LLM 擴寫提示詞**：在「LLM 擴寫提示詞」輸入簡短中文構想（留空則潤飾現有 Prompt），後端（`/api/expand_prompt`）依目前素材數量、片長與是否換人模式，請 LLM 寫成符合 H3 語法的完整英文 Prompt，填入可編輯的 Prompt 欄。介面為 OpenAI 相容的 `/v1/chat/completions`，以環境變數設定：`H3_LLM_BASE_URL`（預設 `http://100.89.149.50:8006/v1`，即 Spark 上的 vLLM 8006）、`H3_LLM_MODEL`（空白 = 伺服器第一個模型）、`H3_LLM_API_KEY`、`H3_LLM_THINKING`（預設 `1`，推理模型先推理再作答，品質較好但約 30～40 秒；設 `0` 約 2 秒）。擴寫時會把參考圖與原片的 6 張畫面一起送給支援看圖的 LLM（`H3_LLM_VISION=0` 關閉），讓提示詞依實際畫面描述場景與動作。
-   - **長片分段換人**：換人模式可上傳超過 15 秒的原片（只能這一支影片）。送出後後端（`/api/generate_long_swap`）會用 ffmpeg 把原片切成每段 ≤ 8 秒，在同一個 Colab session 依序換人；第 2 段起把上一段在切點的畫面加為最後一張 `<Picture N>` 當接續參考，最後把各段裁回原片段長度、接成 `outputs/long_*_full.mp4`。需要本機安裝 ffmpeg。接縫處的構圖可能略有跳動（接續畫面只是參考圖，不是強制首幀）。
+   - **長片分段換人**：換人模式可上傳超過 15 秒的原片（只能這一支影片）。送出後後端（`/api/generate_long_swap`）會用 ffmpeg 把原片切成每段 ≤ 8 秒，在同一個 Colab session 依序換人；第 2 段起把上一段在切點的畫面加為最後一張 `<Picture N>` 當接續參考，最後把各段裁回原片段長度、接成 `outputs/long_*_full.mp4`。需要本機安裝 ffmpeg。接縫處的構圖可能略有跳動（接續畫面只是參考圖，不是強制首幀）。現在作為「快速模式」保留。
+   - **鏡頭分段換人 v2（`/shotswap` 頁面，`shotswap.py`）**：以正確為優先的半自動流程。ffmpeg 場景分數找鏡頭切換點，每個鏡頭各自一段（超過 12 秒的在動作最少處切開並標為強制接縫；1～4 秒的放慢到 4 秒生成再加速回原長；短於 1 秒的預設保留原片），每段各自用 LLM 看該段畫面擴寫提示詞、可修改，送出後由全域排隊器**一次只跑一段**（與單片生成共用 `is_running`，Spark 忙碌時等待重試），逐段驗收（通過／重跑／改用原片）後合併，音軌用原片。不使用接續圖，角色圖可用 9 張。說明見 [docs/USER_GUIDE.md](docs/USER_GUIDE.md#46-鏡頭分段換人-v2)。
 4. **分鏡時間軸與一鍵接續延伸（Last-Frame Continuation）**：
    - 內建故事板時間軸（Storyboard Timeline），將各次生成結果組織為連續鏡頭（Shot 1, Shot 2...）。
    - 提供「延伸此鏡頭（接續生成下一鏡）」按鈕：透過後端 OpenCV 即時無失真擷取當前影片最後一幀，自動將其設為下一段的 `<Picture 1>`，使鏡頭銜接流暢無縫。

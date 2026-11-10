@@ -832,7 +832,11 @@ class LongSwapRequest(BaseModel):
 def _ffmpeg_path() -> str:
     path = shutil.which("ffmpeg")
     if not path:
-        raise RuntimeError("找不到 ffmpeg，長片分段換人需要 ffmpeg 切段與合併（請安裝並加入 PATH）。")
+        try:  # requirements 已有 imageio-ffmpeg，沒裝系統 ffmpeg 時用它附的
+            import imageio_ffmpeg
+            return imageio_ffmpeg.get_ffmpeg_exe()
+        except Exception:
+            raise RuntimeError("找不到 ffmpeg，分段換人需要 ffmpeg 切段與合併（請安裝並加入 PATH）。")
     return path
 
 
@@ -1081,7 +1085,7 @@ def get_status():
     manually_stopped = current_state["status"] in ("stopped", "cancelled")
     if manually_stopped:
         status_str = current_state["status"]
-    long_swap = current_state.get("task") == "long_swap"
+    long_swap = current_state.get("task") in ("long_swap", "shotswap")
     if long_swap:
         # 每段 run_batch 都會把進度檔寫成 completed；整體結果以長片 worker 的狀態為準
         if not current_state["is_running"] or current_state["status"] in ("starting", "merging"):
@@ -1200,6 +1204,15 @@ def get_history():
             "metadata": meta,
         })
     return {"ok": True, "videos": videos}
+
+
+# 鏡頭分段換人 v2（/shotswap 頁面與 /api/shotswap/*）；舊的長片分段換人保留為快速模式
+# `python app.py` 會先以 __main__ 跑一次，再由 uvicorn 以 "app" 匯入一次；只在後者註冊，
+# 否則會有兩個排隊器各自拿不同的 generation_lock，可能同時佔用 Spark。
+if __name__ != "__main__":
+    import shotswap  # noqa: E402
+
+    shotswap.register(app, sys.modules[__name__])
 
 
 if __name__ == "__main__":
