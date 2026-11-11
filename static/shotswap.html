@@ -39,9 +39,11 @@
       <h2 class="font-semibold text-sm">新增專案</h2>
       <div class="grid md:grid-cols-2 gap-3 text-xs">
         <label class="space-y-1 block"><span class="text-zinc-400">原片（任意長度）</span>
-          <input id="srcFile" type="file" accept="video/*" class="w-full"></label>
+          <input id="srcFile" type="file" accept="video/*" class="w-full" onchange="previewSrc()">
+          <video id="srcPreview" class="hidden max-h-48" controls muted></video></label>
         <label class="space-y-1 block"><span class="text-zinc-400">角色圖（1～9 張，第一張為 &lt;Picture 1&gt;）</span>
-          <input id="imgFiles" type="file" accept="image/*" multiple class="w-full"></label>
+          <input id="imgFiles" type="file" accept="image/*" multiple class="w-full" onchange="previewImgs()">
+          <div id="imgPreview" class="flex flex-wrap gap-2"></div></label>
         <label class="space-y-1 block md:col-span-2"><span class="text-zinc-400">全域構想（每段擴寫都會用到，例如「把穿灰外套的男人換成參考圖的女生，連服裝一起換」）</span>
           <textarea id="newIdea" rows="2" class="w-full"></textarea></label>
         <label class="space-y-1 block"><span class="text-zinc-400">後端</span>
@@ -57,7 +59,7 @@
 
     <section class="rounded-xl border border-zinc-800 bg-surface-900 p-4">
       <h2 class="font-semibold text-sm mb-2">既有專案</h2>
-      <div id="projectList" class="flex flex-wrap gap-2 text-xs"></div>
+      <div id="projectList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs"></div>
     </section>
 
     <!-- 專案 -->
@@ -66,6 +68,12 @@
         <div class="flex flex-wrap items-center justify-between gap-2">
           <h2 id="pTitle" class="font-semibold"></h2>
           <span id="pMeta" class="text-xs text-zinc-400"></span>
+        </div>
+        <div class="flex flex-wrap items-start gap-4">
+          <div class="space-y-1 w-full sm:w-72"><span class="text-xs text-zinc-400">原片</span>
+            <video id="pSource" controls preload="metadata" class="max-h-44"></video></div>
+          <div class="space-y-1 flex-1 min-w-[200px]"><span class="text-xs text-zinc-400">角色圖（點擊放大）</span>
+            <div id="pImages" class="flex flex-wrap gap-2"></div></div>
         </div>
         <div class="flex flex-wrap items-start gap-3 text-xs">
           <label class="flex-1 min-w-[280px] space-y-1"><span class="text-zinc-400">全域構想</span>
@@ -148,8 +156,28 @@ async function createProject() {
 async function loadList() {
   const d = await api('/api/shotswap');
   document.getElementById('projectList').innerHTML = d.projects.length ? d.projects.map(p =>
-    `<button class="btn" onclick="openProject('${p.id}')">${esc(p.title || p.id)} · ${p.done}/${p.shots} 段已定</button>`).join('')
+    `<button class="text-left rounded-lg border border-zinc-800 bg-surface-850 hover:border-brand-500 overflow-hidden transition" onclick="openProject('${p.id}')">
+      <div class="relative aspect-video bg-black">
+        ${p.thumb_url ? `<img src="${p.thumb_url}" class="w-full h-full object-cover" loading="lazy">` : ''}
+        ${p.image_url ? `<img src="${p.image_url}" class="absolute bottom-1 right-1 w-10 h-10 object-cover rounded border border-zinc-600" loading="lazy">` : ''}
+      </div>
+      <div class="p-2"><div class="font-semibold truncate">${esc(p.title || p.id)}</div>
+        <div class="text-zinc-400">${p.done}/${p.shots} 段已定</div></div>
+    </button>`).join('')
     : '<span class="text-zinc-500">還沒有專案</span>';
+}
+
+function previewSrc() {
+  const f = document.getElementById('srcFile').files[0], v = document.getElementById('srcPreview');
+  if (v.src) URL.revokeObjectURL(v.src);
+  if (f) { v.src = URL.createObjectURL(f); v.classList.remove('hidden'); } else { v.removeAttribute('src'); v.classList.add('hidden'); }
+}
+function previewImgs() {
+  const box = document.getElementById('imgPreview');
+  box.querySelectorAll('img').forEach(i => URL.revokeObjectURL(i.src));
+  box.innerHTML = [...document.getElementById('imgFiles').files].map((f, i) =>
+    `<div class="relative"><img src="${URL.createObjectURL(f)}" class="h-20 w-20 object-cover rounded-lg border border-zinc-700">
+      <span class="absolute top-0.5 left-0.5 tag border-zinc-600 bg-black/70 text-zinc-200">P${i + 1}</span></div>`).join('');
 }
 
 async function openProject(id) {
@@ -230,6 +258,16 @@ function show(p) {
   document.getElementById('projectBox').classList.remove('hidden');
   document.getElementById('pTitle').textContent = p.title || p.id;
   document.getElementById('pMeta').textContent = `${p.source_name} · ${p.duration.toFixed(2)} 秒 · ${p.aspect === 'portrait' ? '直式' : '橫式'} · 角色圖 ${p.images.length} 張 · 單段上限 ${p.limits.max} 秒`;
+  const srcV = document.getElementById('pSource');
+  if (p.source_url && !srcV.src.endsWith(p.source_url)) srcV.src = p.source_url;
+  srcV.parentElement.classList.toggle('hidden', !p.source_url);
+  const imgSig = (p.image_urls || []).join('|'), imgBox = document.getElementById('pImages');
+  if (imgBox.dataset.sig !== imgSig) {
+    imgBox.dataset.sig = imgSig;
+    imgBox.innerHTML = (p.image_urls || []).map((u, i) => u ?
+      `<a href="${u}" target="_blank" class="relative block"><img src="${u}" class="h-24 w-24 object-cover rounded-lg border border-zinc-700 hover:border-brand-500">
+        <span class="absolute top-0.5 left-0.5 tag border-zinc-600 bg-black/70 text-zinc-200">P${i + 1}</span></a>` : '').join('');
+  }
   const idea = document.getElementById('pIdea');
   if (document.activeElement !== idea) idea.value = p.idea || '';
   document.getElementById('pBackend').value = p.backend;

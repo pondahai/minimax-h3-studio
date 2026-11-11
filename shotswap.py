@@ -82,6 +82,13 @@ def _url(path: Path) -> str:
     return "/outputs/" + path.resolve().relative_to(A.OUTPUTS_DIR.resolve()).as_posix()
 
 
+def _upload_url(path: str) -> Optional[str]:
+    try:
+        return "/uploads/" + Path(path).resolve().relative_to(A.UPLOADS_DIR.resolve()).as_posix()
+    except Exception:
+        return None
+
+
 # ───────────────────────── 分鏡 ─────────────────────────
 
 def _ffmpeg() -> str:
@@ -252,7 +259,8 @@ def _view(state: dict) -> dict:
             item["output_url"] = _url(Path(shot["output"]))
         shots.append(item)
     final = state.get("final")
-    return {**state, "shots": shots, "final_url": _url(Path(final)) if final and Path(final).is_file() else None,
+    return {**state, "shots": shots, "image_urls": [_upload_url(p) for p in state["images"]],
+            "source_url": _upload_url(state["source"]), "final_url": _url(Path(final)) if final and Path(final).is_file() else None,
             "limits": {"min": MIN_SHOT, "max": MAX_SHOT, "hard_max": HARD_MAX_SHOT, "min_stretch": MIN_STRETCH_SOURCE},
             "worker": _worker_note["text"], "spark_busy": A.current_state["is_running"]}
 
@@ -566,6 +574,8 @@ def register(app, app_module) -> None:
                 s = json.loads(path.read_text(encoding="utf-8"))
                 items.append({"id": s["id"], "title": s.get("title"), "source_name": s.get("source_name"),
                               "shots": len(s["shots"]), "updated_at": s.get("updated_at"),
+                              "thumb_url": next((_url(t) for t in sorted(path.parent.glob("clips/th_*.jpg"))), None),
+                              "image_url": _upload_url(s["images"][0]) if s.get("images") else None,
                               "done": sum(1 for x in s["shots"] if x.get("review") in ("pass", "keep") or x["action"] == "keep")})
             except Exception:
                 pass
