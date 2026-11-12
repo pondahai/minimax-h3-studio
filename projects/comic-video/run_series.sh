@@ -6,6 +6,8 @@
 # Spark 目錄：~/h3-bench/comic-video/（本目錄的腳本＋bench.py）、~/h3-bench/comic-video/<篇目>/
 set -u
 ROOT=$(cd "$(dirname "$0")" && pwd)
+# 解析度：預設草稿 672×384；RES=full 出 1376×768，並自動開稀疏注意力（2026-11-12 實測高解析度快 28–41%，畫質不變）
+if [ "${RES:-draft}" = full ]; then RESOPT="-e H3_RESOLUTION=full -e H3_SPARSE=1"; echo "解析度 1376×768＋稀疏注意力"; else RESOPT="-e H3_RESOLUTION=draft"; fi
 . "$ROOT/wait_cool.sh"
 NAME=$1
 BASE=$ROOT/$NAME
@@ -42,7 +44,7 @@ while [ $# -gt 0 ]; do
     -e 'H3_REFERENCE_AUDIOS=[]' -e 'H3_REFERENCE_VIDEOS=[]' -e 'H3_GUIDES=[]' \
     -e H3_PROMPT_FILE=/content/run/prompt.txt -e H3_DURATION_SECONDS=$dur -e H3_SEED=164723 \
     -e H3_OUTPUT_PREFIX=${NAME}_$sid -e H3_OUTPUT_PATH=/content/run/output.mp4 -e H3_JOB_TIMEOUT_SECONDS=3600 \
-    -e H3_CHARACTER_SWAP=0 -e H3_ASPECT=landscape -e H3_TEXT_ENCODER=heretic -e H3_FIRST_FRAME_FIT=crop \
+    $RESOPT -e H3_CHARACTER_SWAP=0 -e H3_ASPECT=landscape -e H3_TEXT_ENCODER=heretic -e H3_FIRST_FRAME_FIT=crop \
     -v /home/funsteam/h3-bench/ComfyUI:/content/ComfyUI \
     -v /home/funsteam/h3-bench/models:/content/ComfyUI/models \
     -v "$BASE/run/$sid":/content/run -v "$ROOT/bench.py":/content/bench.py:ro \

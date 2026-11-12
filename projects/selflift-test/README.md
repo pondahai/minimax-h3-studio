@@ -68,3 +68,8 @@
 - 聲音：兩版都換成男聲，音高都接近參考的 106 Hz（原片女聲約 242 Hz）
 - 比較片：`ab_S_flex.mp4`
 - 2026-11-12 runner 預設改成：job 沒有填 `sparse` 時，`resolution: full`（高解析度）自動開啟、草稿不開；填了 `sparse: true／false` 就照填的值。Studio 網頁和 story-film-studio 都經由 runner 出片，所以都會套用。漫畫影片的 `run_jobs.sh`／`run_series.sh` 是直接呼叫 docker，而且跑的是草稿，所以不受影響
+
+## 保留待研究（2026-11-12 使用者決定）
+- Spark 上的 SelfLift 節點（`custom_nodes/comfyui-SelfLift`@835c3cf）、DMAD LoRA、LMS upscaler **先保留不刪**，之後再研究毛衣亂紋的原因，也等作者是否放出修正
+- 可以測的方向：只用 DMAD、不用 SelfLift；SelfLift 改用 `upscaler_model=none`；加上 MysticXXX 0.35；改用作者原本的 hybrid 主模型
+- 測試腳本和副本：`~/h3-bench/selflift/`（bench.py 副本支援 `H3_SELFLIFT=1`）
