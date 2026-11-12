@@ -93,7 +93,7 @@ sed "/^non_diegetic_music:/ { /no vocals/! s/\$/ $NOVOX/ }" prompts/music_offici
 music_ok=""
 for seed in $(seq 1 ${MUSIC_TRIES:-4}); do
   m=music$seed
-  [ -f out/$m.mp4 ] || bash "$ROOT/run_jobs.sh" "$NAME" "$m prompts/music_run.txt $seed 12 -"
+  [ -f out/$m.mp4 ] || RES=draft bash "$ROOT/run_jobs.sh" "$NAME" "$m prompts/music_run.txt $seed 12 -"
   [ -f out/$m.mp4 ] || { say "$m 生成失敗"; continue; }
   ffmpeg -y -loglevel error -i out/$m.mp4 -vn -ar 44100 music/$m.wav
   cp music/$m.wav music/${m}_h3.wav

@@ -18,6 +18,7 @@
 - ssh 字串裡的 `pkill -f`／`pgrep -f` 關鍵字寫成 `[c]hinese_tts` 這種形式，否則會砍到自己的 ssh
 - Windows 本機沒有 ffmpeg，影音處理都在 Spark
 - 跑長工作前看 GPU 溫度與 `free -g`；一張立繪超過 3 分鐘＝記憶體被搶，先查誰開著
+- **H3 解析度**：預設出草稿 672×384。要出高解析度 1376×768，在 `pipeline.sh`／`run_series.sh`／`run_jobs.sh` 前面加 `RES=full`，會**自動開稀疏注意力**（2026-11-12 實測快 28–41%，畫質不變，見 [projects/selflift-test/README.md](../projects/selflift-test/README.md)）。不要只手動加 `H3_RESOLUTION=full` 卻漏掉 `H3_SPARSE=1`，那樣會白白慢 40%
 
 ## 1. 取材
 - **做**：抓官網原圖 `https://shezi.org.tw/assets/images/panels/journey-NN/`（header、panel-01～12）→ `<篇目>/source/`；逐格讀圖

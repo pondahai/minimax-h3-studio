@@ -1,8 +1,10 @@
 #!/bin/bash
-# 在 Spark 上依序跑 <篇目> 的指定 H3 工作（672×384）。每個工作：名稱 prompt檔 seed 秒數 首幀(- = t2va)，路徑相對於篇目資料夾
+# 在 Spark 上依序跑 <篇目> 的指定 H3 工作（672×384；RES=full 改 1376×768）。每個工作：名稱 prompt檔 seed 秒數 首幀(- = t2va)，路徑相對於篇目資料夾
 # 用法：bash run_jobs.sh <篇目> "S10v2 prompts/S10.txt 164723 12 frames/S10_first.png" "music1 prompts/music.txt 1 12 -" ...
 set -u
 ROOT=$(cd "$(dirname "$0")" && pwd)
+# 解析度：預設草稿 672×384；RES=full 出 1376×768，並自動開稀疏注意力（2026-11-12 實測高解析度快 28–41%，畫質不變）
+if [ "${RES:-draft}" = full ]; then RESOPT="-e H3_RESOLUTION=full -e H3_SPARSE=1"; echo "解析度 1376×768＋稀疏注意力"; else RESOPT="-e H3_RESOLUTION=draft"; fi
 . "$ROOT/wait_cool.sh"
 NAME=$1; shift
 BASE=$ROOT/$NAME
@@ -25,7 +27,7 @@ for job in "$@"; do
     -e 'H3_REFERENCE_AUDIOS=[]' -e 'H3_REFERENCE_VIDEOS=[]' -e 'H3_GUIDES=[]' \
     -e H3_PROMPT_FILE=/content/run/prompt.txt -e H3_DURATION_SECONDS=$dur -e H3_SEED=$seed \
     -e H3_OUTPUT_PREFIX=${NAME}_$name -e H3_OUTPUT_PATH=/content/run/output.mp4 -e H3_JOB_TIMEOUT_SECONDS=3600 \
-    -e H3_CHARACTER_SWAP=0 -e H3_ASPECT=landscape -e H3_TEXT_ENCODER=heretic -e H3_FIRST_FRAME_FIT=crop \
+    $RESOPT -e H3_CHARACTER_SWAP=0 -e H3_ASPECT=landscape -e H3_TEXT_ENCODER=heretic -e H3_FIRST_FRAME_FIT=crop \
     -v /home/funsteam/h3-bench/ComfyUI:/content/ComfyUI \
     -v /home/funsteam/h3-bench/models:/content/ComfyUI/models \
     -v "$BASE/run/$name":/content/run -v "$ROOT/bench.py":/content/bench.py:ro \
