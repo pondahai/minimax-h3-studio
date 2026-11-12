@@ -98,3 +98,16 @@ H3 測試前的原始狀態，測完復原時逐項比對。SSH：`funsteam@100.
 **更新：使用者已刪除 `openai/gpt-oss-120b`（122 GB），刪除後可用 229 G（74%）。**裝完 H3 後預計還剩 150 G 以上。
 
 其他候選清理項目（尚未刪除）：未使用的 docker 映像（可回收約 54 GB）、`~/.cache/huggingface` 裡不再使用的模型、`~/下載`。
+
+## 2026-11-12 SelfLift 試裝（DMAD＋二採 A/B 測試用）
+
+- 安裝前狀態：`h3-bench/ComfyUI` commit 1a82e6d，工作樹乾淨；`custom_nodes` 只有 ComfyUI-VideoHelperSuite；容器停止
+- 新增：`custom_nodes/comfyui-SelfLift`（facok/comfyui-SelfLift，固定在 commit 835c3cf）。ComfyUI 本體沒有改動，沒有安裝額外 pip 套件
+- 驗證：8288 啟動後 `/object_info/SelfLiftH3Sampler` 有回應，載入沒有錯誤；驗證完已把容器停回去
+- 注意：SelfLift 的 sampler 輸入只接受標準 Euler
+- **復原**：`rm -rf ~/h3-bench/ComfyUI/custom_nodes/comfyui-SelfLift`；容器若正在執行，再跑一次 `docker compose restart`
+- 2026-11-12 新增的模型檔案（SHA-256 都已比對過）：
+  - `models/loras/minimax_h3_dmad_full_dareties_v4_step600_comfy_fro.safetensors`（957 MB，來源 HF tsolful/minimaxh3_tests，原作者，sha256 4d4ea608…）
+  - `models/latent_upscale_models/h3_upscaler_lms_v0.1.safetensors`（691 MB，來源 HF Alissonerdx/Minimax-H3-ComfyUI，sha256 40d42282…；`latent_upscale_models` 資料夾也是這次新建的）
+  - 復原時刪掉這兩個檔案即可
+- 2026-11-12 正式 `~/h3-bench/studio/bench.py` 加上 `H3_SPARSE` 開關（預設關閉；開啟後接 comfy kitchen attention＋sol-attn 稀疏注意力），改動內容見 `projects/selflift-test/bench_sparse.patch`。原檔備份在 `bench.py.bak-20261112`（md5 88cb42ad…），新檔 md5 fa27ca0c…。**復原**：`cp ~/h3-bench/studio/bench.py.bak-20261112 ~/h3-bench/studio/bench.py`

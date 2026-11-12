@@ -544,6 +544,9 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
             "character_swap": character_swap,
             # Pika H3 Flex：true／false 強制；不填則依後端預設（Colab：FL2VA Flex、Ref2VA Turbo；Spark：都用 Flex）
             "flex": None if raw.get("flex") is None else bool(raw.get("flex")),
+            # 稀疏注意力（只有 Spark 的 bench.py 看）：不填＝高解析度（full）自動開、草稿不開；true／false 強制
+            # 2026-11-12 實測 1376×768 快 28–41%，畫質／對嘴／換聲不受影響；草稿序列太短不會啟動
+            "sparse": (str(raw.get("resolution", "")).lower() == "full") if raw.get("sparse") is None else bool(raw.get("sparse")),
             "text_encoder": text_encoder,
             "first_frame_fit": first_frame_fit,
             "aspect": "portrait" if str(raw.get("aspect", "")).lower() == "portrait" else "landscape",
@@ -764,6 +767,8 @@ def run_batch(
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")
             if job.get("flex") is not None:
                 env_values.append("H3_FLEX=" + ("1" if job["flex"] else "0"))
+            if job.get("sparse"):
+                env_values.append("H3_SPARSE=1")
             current.update({"status": "generating", "seed": job["seed"], "duration_seconds": job["duration_seconds"]})
             progress["updated_at"] = now_iso()
             write_progress(progress_path, progress)

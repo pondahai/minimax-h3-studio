@@ -1,0 +1,70 @@
+# SelfLift＋DMAD A/B 測試（2026-11-12）
+
+這組測試的參數照 YZ金魚「MiniMax H3 終極篇-文武雙全」工作流設定，目的是在 Spark 上和現行的 Flex 比較。
+
+## 設定
+- **A（現行）**：Ref2VA，Pika Flex LoRA，lcm，官方 6 步 ManualSigmas
+- **B**：Ref2VA，DMAD 融合 LoRA（`minimax_h3_dmad_full_dareties_v4_step600_comfy_fro`，強度 0.8）。依序接 comfy kitchen attention、sol-attn 稀疏注意力（tau 1.3）、SigmaShift 12/3，再交給 `SelfLiftH3Sampler`（euler、simple 10 步、前 6 步以 ×0.6 解析度、LMS upscaler、cfg 1）
+- 共同條件：flex-test 的首幀和 `prompt_ref2va.txt`，4 秒，seed 164723，跑的時候 8002 已停
+- Spark 上的檔案：`~/h3-bench/selflift/bench.py`（正式 bench.py 的副本，用 `H3_SELFLIFT=1` 開啟 B 設定）、`run_one.sh`、`ab.sh`
+
+## 結果
+| | 推論 | 峰值 RAM |
+|---|---|---|
+| A 672×384 | 80 s | 79.8 GB |
+| B 672×384 | 80 s | 82.1 GB |
+| A 1376×768 | 320 s | 83.2 GB |
+| B 1376×768 | **240 s（少 25%）** | 82.9 GB |
+
+- 推論秒數是 bench.py 依輪詢間隔記錄的，誤差約 ±10 s
+- 草稿解析度下兩者一樣快。只有高解析度時 SelfLift 才省時間，跟原理相符
+- **畫質（1376×768）**：B 比較銳利，表情也比較生動，但第 60 幀前後毛衣胸口冒出**像亂寫字的白色紋路**，是明顯的瑕疵。A 比較柔和，沒有瑕疵
+- 另一個發現：第一次試跑時 8002 沒停、swap 全滿，草稿推論花了 491 s；停掉 8002 後只要 80 s。**H3 跑之前要停 8002，這點很重要**
+
+## 第 2 輪：關掉稀疏注意力（`H3_SL_SPARSE=0`，1376×768）
+- 推論 **320 s**，跟 Flex 一樣，峰值 RAM 83.2 GB
+- **瑕疵還在**，毛衣胸口一樣有亂紋，而且從第 20 幀就開始出現
+- 結論：B 的 25% 加速**全部來自稀疏注意力**，SelfLift 本身在這個解析度沒有省到時間；瑕疵跟稀疏注意力無關，問題出在 DMAD 或 SelfLift 的放大步驟
+
+## 第 3 輪：Flex＋稀疏注意力（`H3_SPARSE=1`，1376×768）
+- 推論 **230 s**，比 Flex 的 320 s **快約 28%**，峰值 RAM 83.0 GB
+- **畫面乾淨**：第 20、60、100 幀跟 Flex 幾乎一樣，沒有瑕疵，構圖和動作也一致。比較片是 `ab_flex_sparse.mp4`
+- 這個做法是我們自己推出來的，作者和 Pika 官方都沒有這樣用。只測了一個文戲鏡頭，要正式採用前，還要在別的鏡頭、別的解析度、FL2VA 上驗證，對嘴也要檢查
+
+## 第 4 輪：多鏡頭驗證 Flex＋稀疏注意力
+| 組 | 模式（俗名） | 解析度／長度 | Flex | ＋稀疏 | PSNR |
+|---|---|---|---|---|---|
+| 草稿 | Ref2VA（參考圖生影片） | 672×384／4 s | 80 s | 80 s（沒加速） | 32.6 |
+| 文戲 | FL2VA（首幀生影片） | 1376×768／6 s | 583 s | **370 s（−37%）** | 27.2 |
+| 高動態 | FL2VA（首幀生影片） | 1376×768／6 s | 580 s | **350 s（−40%）** | 19.0 |
+
+- 草稿沒加速：序列長度低於 `min_tokens` 12288，稀疏注意力沒有啟動；INT8 後端仍然作用，畫面有細微差異
+- 文戲：動作、表情、構圖和 Flex 一致，沒有瑕疵。每 0.5 s 檢查音量，兩版的對白都落在 0–3 s，時間點相同；＋稀疏的整體音量大約高 5 dB
+- 高動態：沒有破圖。轉身時動態模糊比較重，動作路徑也和 Flex 不同（PSNR 19 主要反映動作路徑不同，不是瑕疵），起始和結尾的構圖一致
+- 峰值 RAM 84–86 GB，跟 Flex 差不多
+- 比較片：`ab_F_flex.mp4`（文戲）、`ab_M_flex.mp4`（高動態）
+
+## 待定
+- 瑕疵的來源：可以試只用 DMAD、不用 SelfLift（一般取樣），或 SelfLift 改用 `upscaler_model=none`
+- 稀疏注意力也可以單獨接到 Flex 上，看能不能讓 Flex 一樣快 25%
+- 武戲鏡頭還沒測
+- 復原步驟見 [docs/spark-baseline-2026-10-28.md](../../docs/spark-baseline-2026-10-28.md)
+
+## 上線：H3_SPARSE 開關（2026-11-12）
+- 正式 bench.py 加上 `H3_SPARSE=1` 開關（預設關閉），改動內容見 `bench_sparse.patch`；runner manifest 新增 `"sparse": true` 欄位，會轉成 `H3_SPARSE=1` 傳進去
+- 用正式版實跑確認過（首幀生影片 4 秒草稿，開啟 H3_SPARSE）：能正常產出，log 有出現「稀疏注意力」。這次 8002 沒停，推論花了 1161 s，再次證明 swap 吃滿時會慢很多
+- 只建議**高解析度（`resolution: full`）**使用；草稿不會加速
+- 換人（Character Swap）已測，見第 5 輪
+
+## 第 5 輪：換人（Ref2VA＋Character Swap，參考圖生影片＋換人），用正式 bench.py
+| | 推論 | 峰值 RAM | 音高中位數 |
+|---|---|---|---|
+| Flex | 1051 s | 87.1 GB | 110 Hz |
+| Flex＋稀疏（`H3_SPARSE=1`） | **622 s（−41%）** | 88.6 GB | 112 Hz |
+| 參考聲音 `swap_voice.wav` | — | — | 106 Hz |
+
+- 素材：flex-test 的換人素材（原片的女生換成戴眼鏡、留鬍子、穿丹寧襯衫的男生，聲音也換成參考音檔），1376×768，8 秒，seed 164723，8002 已停
+- 角色：兩版的眼鏡、鬍子、襯衫、手錶都對，跟原片的動作（說話、喝咖啡、撥頭髮）同步，沒有瑕疵
+- 聲音：兩版都換成男聲，音高都接近參考的 106 Hz（原片女聲約 242 Hz）
+- 比較片：`ab_S_flex.mp4`
+- 2026-11-12 runner 預設改成：job 沒有填 `sparse` 時，`resolution: full`（高解析度）自動開啟、草稿不開；填了 `sparse: true／false` 就照填的值。Studio 網頁和 story-film-studio 都經由 runner 出片，所以都會套用。漫畫影片的 `run_jobs.sh`／`run_series.sh` 是直接呼叫 docker，而且跑的是草稿，所以不受影響
