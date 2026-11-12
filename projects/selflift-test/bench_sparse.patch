@@ -1,0 +1,28 @@
+diff --git a/bench_orig.py b/bench_sparse.py
+index f4e57c3..2d383a6 100644
+--- a/bench_orig.py
++++ b/bench_sparse.py
+@@ -587,6 +587,14 @@ for guide_index, guide in enumerate(json.loads(os.environ.get("H3_GUIDES") or "[
+     CONDITIONING = [str(base_id + 2), 0]
+     print(f"錨點 {guide_index + 1}：第 {guide_inputs['frame_idx']} 幀", {k: guide[k] for k in ("image", "audio") if guide.get(k)})
+ 
++# 稀疏注意力（2026-11-12 A/B：1376×768 首幀生影片快 37–40%、畫面無瑕疵；草稿解析度不會啟動）。H3_SPARSE=1 開啟，預設關
++if os.environ.get("H3_SPARSE", "0") == "1":
++    graph["sp1"] = {"class_type": "ModelAttentionBackend", "inputs": {"model": MODEL, "attention": "comfy kitchen attention"}}
++    graph["sp2"] = {"class_type": "BlockSparseAttention", "inputs": {"model": ["sp1", 0], "selection": "sol-attn", "selection.tau": 1.3,
++        "start_percent": 0.2, "end_percent": 1.0, "dense_blocks": "", "min_tokens": 12288, "extra_tokens": 256,
++        "sink_conditioning": "exact_kv_and_rows", "verbose": False}}
++    MODEL = ["sp2", 0]
++    print("稀疏注意力：comfy kitchen attention＋sol-attn")
+ graph.update({
+     "8": {"class_type": "BasicGuider", "inputs": {"model": MODEL, "conditioning": CONDITIONING}},
+     "9": {"class_type": "RandomNoise", "inputs": {"noise_seed": SEED}},
+@@ -622,7 +630,7 @@ for node in graph.values():
+             or re.fullmatch(r"ref_videos\.ref_video_\d+", key)
+             or re.fullmatch(r"ref_video_audios\.ref_video_audio_\d+", key))
+     }
+-    unexpected = set(node["inputs"]) - known - dynamic_reference_inputs
++    unexpected = {k for k in set(node["inputs"]) - known - dynamic_reference_inputs if k.split(".")[0] not in known}
+     if unexpected:
+         raise ValueError(f"{node['class_type']} 的參數已變更：{sorted(unexpected)}；請更新 notebook。")
+ result = requests.post(BASE_URL + "/prompt", json={"prompt": graph, "client_id": "h3-colab"}, timeout=60)
