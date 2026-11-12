@@ -544,8 +544,9 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
             "character_swap": character_swap,
             # Pika H3 Flex：true／false 強制；不填則依後端預設（Colab：FL2VA Flex、Ref2VA Turbo；Spark：都用 Flex）
             "flex": None if raw.get("flex") is None else bool(raw.get("flex")),
-            # 稀疏注意力（只有 Spark 的 bench.py 看）：true 開啟；1376×768 高解析度約快 37–40%，草稿無效
-            "sparse": bool(raw.get("sparse", False)),
+            # 稀疏注意力（只有 Spark 的 bench.py 看）：不填＝高解析度（full）自動開、草稿不開；true／false 強制
+            # 2026-11-12 實測 1376×768 快 28–41%，畫質／對嘴／換聲不受影響；草稿序列太短不會啟動
+            "sparse": (str(raw.get("resolution", "")).lower() == "full") if raw.get("sparse") is None else bool(raw.get("sparse")),
             "text_encoder": text_encoder,
             "first_frame_fit": first_frame_fit,
             "aspect": "portrait" if str(raw.get("aspect", "")).lower() == "portrait" else "landscape",

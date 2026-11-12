@@ -67,3 +67,4 @@
 - 角色：兩版的眼鏡、鬍子、襯衫、手錶都對，跟原片的動作（說話、喝咖啡、撥頭髮）同步，沒有瑕疵
 - 聲音：兩版都換成男聲，音高都接近參考的 106 Hz（原片女聲約 242 Hz）
 - 比較片：`ab_S_flex.mp4`
+- 2026-11-12 runner 預設改成：job 沒有填 `sparse` 時，`resolution: full`（高解析度）自動開啟、草稿不開；填了 `sparse: true／false` 就照填的值。Studio 網頁和 story-film-studio 都經由 runner 出片，所以都會套用。漫畫影片的 `run_jobs.sh`／`run_series.sh` 是直接呼叫 docker，而且跑的是草稿，所以不受影響
