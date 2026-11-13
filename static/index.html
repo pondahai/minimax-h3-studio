@@ -127,6 +127,18 @@
         <div id="imageList" class="grid grid-cols-3 gap-2 mt-3">
           <!-- Populated dynamically -->
         </div>
+
+        <!-- FL2VA 尾幀（選填）：影片最後一秒鎖定在這張圖 -->
+        <div id="lastFrameSection" class="hidden mt-3 pt-3 border-t border-zinc-800">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[11px] font-semibold text-purple-300">🏁 尾幀（選填）</span>
+            <button id="lastFrameClear" onclick="setLastFrame(null)" class="hidden text-[10px] text-zinc-500 hover:text-red-400">移除</button>
+          </div>
+          <input type="file" id="lastFrameInput" accept="image/*" class="hidden" onchange="handleLastFrameSelect(event)">
+          <div id="lastFrameBox" onclick="document.getElementById('lastFrameInput').click()" class="border border-dashed border-purple-800/70 hover:border-purple-500 rounded-xl p-2.5 text-center cursor-pointer transition bg-surface-850/60 text-[10px] text-zinc-500">
+            點擊上傳尾幀圖：影片最後一秒會停在這張畫面。首尾景別最好只差一級，否則 H3 會在中途跳切。
+          </div>
+        </div>
       </div>
 
       <!-- Section: Reference Audio / Timbre Cloning (Audio 1-3) -->
@@ -205,6 +217,7 @@
             <p>• <b class="text-zinc-200">必填</b>，1～9 張，依上傳順序編號；可直接貼截圖。</p>
             <p>• <b class="text-zinc-200">Ref2VA</b>：每張都是外觀參考（角色、服裝、風格），構圖會重新生成。</p>
             <p>• <b class="text-zinc-200">FL2VA</b>：第 1 張是首幀，影片第 0 秒就是這張圖；第 2 張起才是一般參考。比例不符時依「首幀比例不符時」處理。</p>
+            <p>• <b class="text-zinc-200">FL2VA 尾幀</b>（選填）：影片最後一秒停在這張圖，提示詞開頭會自動換成官方首尾幀句。首尾景別差太多 H3 會中途跳切；快到尾幀時人物會停約 1 秒。</p>
             <p>• 「擷取最後一幀」會拿上一支影片的最後一格當首幀，並自動切到 FL2VA，用來接續多鏡。</p>
           </div>
           <div>
@@ -756,7 +769,46 @@
       }
     }
 
+    // FL2VA 尾幀：獨立一張，不算在 <Picture 1～9>
+    let lastFrameImage = null;
+    async function handleLastFrameSelect(e) {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('files', file);
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        const img = data.ok && data.files.find(f => f.type === 'image');
+        if (!img) throw new Error(data.detail || '不是圖片');
+        setLastFrame(img);
+      } catch (err) {
+        alert('尾幀上傳失敗: ' + err);
+      }
+    }
+    function setLastFrame(img) {
+      lastFrameImage = img;
+      renderLastFrame();
+    }
+    function renderLastFrame() {
+      const section = document.getElementById('lastFrameSection');
+      section.classList.toggle('hidden', workflowMode !== 'fl2va');
+      const box = document.getElementById('lastFrameBox');
+      document.getElementById('lastFrameClear').classList.toggle('hidden', !lastFrameImage);
+      if (lastFrameImage) {
+        box.innerHTML = `<img src="${lastFrameImage.url}" class="max-h-28 mx-auto rounded-lg"><div class="mt-1 text-purple-300 font-mono font-bold">&lt;尾幀 Picture 2&gt;</div>`;
+      } else {
+        box.innerText = '點擊上傳尾幀圖：影片最後一秒會停在這張畫面。首尾景別最好只差一級，否則 H3 會在中途跳切。';
+      }
+    }
+    // 送出時用：只有 FL2VA 才帶尾幀
+    function activeLastFrame() {
+      return workflowMode === 'fl2va' && !document.getElementById('characterSwapToggle')?.checked ? lastFrameImage : null;
+    }
+
     function renderAssetLists() {
+      renderLastFrame();
       // Images
       const imgContainer = document.getElementById('imageList');
       imgContainer.innerHTML = '';
@@ -1289,6 +1341,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
             character_swap: !t2va && swapToggle.checked,
             t2va: t2va,
             mode: workflowMode,
+            has_last_frame: !t2va && !!activeLastFrame(),
             duration_seconds: parseFloat(document.getElementById('durRange').value),
             // 讓支援看圖的 LLM 看到參考圖與原片畫面，避免憑空編造影片內容
             image_paths: t2va ? [] : uploadedImages.map(img => img.path),
@@ -1370,6 +1423,7 @@ ${isSwap ? `7. 換人模式：只寫 1 個連續分鏡（不要切鏡），在 d
         aspect: document.getElementById('aspectSelect').value,
         text_encoder: document.getElementById('textEncoderSelect').value,
         first_frame_fit: document.getElementById('firstFrameFitSelect').value,
+        last_frame_image: (!t2va && !longSwap && activeLastFrame()) ? activeLastFrame().path : null,
         high_mem: true
       };
       const endpoint = longSwap ? '/api/generate_long_swap' : '/api/generate';

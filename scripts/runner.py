@@ -516,6 +516,13 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
         first_frame_fit = str(raw.get("first_frame_fit") or "crop").lower()
         if first_frame_fit not in FIRST_FRAME_FITS:
             raise ValueError(f"Job {index} first_frame_fit must be one of {sorted(FIRST_FRAME_FITS)}.")
+        last_frame = None
+        if raw.get("last_frame_image"):
+            if mode != "first_frame":
+                raise ValueError(f"Job {index} last_frame_image needs first_frame mode.")
+            last_frame = Path(str(raw["last_frame_image"])).expanduser().resolve()
+            if not last_frame.is_file() or last_frame.stat().st_size == 0:
+                raise ValueError(f"Last frame image is missing or empty: {last_frame}")
         if mode == "reference":
             invalid = sorted({int(n) for n in VIDEO_RE.findall(prompt) if int(n) < 1 or int(n) > len(video_paths)})
             if invalid:
@@ -549,6 +556,7 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
             "sparse": (str(raw.get("resolution", "")).lower() == "full") if raw.get("sparse") is None else bool(raw.get("sparse")),
             "text_encoder": text_encoder,
             "first_frame_fit": first_frame_fit,
+            "last_frame_image": last_frame,
             "aspect": "portrait" if str(raw.get("aspect", "")).lower() == "portrait" else "landscape",
             "resolution": "full" if str(raw.get("resolution", "")).lower() == "full" else "draft",
             "duration_seconds": duration,
@@ -707,6 +715,8 @@ def run_batch(
             elif is_first_frame:
                 upload(job["reference_images"][0], remote_first_frame, f"upload first frame for {job['title']}", 600)
                 remote_refs.append(remote_first_frame)
+                if job.get("last_frame_image"):
+                    upload(job["last_frame_image"], f"{remote_prefix}_last_frame.png", f"upload last frame for {job['title']}", 600)
             else:
                 for image_index, image_path in enumerate(job["reference_images"], start=1):
                     remote = f"{remote_prefix}_reference_{image_index}.img"
@@ -765,6 +775,9 @@ def run_batch(
                 env_values.append("H3_T2VA=1")
             elif is_first_frame:
                 env_values.append(f"H3_INPUT_IMAGE={remote_first_frame}")
+                if job.get("last_frame_image"):
+                    # Spark bench.py／Colab notebook 都接到 MiniMaxH3ImageToVideo 的 last_frame
+                    env_values.append(f"H3_LAST_FRAME={remote_prefix}_last_frame.png")
             if job.get("flex") is not None:
                 env_values.append("H3_FLEX=" + ("1" if job["flex"] else "0"))
             if job.get("sparse"):

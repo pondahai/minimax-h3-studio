@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import json
 import time
@@ -321,6 +322,25 @@ EXPAND_T2VA_SYSTEM_PROMPT = """You write prompts for MiniMax H3, a video model t
 
 # 首幀錨定句由程式加（官方原句），不讓 LLM 抄寫
 FIRST_FRAME_ANCHOR = "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced."
+# 官方首尾幀開頭句：Picture 2（尾幀）對齊最後一個分鏡、片長秒數；生成時依實際秒數重寫
+FIRST_LAST_ANCHOR = ("How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark "
+                     "of the target video; Picture 2 (from Shot {shot}) aligns with the {sec:.2f}-second mark of the target video.")
+FIRST_LAST_RULE = ("\n\nThere is also an end frame: <Picture 2> is the exact last frame of the video. Plan the action so it ends exactly on what "
+                   "<Picture 2> shows (same framing, poses and setting); keep the camera within one shot-size step between the two frames. "
+                   "Use the tags <Picture 1> and <Picture 2> only.")
+
+
+def _with_frame_anchor(prompt: str, seconds: float, last_frame: bool) -> str:
+    """Strip any alignment sentence and prepend the official one (first frame, or first + last frame)."""
+    lines = [l for l in prompt.strip().splitlines()
+             if l.strip() != FIRST_FRAME_ANCHOR and not l.strip().startswith("How the reference pictures align")]
+    body = "\n".join(lines).strip()
+    if last_frame:
+        shots = [int(n) for n in re.findall(r"\[Shot (\d+)\]", body)]
+        head = FIRST_LAST_ANCHOR.format(shot=max(shots or [1]), sec=seconds)
+    else:
+        head = FIRST_FRAME_ANCHOR
+    return head + "\n\n" + body
 
 EXPAND_FIRST_FRAME_SYSTEM_PROMPT = """You write prompts for MiniMax H3, a video model that generates video with synchronized audio. This is first-frame mode: <Picture 1> is the exact first frame of [Shot 1]. Start [Shot 1] from what <Picture 1> shows (the subject shown in <Picture 1> ..., preserving appearance, clothing, position and setting), then describe what happens next. Do not write any alignment sentence; it is added automatically. Use no tags other than <Picture 1>.
 
@@ -396,6 +416,7 @@ class ExpandPromptRequest(BaseModel):
     character_swap: bool = False
     t2va: bool = False
     mode: Optional[str] = None  # ref2va / fl2va / t2va
+    has_last_frame: bool = False  # FL2VA 有尾幀
     duration_seconds: float = 12
     image_paths: Optional[List[str]] = []
     video_path: Optional[str] = None
@@ -530,6 +551,8 @@ def expand_prompt(req: ExpandPromptRequest):
         system = EXPAND_T2VA_SYSTEM_PROMPT
     elif first_frame:
         system = EXPAND_FIRST_FRAME_SYSTEM_PROMPT
+        if req.has_last_frame:
+            system = system.replace(" Use no tags other than <Picture 1>.", "") + FIRST_LAST_RULE
     else:
         system = EXPAND_REF_SYSTEM_PROMPT
     if req.character_swap and req.audio_count > 0:
@@ -558,8 +581,8 @@ def expand_prompt(req: ExpandPromptRequest):
             prompt = _llm_chat(text_only)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"LLM 擴寫失敗（{LLM_BASE_URL}）：{exc}")
-    if first_frame and FIRST_FRAME_ANCHOR not in prompt:
-        prompt = FIRST_FRAME_ANCHOR + "\n\n" + prompt
+    if first_frame:
+        prompt = _with_frame_anchor(prompt, req.duration_seconds, req.has_last_frame)
     return {"ok": True, "prompt": prompt, "used_vision": used_vision}
 
 
@@ -613,6 +636,7 @@ class GenerateRequest(BaseModel):
     aspect: Optional[str] = "landscape"
     text_encoder: Optional[str] = "heretic"
     first_frame_fit: Optional[str] = "crop"
+    last_frame_image: Optional[str] = None  # FL2VA 尾幀
     prompt: str
     duration_seconds: int = 12
     gpu: str = "A100"
@@ -639,6 +663,7 @@ def _job_settings(job: dict) -> dict:
         "reference_images": names(job.get("reference_images")),
         "reference_audios": names(job.get("reference_audios")),
         "reference_videos": names(job.get("reference_videos")),
+        "last_frame_image": Path(job["last_frame_image"]).name if job.get("last_frame_image") else None,
     }
 
 
@@ -766,6 +791,18 @@ def start_generation(req: GenerateRequest):
         if req.character_swap and not resolved_videos:
             raise HTTPException(status_code=400, detail="換人模式需要上傳一支原片。")
 
+        # 尾幀（官方首尾幀）：只有 FL2VA；Spark bench.py 與 Colab notebook 都接到 last_frame
+        last_frame = None
+        prompt = req.prompt
+        if req.last_frame_image:
+            if mode_val != "first_frame" or req.character_swap:
+                raise HTTPException(status_code=400, detail="尾幀只能用在 FL2VA 首幀模式。")
+            lp = _upload_file(req.last_frame_image)
+            if not lp:
+                raise HTTPException(status_code=400, detail=f"找不到尾幀圖片：{req.last_frame_image}")
+            last_frame = str(lp)
+            prompt = _with_frame_anchor(prompt, req.duration_seconds, True)
+
         job_id = f"job_{int(time.time())}_{uuid.uuid4().hex[:4]}"
         output_name = req.output_name or f"h3_{job_id}"
         if not output_name.endswith(".mp4"):
@@ -786,7 +823,8 @@ def start_generation(req: GenerateRequest):
                     "first_frame_fit": req.first_frame_fit or "crop",
                     # Colab 一律 1376×768；草稿只在 Spark 上有效
                     "resolution": "full" if (req.backend or "spark") == "colab" or req.resolution == "full" else "draft",
-                    "prompt": req.prompt,
+                    "last_frame_image": last_frame,
+                    "prompt": prompt,
                     "duration_seconds": req.duration_seconds,
                     "seed": req.seed if req.seed is not None else int(time.time()) % 1000000,
                     "output_name": output_name,
