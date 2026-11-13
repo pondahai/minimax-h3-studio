@@ -123,6 +123,8 @@ for sid in $SIDS; do
   [ -f "out/$sid.mp4" ] && continue
   for try in 1 2; do
     ONLY=$sid bash "$ROOT/run_series.sh" "$NAME" >> series.log 2>&1
+    # 結束碼 3＝Spark 被別的 H3／Demucs 佔用（例如 Studio 中途開跑）：不要逐段重試燒過去，整條停下
+    [ $? -eq 3 ] && { say "ABORT $sid 開跑前發現已有 H3／Demucs 在跑，pipeline 停止"; exit 1; }
     [ -f "out/$sid.mp4" ] && break
     [ -d "run/$sid" ] && mv "run/$sid" "run/${sid}_fail$try"
     say "$sid 第 $try 次失敗"
