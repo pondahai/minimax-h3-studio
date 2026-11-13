@@ -559,6 +559,8 @@ def resolve_jobs(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, A
             "last_frame_image": last_frame,
             "aspect": "portrait" if str(raw.get("aspect", "")).lower() == "portrait" else "landscape",
             "resolution": "full" if str(raw.get("resolution", "")).lower() == "full" else "draft",
+            # 少步數草稿（只有 Spark 的 bench.py 看）：Turbo 改步數、Flex 改 sigmas；目前只開放 2
+            "fast_steps": 2 if raw.get("fast_steps") == 2 else None,
             "duration_seconds": duration,
             "seed": seed,
             "output_path": output,
@@ -788,6 +790,8 @@ def run_batch(
                 env_values.append("H3_FLEX=" + ("1" if job["flex"] else "0"))
             if job.get("sparse"):
                 env_values.append("H3_SPARSE=1")
+            if job.get("fast_steps"):
+                env_values.append(f"H3_FAST_STEPS={job['fast_steps']}")
             current.update({"status": "generating", "seed": job["seed"], "duration_seconds": job["duration_seconds"]})
             progress["updated_at"] = now_iso()
             write_progress(progress_path, progress)

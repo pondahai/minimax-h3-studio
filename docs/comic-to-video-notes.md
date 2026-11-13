@@ -253,7 +253,7 @@
 - 段落表在 `config.json` 的 `shots`：`[段, 秒數, 首幀來源]`，首幀來源 `-`＝t2va、圖檔路徑（如 `frames/S01.png`，選定的 seed 複製改名）＝用該圖、段名＝續接該段末幀
 - 從 Windows 傳到 Spark 的 `.sh` 要先轉成 LF 換行，否則 bash 會報 `$'
 '` 指令找不到；`comic-video/.gitattributes` 已固定 `.sh` 為 LF，啟動前仍先 `bash -n` 檢查語法
-- Spark 上的目錄比照 repo：`~/h3-bench/comic-video/`（共用腳本＋`bench.py`）、`~/h3-bench/comic-video/<篇目>/`。《密度》已搬到新位置（第一批 11 段是重整前用舊腳本跑的）；《蝴蝶》還在 `~/h3-bench/butterfly/`
+- Spark 上的目錄比照 repo：`~/h3-bench/comic-video/`（共用腳本；H3 推論腳本在 `~/h3-bench/bench.py`，來源 repo `spark/bench.py`）、`~/h3-bench/comic-video/<篇目>/`。《密度》已搬到新位置（第一批 11 段是重整前用舊腳本跑的）；《蝴蝶》還在 `~/h3-bench/butterfly/`
 - 重跑某段：把舊檔移到 `out/archive/<段>_v1.mp4`、`run/<段>_v1/`，更新 prompt／首幀／`config.json` 後 `bash run_series.sh <篇目> <段>`（其他已存在的段會跳過）
 - `run_series.sh`：整批依序跑，已有的段會跳過；失敗就停（exit 1）。環境變數 `ONLY=S05` 只跑那一段
 - **離線排隊（《電池》起）**：`pipeline.sh <篇目>` 在 Spark 上一次跑完 H3 與後處理，本機可以關機。素材（config、storyboard、prompts、`frames/SXX.png`、`audio/` 台詞與 `lines.json`）先 tar 經 ssh 傳上去，再 `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（一定要 `< /dev/null`，否則 ssh 掛住不回來）

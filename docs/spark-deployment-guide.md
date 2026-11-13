@@ -68,7 +68,7 @@ docker build -t h3-bench:latest ~/h3-bench
 
 完整 revision hash 見 `download_models.sh` 和 [projects/flex-test/README.md](../projects/flex-test/README.md)。Flex 從 2026-11-01 起是預設；`-e H3_FLEX=0` 會切回 Turbo。
 
-**執行方式**：工作流不常駐 ComfyUI。`run_series.sh`／`run_jobs.sh` 每段跑一次 `docker run --rm --name h3-<篇目> --gpus all --ipc host`，掛載 `~/h3-bench/ComfyUI`、`~/h3-bench/models` 和該段的 run 目錄，執行 `comic-video/bench.py`。`~/h3-bench/docker-compose.yml`（:8288）只在手動測試時用，平常不需要。
+**執行方式**：工作流不常駐 ComfyUI。`run_series.sh`／`run_jobs.sh` 每段跑一次 `docker run --rm --name h3-<篇目> --gpus all --ipc host`，掛載 `~/h3-bench/ComfyUI`、`~/h3-bench/models` 和該段的 run 目錄，執行 `~/h3-bench/bench.py`（repo `spark/bench.py`，用 `spark/deploy_bench.sh` 部署；Studio 與漫畫流程共用，`studio/`、`comic-video/` 下的 `bench.py` 是指向它的 symlink）。`~/h3-bench/docker-compose.yml`（:8288）只在手動測試時用，平常不需要。
 
 ## 4. vLLM `qwen3.8-nvfp4`（:8006）
 
@@ -130,7 +130,7 @@ build 時會把 htdemucs 權重抓進映像，之後離線也能跑。
 
 ## 8. 放上工作流腳本
 
-- Spark 上的目錄比照 repo：把 `projects/comic-video/` 的共用腳本（`*.sh`、`*.py`、`bench.py`、`Dockerfile.sfx`）放到 `~/h3-bench/comic-video/`。各篇素材之後用 tar 經 ssh 傳到 `~/h3-bench/comic-video/<篇目>/`
+- Spark 上的目錄比照 repo：把 `projects/comic-video/` 的共用腳本（`*.sh`、`*.py`、`Dockerfile.sfx`）放到 `~/h3-bench/comic-video/`；H3 推論腳本另用 `spark/deploy_bench.sh` 部署到 `~/h3-bench/bench.py`。各篇素材之後用 tar 經 ssh 傳到 `~/h3-bench/comic-video/<篇目>/`
 - `.sh` 一定要是 LF 換行（`.gitattributes` 已設定）；從 Windows 傳過去之後先跑 `bash -n` 檢查
 - 本機 Windows 需要 Python 3.12＋Pillow、OpenCC。本機沒有 ffmpeg，影音處理都在 Spark 做
 

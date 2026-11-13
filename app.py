@@ -658,7 +658,7 @@ def _job_settings(job: dict) -> dict:
         "aspect": job.get("aspect"),
         "text_encoder": job.get("text_encoder", "official"),
         "first_frame_fit": job.get("first_frame_fit"),
-        "resolution": job.get("resolution", "draft"),
+        "resolution": "draft_fast" if job.get("fast_steps") else job.get("resolution", "draft"),
         "requested_seconds": job.get("duration_seconds"),
         "reference_images": names(job.get("reference_images")),
         "reference_audios": names(job.get("reference_audios")),
@@ -823,6 +823,8 @@ def start_generation(req: GenerateRequest):
                     "first_frame_fit": req.first_frame_fit or "crop",
                     # Colab 一律 1376×768；草稿只在 Spark 上有效
                     "resolution": "full" if (req.backend or "spark") == "colab" or req.resolution == "full" else "draft",
+                    # 「草稿 2 步」：只在 Spark 草稿有效（2026-11-13 實測推論約 80 秒，畫面偏軟）
+                    "fast_steps": 2 if (req.backend or "spark") == "spark" and req.resolution == "draft_fast" else None,
                     "last_frame_image": last_frame,
                     "prompt": prompt,
                     "duration_seconds": req.duration_seconds,
@@ -962,6 +964,7 @@ def _long_swap_worker(req: LongSwapRequest, images: List[str], source: Path, seg
                 "aspect": "portrait" if req.aspect == "portrait" else "landscape",
                 "text_encoder": req.text_encoder or "heretic",
                 "resolution": "full" if transport.name == "colab" or req.resolution == "full" else "draft",
+                "fast_steps": 2 if transport.name == "spark" and req.resolution == "draft_fast" else None,
                 "prompt": prompt,
                 # 生成長度會向上對齊；要求整數秒向上取整，合併時再裁回原片段長度以保持時間軸同步
                 "duration_seconds": max(4, int(-(-length // 1))),

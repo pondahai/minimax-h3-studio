@@ -22,8 +22,8 @@ import runner
 HOST = os.environ.get("H3_SPARK_HOST", "funsteam@100.89.149.50")
 WORK_ROOT = os.environ.get("H3_SPARK_WORK", "/home/funsteam/h3-studio")
 BENCH_ROOT = "/home/funsteam/h3-bench"
-# comic-video/bench.py 的複本，只把寫死的 672×384 改成看 H3_RESOLUTION（draft／full）和 H3_ASPECT
-BENCH_PY = f"{BENCH_ROOT}/studio/bench.py"
+# 唯一一份 H3 推論腳本：repo 的 spark/bench.py，用 spark/deploy_bench.sh 部署；漫畫流程也用同一支
+BENCH_PY = f"{BENCH_ROOT}/bench.py"
 IMAGE = "h3-bench:latest"
 SSH_OPTS = ["-o", "BatchMode=yes", "-o", "ConnectTimeout=15", "-o", "ServerAliveInterval=30"]
 
