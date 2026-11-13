@@ -29,7 +29,8 @@ SSH_OPTS = ["-o", "BatchMode=yes", "-o", "ConnectTimeout=15", "-o", "ServerAlive
 
 
 class SparkBusyError(RuntimeError):
-    pass
+    # run_batch 看到 busy 就不呼叫 stop()：被拒絕的工作沒有停過任何服務，不能去還原別人停掉的 8002
+    busy = True
 
 
 def _ssh(script: str, *, timeout: float = 120) -> subprocess.CompletedProcess:
@@ -70,6 +71,14 @@ pgrep -f "[c]hinese_tts_server.py" > /dev/null && pkill -f "[c]hinese_tts_server
 
 
 # H3 跑完（正常或中止）：拉回 8002，8006 若不在也順手啟動（與 pipeline.sh 的 restore_services 一致）
+# 還有別的 H3／Demucs 在跑（自己的容器除外）就什麼都不做：8002 和 busy 旗標留給最後一個跑完的人還原，
+# 否則 8002（約 55 GB）會在別人推論中途被拉回來，H3＋8006＋8002 搶統一記憶體、塞爆 swap（2026-11-13 卡機）
+def _restore(own_container: str) -> str:
+    return (f"others=$(docker ps --format '{{{{.Names}}}}' | grep -E '^h3-|^demucs' | grep -vx {shlex.quote(own_container)})\n"
+            "if [ -n \"$others\" ]; then echo \"[*] 還有 $others 在跑，不還原 8002／不清 busy 旗標\"; exit 0; fi\n"
+            + _busy_flag(False) + RESTORE)
+
+
 RESTORE = r"""
 if ! pgrep -f "[l]lama-server.*--port 8002" > /dev/null && [ -x ~/models/qwen3.6-abliterated/start.sh ]; then
   setsid -f ~/models/qwen3.6-abliterated/start.sh >> ~/models/qwen3.6-abliterated/llama-server.log 2>&1 < /dev/null
@@ -111,12 +120,12 @@ class SparkTransport:
             print(output, flush=True)
 
     def stop(self, session: str) -> None:
-        _ssh(f"rm -rf {shlex.quote(self._dir(session))}\n" + _busy_flag(False) + RESTORE, timeout=60)
+        _ssh(f"rm -rf {shlex.quote(self._dir(session))}\n" + _restore(self._container(session)), timeout=60)
 
     def emergency_stop(self, session: str) -> None:
         try:
             _ssh(f"docker kill {shlex.quote(self._container(session))} > /dev/null 2>&1\n"
-                 f"rm -rf {shlex.quote(self._dir(session))}\n" + _busy_flag(False) + RESTORE, timeout=60)
+                 f"rm -rf {shlex.quote(self._dir(session))}\n" + _restore(self._container(session)), timeout=60)
         except Exception as exc:
             print(f"[!] 中止 Spark 容器失敗：{exc}", flush=True)
 

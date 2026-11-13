@@ -35,7 +35,14 @@ restore_services() {
     echo "$(date '+%F %T') 還原 8002（llama.cpp）" >> "$ST"
   fi
 }
-trap 'set_busy_status false; restore_services' EXIT
+# 還有別的 H3／Demucs 在跑（例如開頭就因忙碌 ABORT、或中途 Studio 開跑）就不還原、不清旗標，留給它自己收尾；
+# 否則 8002（約 55 GB）會在別人推論中途被拉回來，塞爆統一記憶體（2026-11-13 卡機）
+on_exit() {
+  others=$(docker ps --format '{{.Names}}' | grep -E '^h3-|^demucs' | tr '\n' ' ')
+  if [ -n "$others" ]; then echo "$(date '+%F %T') 還有 $others在跑，不還原 8002／不清 busy 旗標" >> "$ST"; return; fi
+  set_busy_status false; restore_services
+}
+trap on_exit EXIT
 set_busy_status true
 
 # 等 Qwen-Image 手上的工作做完才交班，不強制中斷進行中的生圖任務。

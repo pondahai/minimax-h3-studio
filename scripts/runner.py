@@ -691,9 +691,15 @@ def run_batch(
     batch_error: str | None = None
     work_root = manifest_path.parent / f"work_{uuid.uuid4().hex[:8]}"
     work_root.mkdir(parents=True, exist_ok=True)
+    refused_busy = False
     try:
         if owns_session:
-            transport.start(session, gpu, high_mem)
+            try:
+                transport.start(session, gpu, high_mem)
+            except Exception as exc:
+                # Spark 已有別的 H3 在跑而拒絕：什麼都沒停過，結束時不能 stop（stop 會還原 8002，拖垮正在跑的那支）
+                refused_busy = bool(getattr(exc, "busy", False))
+                raise
         progress["status"] = "running"
         progress["updated_at"] = now_iso()
         write_progress(progress_path, progress)
@@ -816,7 +822,7 @@ def run_batch(
             if item["status"] == "queued":
                 item["status"] = "cancelled"
     finally:
-        if (owns_session or stop_on_complete) and session:
+        if (owns_session or stop_on_complete) and session and not refused_busy:
             progress["status"] = "stopping_session"
             progress["updated_at"] = now_iso()
             write_progress(progress_path, progress)
