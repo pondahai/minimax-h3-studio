@@ -3,7 +3,7 @@
 # shots 第三欄是首幀來源：- ＝t2va；圖檔路徑（如 frames/S01.png）＝用該圖；段名＝續接該段末幀。
 # 有 frames/<段>_end.png 就當尾幀（官方 FL2VA，首尾幀）。
 # 用法：bash run_series.sh <篇目> [起始段，例如 S05]；環境變數 ONLY=S05 只跑那一段（pipeline.sh 逐段重試用）
-# Spark 目錄：~/h3-bench/comic-video/（本目錄的腳本＋bench.py）、~/h3-bench/comic-video/<篇目>/
+# Spark 目錄：~/h3-bench/comic-video/（本目錄的腳本）、~/h3-bench/bench.py（repo spark/bench.py，Studio 共用）、~/h3-bench/comic-video/<篇目>/
 set -u
 ROOT=$(cd "$(dirname "$0")" && pwd)
 # 解析度：預設草稿 672×384；RES=full 出 1376×768，並自動開稀疏注意力（2026-11-12 實測高解析度快 28–41%，畫質不變）
@@ -50,7 +50,7 @@ while [ $# -gt 0 ]; do
     $RESOPT -e H3_CHARACTER_SWAP=0 -e H3_ASPECT=landscape -e H3_TEXT_ENCODER=heretic -e H3_FIRST_FRAME_FIT=crop \
     -v /home/funsteam/h3-bench/ComfyUI:/content/ComfyUI \
     -v /home/funsteam/h3-bench/models:/content/ComfyUI/models \
-    -v "$BASE/run/$sid":/content/run -v "$ROOT/bench.py":/content/bench.py:ro \
+    -v "$BASE/run/$sid":/content/run -v "$(dirname "$ROOT")/bench.py":/content/bench.py:ro \
     --entrypoint sh h3-bench:latest -c 'touch /content/.h3_comfyui_setup_v1 && cd /content && python3 /content/bench.py' > "run/$sid/bench.log" 2>&1
   rc=$?
   if [ $rc = 0 ] && [ -f "run/$sid/output.mp4" ]; then

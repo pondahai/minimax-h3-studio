@@ -33,7 +33,7 @@ for job in "$@"; do
     $RESOPT -e H3_CHARACTER_SWAP=0 -e H3_ASPECT=landscape -e H3_TEXT_ENCODER=heretic -e H3_FIRST_FRAME_FIT=crop \
     -v /home/funsteam/h3-bench/ComfyUI:/content/ComfyUI \
     -v /home/funsteam/h3-bench/models:/content/ComfyUI/models \
-    -v "$BASE/run/$name":/content/run -v "$ROOT/bench.py":/content/bench.py:ro \
+    -v "$BASE/run/$name":/content/run -v "$(dirname "$ROOT")/bench.py":/content/bench.py:ro \
     --entrypoint sh h3-bench:latest -c 'touch /content/.h3_comfyui_setup_v1 && cd /content && python3 /content/bench.py' > "run/$name/bench.log" 2>&1
   rc=$?
   if [ $rc = 0 ] && [ -f "run/$name/output.mp4" ]; then

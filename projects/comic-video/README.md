@@ -85,7 +85,7 @@ TTS、Qwen-Image、H3、Demucs 互斥（記憶體），一次只開一個。
 3. 啟動 TTS → 新角色候選、**由人挑選**存成 `audio/ref_<角色>.wav`（同系列角色直接複製前一篇的）→ `python tts.py <篇目>` → `python asr_check.py <篇目>` → 壞句重配、人工試聽 → 關 TTS
 4. 啟動 8188 → 每個獨立段 `python qwen_frame.py <篇目> <段> 3 <原漫畫分格> <角色參考圖>` → 關 8188
 5. 寫 `review.json`（建議 seed 與理由）→ `python review.py <篇目>` → 使用者選定 → 存成 `shots` 指定的首幀檔名
-6. 把本目錄腳本、`bench.py`（672×384）和 `<篇目>/` 放到 Spark `~/h3-bench/comic-video/` → `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（自動停 8002 以外的服務）
+6. 用 `spark/deploy_bench.sh` 確認 Spark 的 `~/h3-bench/bench.py` 是最新版；把本目錄腳本和 `<篇目>/` 放到 Spark `~/h3-bench/comic-video/` → `setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（自動停 8002 以外的服務）
 7. 跑完看 `pipeline.status`：失敗段重跑、配樂若 ASR 聽到人聲要人聽
 8. `python3 mux.py <篇目>`（兩版加 `CUT=A|B`）→ `python3 subs.py <篇目>` → 分享版 → 拉回本機給使用者驗收
 
