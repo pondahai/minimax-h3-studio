@@ -25,6 +25,8 @@ BENCH_ROOT = "/home/funsteam/h3-bench"
 # 唯一一份 H3 推論腳本：repo 的 spark/bench.py，用 spark/deploy_bench.sh 部署；漫畫流程也用同一支
 BENCH_PY = f"{BENCH_ROOT}/bench.py"
 IMAGE = "h3-bench:latest"
+# 一批多鏡共用一個常駐容器（模型只載入一次）；H3_SPARK_WARM=0 改回每鏡一個 docker run --rm
+WARM = os.environ.get("H3_SPARK_WARM", "1") != "0"
 SSH_OPTS = ["-o", "BatchMode=yes", "-o", "ConnectTimeout=15", "-o", "ServerAliveInterval=30"]
 
 
@@ -109,8 +111,18 @@ class SparkTransport:
     def check(self) -> None:
         pass
 
+    def _run_args(self, session: str) -> str:
+        return (f"--gpus all --ipc host -e PYTORCH_NO_CUDA_MEMORY_CACHING=1 -e PYTHONUNBUFFERED=1 "
+                f"-v {BENCH_ROOT}/ComfyUI:/content/ComfyUI -v {BENCH_ROOT}/models:/content/ComfyUI/models "
+                f"-v {shlex.quote(self._dir(session))}:{self.remote_root} -v {BENCH_PY}:/content/bench.py:ro ")
+
     def start(self, session: str, gpu: str, high_mem: bool) -> None:
-        result = _ssh(TAKEOVER + _busy_flag(True) + f"mkdir -p {shlex.quote(self._dir(session))}\n", timeout=180)
+        # 常駐容器（WARM）：整批開一個容器，每鏡 docker exec 跑 bench.py。第一鏡啟動的 ComfyUI 留在容器裡，
+        # 之後的鏡頭 bench.py 會「使用已啟動的 ComfyUI」，模型留在記憶體不重載；stop() 時整個容器移除
+        warm = (f"docker run -d --name {shlex.quote(self._container(session))} {self._run_args(session)}"
+                f"--entrypoint sh {IMAGE} -c 'touch /content/.h3_comfyui_setup_v1 && exec sleep infinity' > /dev/null\n"
+                if WARM else "")
+        result = _ssh(TAKEOVER + _busy_flag(True) + f"mkdir -p {shlex.quote(self._dir(session))}\n" + warm, timeout=180)
         output = _text(result.stdout + result.stderr)
         if result.returncode == 3:
             raise SparkBusyError(output or "Spark 忙碌中")
@@ -120,11 +132,13 @@ class SparkTransport:
             print(output, flush=True)
 
     def stop(self, session: str) -> None:
-        _ssh(f"rm -rf {shlex.quote(self._dir(session))}\n" + _restore(self._container(session)), timeout=60)
+        _ssh(f"docker rm -f {shlex.quote(self._container(session))} > /dev/null 2>&1\n"
+             f"rm -rf {shlex.quote(self._dir(session))}\n" + _restore(self._container(session)), timeout=60)
 
     def emergency_stop(self, session: str) -> None:
         try:
-            _ssh(f"docker kill {shlex.quote(self._container(session))} > /dev/null 2>&1\n"
+            # rm -f：常駐容器沒有 --rm，只 kill 會留下停止的容器
+            _ssh(f"docker rm -f {shlex.quote(self._container(session))} > /dev/null 2>&1\n"
                  f"rm -rf {shlex.quote(self._dir(session))}\n" + _restore(self._container(session)), timeout=60)
         except Exception as exc:
             print(f"[!] 中止 Spark 容器失敗：{exc}", flush=True)
@@ -137,13 +151,15 @@ class SparkTransport:
     def execute(self, session: str, env_values: list[str], *, job_id: str, work_dir: Path, label: str,
                 timeout: int, on_line: Callable[[str], None]) -> None:
         env_args = " ".join(f"-e {shlex.quote(value)}" for value in env_values)
-        command = (
-            f"docker run --rm --name {shlex.quote(self._container(session))} --gpus all --ipc host "
-            f"-e PYTORCH_NO_CUDA_MEMORY_CACHING=1 -e PYTHONUNBUFFERED=1 {env_args} "
-            f"-v {BENCH_ROOT}/ComfyUI:/content/ComfyUI -v {BENCH_ROOT}/models:/content/ComfyUI/models "
-            f"-v {shlex.quote(self._dir(session))}:{self.remote_root} -v {BENCH_PY}:/content/bench.py:ro "
-            f"--entrypoint sh {IMAGE} -c 'touch /content/.h3_comfyui_setup_v1 && cd /content && python3 /content/bench.py'"
-        )
+        if WARM:
+            # 常駐容器裡跑：上一鏡留下的 ComfyUI 與已載入的模型沿用
+            command = (f"docker exec {env_args} -w /content {shlex.quote(self._container(session))} "
+                       f"python3 /content/bench.py")
+        else:
+            command = (
+                f"docker run --rm --name {shlex.quote(self._container(session))} {self._run_args(session)}{env_args} "
+                f"--entrypoint sh {IMAGE} -c 'touch /content/.h3_comfyui_setup_v1 && cd /content && python3 /content/bench.py'"
+            )
         try:
             runner.stream_command(["ssh", *SSH_OPTS, HOST, command], label=label, timeout=timeout + 60,
                                   on_line=on_line, on_abort=lambda: self.emergency_stop(session),
