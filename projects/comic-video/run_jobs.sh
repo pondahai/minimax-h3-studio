@@ -21,6 +21,9 @@ for job in "$@"; do
     MODE="-e H3_INPUT_IMAGE=/content/run/first_frame.png"
   fi
   echo "$(date -Is) $name 開始（${dur}s，seed $seed，首幀 $img）"
+  # 已有 H3（Studio 的 h3-studio-*、其他篇目的 h3-*）或 Demucs 在跑就停，不同時搶 GPU／記憶體
+  busy=$(docker ps --format '{{.Names}}' | grep -E '^h3-|^demucs' | tr '\n' ' ')
+  [ -n "$busy" ] && { echo "Spark 忙碌：已有 H3／Demucs 在跑（$busy），停止"; exit 3; }
   docker run --rm --name h3-$NAME --gpus all --ipc host \
     -e PYTORCH_NO_CUDA_MEMORY_CACHING=1 -e PYTHONUNBUFFERED=1 \
     -e H3_INFERENCE_MODE=first_frame $MODE \

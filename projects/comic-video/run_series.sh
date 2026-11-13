@@ -38,6 +38,9 @@ while [ $# -gt 0 ]; do
   LAST=""
   [ -f "frames/${sid}_end.png" ] && { cp "frames/${sid}_end.png" "run/$sid/last_frame.png"; LAST="-e H3_LAST_FRAME=/content/run/last_frame.png"; }
   echo "$(date -Is) $sid 開始（${dur}s，首幀 $src）"
+  # 已有 H3（Studio 的 h3-studio-*、其他篇目的 h3-*）或 Demucs 在跑就停，不同時搶 GPU／記憶體
+  busy=$(docker ps --format '{{.Names}}' | grep -E '^h3-|^demucs' | tr '\n' ' ')
+  [ -n "$busy" ] && { echo "Spark 忙碌：已有 H3／Demucs 在跑（$busy），停止"; kill $MEMPID 2>/dev/null; exit 3; }
   docker run --rm --name h3-$NAME --gpus all --ipc host \
     -e PYTORCH_NO_CUDA_MEMORY_CACHING=1 -e PYTHONUNBUFFERED=1 \
     -e H3_INFERENCE_MODE=first_frame $MODE $LAST \

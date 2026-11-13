@@ -35,7 +35,14 @@ restore_services() {
     echo "$(date '+%F %T') 還原 8002（llama.cpp）" >> "$ST"
   fi
 }
-trap 'set_busy_status false; restore_services' EXIT
+# 還有別的 H3／Demucs 在跑（例如開頭就因忙碌 ABORT、或中途 Studio 開跑）就不還原、不清旗標，留給它自己收尾；
+# 否則 8002（約 55 GB）會在別人推論中途被拉回來，塞爆統一記憶體（2026-11-13 卡機）
+on_exit() {
+  others=$(docker ps --format '{{.Names}}' | grep -E '^h3-|^demucs' | tr '\n' ' ')
+  if [ -n "$others" ]; then echo "$(date '+%F %T') 還有 $others在跑，不還原 8002／不清 busy 旗標" >> "$ST"; return; fi
+  set_busy_status false; restore_services
+}
+trap on_exit EXIT
 set_busy_status true
 
 # 等 Qwen-Image 手上的工作做完才交班，不強制中斷進行中的生圖任務。
@@ -123,6 +130,8 @@ for sid in $SIDS; do
   [ -f "out/$sid.mp4" ] && continue
   for try in 1 2; do
     ONLY=$sid bash "$ROOT/run_series.sh" "$NAME" >> series.log 2>&1
+    # 結束碼 3＝Spark 被別的 H3／Demucs 佔用（例如 Studio 中途開跑）：不要逐段重試燒過去，整條停下
+    [ $? -eq 3 ] && { say "ABORT $sid 開跑前發現已有 H3／Demucs 在跑，pipeline 停止"; exit 1; }
     [ -f "out/$sid.mp4" ] && break
     [ -d "run/$sid" ] && mv "run/$sid" "run/${sid}_fail$try"
     say "$sid 第 $try 次失敗"
