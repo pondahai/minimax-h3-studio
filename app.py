@@ -286,12 +286,13 @@ LLM_MODEL = os.environ.get("H3_LLM_MODEL", "")  # 空白 = 用伺服器第一個
 LLM_API_KEY = os.environ.get("H3_LLM_API_KEY", "")
 LLM_TIMEOUT = float(os.environ.get("H3_LLM_TIMEOUT", "180"))
 LLM_THINKING = os.environ.get("H3_LLM_THINKING", "1") == "1"  # Qwen3 等推理模型先推理再作答
+LLM_MAX_TOKENS = int(os.environ.get("H3_LLM_MAX_TOKENS", "16000"))  # 推理＋正文總額度
 
 # 擴寫一律照 MiniMax 官方指南（docs/VIDEO_PROMPT_WRITING_GUIDE_base_en.md 與 _ref_en.md，2026-11-06 查證）：
 # T2VA／首幀用三欄位，Ref2VA 用六段；時間點只能用 [Shot N] At MM:SS.mmm 表達（散文寫「第 4 秒」H3 會把事件擠到開頭）
 EXPAND_COMMON_RULES = """General rules:
 - Write the user's idea faithfully; add concrete visual detail, never change its intent. Keep actions physically plausible and paced to fit the requested duration.
-- Camera motion is natural prose (e.g. The camera pushes in with small amplitude at slow speed toward ...), not stacked labels. On-screen text goes in double quotes.
+- Camera motion is natural prose (e.g. The camera pushes in with small amplitude at slow speed toward ...), not stacked labels; give amplitude and speed once when the move starts, not in every sentence. On-screen text goes in double quotes.
 - Spoken lines go only inside <d>[Chinese] ...</d> (or <d>[English] ...</d>), right after who speaks, e.g. The woman (S1) says, <d>[Chinese] 你好。</d> Give each speaking character a stable speaker ID (S1), (S2); characters who never speak get no ID. The tag is exactly [Chinese], never [Traditional Chinese], but the line itself is Traditional Chinese as used in Taiwan; keep the user's wording. Voiceover: "says in an off-screen voiceover", then state that the on-screen lips remain closed. Never write dialogue in the sound sections.
 - If the user gives no spoken lines, write no <d> tags and no speaker IDs (do not add sentences like "no dialogue").
 
@@ -369,6 +370,9 @@ non_diegetic_music:
 
 - When frames of a reference video are attached, describe its setting, subjects, camera and action exactly as the frames show them; never relocate or reinvent what <Video N> contains.
 - When no frames of a reference video are attached, you cannot see it: do not invent its setting, subjects or action; describe it only as the user's idea does.
+- Reference pictures of people give appearance only (face, hair, body, clothing). Do not carry their original background, furniture or props (tables, food, machines) into the video unless the user asks; place the subjects directly in the one setting the idea calls for, with no split screens or merging scenes. subject_definitions describe the look, not the old background.
+- retention_analysis lists only what is kept from the reference (look, clothing, voice), never actions or fighting styles.
+- Use 2-3 shots for clips up to 12 seconds. Every shot lasts at least 3 seconds, the last shot included, and holds only as much action as fits its length.
 
 """ + EXPAND_COMMON_RULES
 
@@ -504,7 +508,11 @@ def _vision_parts(req: "ExpandPromptRequest") -> tuple:
     return parts, video_seconds
 
 
-def _llm_chat(messages: List[Dict[str, Any]]) -> str:
+class LLMTruncated(RuntimeError):
+    """LLM 輸出到 max_tokens 被截斷（多半是推理吃光額度），半截提示詞不能拿去生成。"""
+
+
+def _llm_chat(messages: List[Dict[str, Any]], thinking: Optional[bool] = None) -> str:
     import urllib.request
     import re
 
@@ -517,16 +525,20 @@ def _llm_chat(messages: List[Dict[str, Any]]) -> str:
         with urllib.request.urlopen(request, timeout=LLM_TIMEOUT) as resp:
             return json.loads(resp.read().decode("utf-8"))
 
+    thinking = LLM_THINKING if thinking is None else thinking
     model = LLM_MODEL or call("/models")["data"][0]["id"]
     result = call("/chat/completions", {
         "model": model,
         "messages": messages,
         "temperature": 0.7,
-        # 推理內容另計 token，開 thinking 時要留足空間，否則正文會被截掉
-        "max_tokens": 8000 if LLM_THINKING else 1500,
-        "chat_template_kwargs": {"enable_thinking": LLM_THINKING},
+        # 推理與正文共用額度：8000 曾把 Ref2VA 正文截掉（聲音段全沒了），推理模式放寬到 16000
+        "max_tokens": LLM_MAX_TOKENS if thinking else 3000,
+        "chat_template_kwargs": {"enable_thinking": thinking},
     })
-    text = (result["choices"][0]["message"].get("content") or "").strip()
+    choice = result["choices"][0]
+    if choice.get("finish_reason") == "length":
+        raise LLMTruncated("LLM 輸出被截斷（max_tokens 不足）。")
+    text = (choice["message"].get("content") or "").strip()
     text = re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip()
     if not text:
         raise RuntimeError("LLM 沒有回傳內容。")
@@ -569,16 +581,35 @@ def expand_prompt(req: ExpandPromptRequest):
         user += "\n\nCurrent prompt to improve (keep what still fits the idea):\n" + req.current_prompt.strip()
     text_only = [{"role": "system", "content": system}, {"role": "user", "content": user}]
     used_vision = bool(parts)
-    try:
-        if parts:
+    with_vision = [text_only[0], {"role": "user", "content": [{"type": "text", "text": user}, *parts]}]
+
+    def ask(thinking: Optional[bool] = None) -> str:
+        nonlocal used_vision
+        if used_vision:
             try:
-                prompt = _llm_chat([text_only[0], {"role": "user", "content": [{"type": "text", "text": user}, *parts]}])
+                return _llm_chat(with_vision, thinking)
+            except LLMTruncated:
+                raise
             except Exception:
                 # LLM 不支援看圖時退回純文字
                 used_vision = False
-                prompt = _llm_chat(text_only)
-        else:
-            prompt = _llm_chat(text_only)
+        return _llm_chat(text_only, thinking)
+
+    # 換人模式是單段落，其餘模式都必須有聲音段；缺了代表輸出不完整
+    required = [] if req.character_swap else ["overall_soundscape:", "non_diegetic_music:"]
+    if mode not in ("t2va",) and not first_frame and not req.character_swap:
+        required += ["subject_definitions:", "detailed_description:"]
+    try:
+        try:
+            prompt = ask()
+        except LLMTruncated:
+            prompt = ask(thinking=False)  # 推理吃光額度時，關掉推理重寫一次
+        missing = [k for k in required if k not in prompt]
+        if missing:
+            prompt = ask(thinking=False)
+            missing = [k for k in required if k not in prompt]
+            if missing:
+                raise RuntimeError(f"輸出缺少段落 {', '.join(missing)}，請再按一次擴寫。")
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"LLM 擴寫失敗（{LLM_BASE_URL}）：{exc}")
     if first_frame:

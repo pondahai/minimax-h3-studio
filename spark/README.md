@@ -18,3 +18,7 @@
 4. 之後每次功能都直接在 Spark 上改兩份，repo 只留部分 patch（`projects/*/bench_*.patch`），尾幀與 2 步的改動沒有 patch。
 
 沒有人決定「不收」，是測試檔升格為正式程式時少了收進 repo 這一步。
+
+## 一批多鏡共用常駐容器（2026-11-13）
+
+`scripts/runner_spark.py` 預設（`H3_SPARK_WARM=1`）在 `start()` 開一個常駐容器 `h3-studio-<session>`（`sleep infinity`），每鏡用 `docker exec` 跑 `bench.py`。第一鏡啟動的 ComfyUI 留在容器裡，之後的鏡頭走「使用已啟動的 ComfyUI」，模型不重載；`stop()`／中止時 `docker rm -f` 整個容器。`bench.py` 不用改，漫畫流程不受影響。`H3_SPARK_WARM=0` 改回每鏡 `docker run --rm`。
