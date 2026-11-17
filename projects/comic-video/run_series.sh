@@ -37,6 +37,27 @@ while [ $# -gt 0 ]; do
   fi
   LAST=""
   [ -f "frames/${sid}_end.png" ] && { cp "frames/${sid}_end.png" "run/$sid/last_frame.png"; LAST="-e H3_LAST_FRAME=/content/run/last_frame.png"; }
+  # TTS 音訊錨點（2026-11-17 起，journey07 五鏡實測）：該段每句 TTS 原速錨在起秒那一幀，H3 照我們的聲音生嘴型，不必事後 DTW 拉伸。
+  # 起秒用 comic.anchor_plan（mux.py 放回 TTS 用同一個時間），寫 run/<段>/anchors.json 給 mux.py／subs.py 讀。
+  # config 寫 "audio_anchor": false 就關掉（回到 H3 自己唸、事後對齊的舊做法）
+  GUIDES=$(SID=$sid DUR=$dur python3 - <<'EOF'
+import json, os, shutil, sys
+sys.path.insert(0, os.path.dirname(os.getcwd()))
+import comic
+cfg = json.load(open("config.json"))
+sid, dur = os.environ["SID"], float(os.environ["DUR"])
+guides = []
+if cfg.get("audio_anchor", True) and os.path.exists("audio/lines.json"):
+    lines = [l for l in json.load(open("audio/lines.json")) if l["sid"] == sid]
+    plan = comic.anchor_plan(lines, dur)
+    for ln, t in plan:
+        shutil.copy(f"audio/{ln['file']}", f"run/{sid}/{ln['file']}")
+        guides.append({"audio": f"/content/run/{ln['file']}", "frame": int(round(t * 24))})
+    json.dump({ln["file"]: t for ln, t in plan}, open(f"run/{sid}/anchors.json", "w"), ensure_ascii=False)
+print(json.dumps(guides, ensure_ascii=False, separators=(",", ":")))
+EOF
+)
+  [ "$GUIDES" != "[]" ] && echo "$sid 音訊錨點：$GUIDES"
   echo "$(date -Is) $sid 開始（${dur}s，首幀 $src）"
   # 已有 H3（Studio 的 h3-studio-*、其他篇目的 h3-*）或 Demucs 在跑就停，不同時搶 GPU／記憶體
   busy=$(docker ps --format '{{.Names}}' | grep -E '^h3-|^demucs' | tr '\n' ' ')
@@ -44,7 +65,7 @@ while [ $# -gt 0 ]; do
   docker run --rm --name h3-$NAME --gpus all --ipc host \
     -e PYTORCH_NO_CUDA_MEMORY_CACHING=1 -e PYTHONUNBUFFERED=1 \
     -e H3_INFERENCE_MODE=first_frame $MODE $LAST \
-    -e 'H3_REFERENCE_AUDIOS=[]' -e 'H3_REFERENCE_VIDEOS=[]' -e 'H3_GUIDES=[]' \
+    -e 'H3_REFERENCE_AUDIOS=[]' -e 'H3_REFERENCE_VIDEOS=[]' -e "H3_GUIDES=$GUIDES" \
     -e H3_PROMPT_FILE=/content/run/prompt.txt -e H3_DURATION_SECONDS=$dur -e H3_SEED=164723 \
     -e H3_OUTPUT_PREFIX=${NAME}_$sid -e H3_OUTPUT_PATH=/content/run/output.mp4 -e H3_JOB_TIMEOUT_SECONDS=3600 \
     $RESOPT -e H3_CHARACTER_SWAP=0 -e H3_ASPECT=landscape -e H3_TEXT_ENCODER=heretic -e H3_FIRST_FRAME_FIT=crop \

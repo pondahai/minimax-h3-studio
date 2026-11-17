@@ -303,6 +303,12 @@
   - H3 原聲（`sfx/SXX_vocals.wav`）的 ASR 幾乎就是台詞，可以拿來檢查 H3 有沒有照台詞唸
   - 《飛機》只有機長的段（S05 S06B S09 S12B S14B）加慢重跑並用 DTW；其他段 H3 沒重跑，`align.json` 只留這 5 段（快版 H3 用 DTW 會把 TTS 壓得更快）
   - 試過零樣本聲音轉換（Seed-VC，H3 原聲換成角色音色，嘴型天生對準），映像 `seed-vc` 已建在 Spark，因 DTW＋慢慢講已夠用，沒有實測
+  4. **TTS 當時間軸錨點（2026-11-17 實測，使用者選定最好）**：上面 1–3 都是「H3 照自己唸的聲音生嘴型，事後把 TTS 拉過去」，根本上對不準。FL2VA（首幀生影片）沒有參考音輸入（`ref_audios` 只接在 Ref2VA），但 `H3_GUIDES` 兩種模式都能用：每句 TTS 一個音訊錨點，`frame`＝起秒×24。journey07 S01 三版比較（同 seed，測試檔 `journey07/voice_test/run.sh`）：
+     - A 首幀＋三句 TTS 錨在 0／120／216 幀，prompt 不改：說話時段落在錨點位置，ASR 三句全對，**使用者試聽最好**
+     - B Ref2VA（參考圖生影片）＋角色參考音 `<Audio 1–3>`＋S01.png 當第 0 幀圖錨點：首幀有保住（和原圖差異與 FL2VA 相當），但節奏是 H3 自己排的
+     - C 現行成品（DTW 拉伸）：當對照
+     - 加測 S07（4 句快速換人）、S13（續接末幀、短句有空檔）、S15（續接、單句後留白 5 秒）、S18（1 秒才開口）：時段都落在錨點、ASR 全對；S15 留白處 H3 自己加了笑聲，使用者可接受
+     - **已改進正式流程**：`run_series.sh` 依 `comic.anchor_plan`（原速、前句沒講完就順延）產生錨點並寫 `run/<段>/anchors.json`；`mux.py`／`subs.py` 讀到就原速放回同一時間；`pipeline.sh` 不再跑 `align_dtw.py`（`lipsync_measure.py` 留著給 `speaker_check.py`）。config `"audio_anchor": false` 可關掉
   - Demucs 裝法的坑：pip 不加 `--no-deps` 會重抓幾 GB 的 torch；4.1 版要 `sphn`，ARM 沒有 wheel；4.0.1 要 torchaudio，容器沒有 → 自己寫腳本呼叫 `apply_model`，給 openunmix 一個空的 torchaudio 模組
 - 每句台詞先量響度、統一到 −20 LUFS（`LINE_LUFS`）再混音，避免某個角色偏小聲
 - 台詞放在分鏡起秒；前句沒講完就順延，講不完用 atempo 加速（一般上限 1.35，段尾最後一句上限 1.5）

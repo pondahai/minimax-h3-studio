@@ -2,6 +2,8 @@
 
 用法（Spark）：python3 mux.py <篇目>
 
+2026-11-17 起 H3 生成時就把 TTS 錨在起秒（run_series.sh，run/<段>/anchors.json），這些段原速放回同一時間；
+沒有錨點的舊段才照下面做：
 台詞放在分鏡標的起秒；若前一句還沒講完就順延，講不完則用 atempo 加速（一般上限 1.35，段尾最後一句上限 1.5）。
 每句先統一響度到 LINE_LUFS，避免某個角色的聲線偏小聲。
 """
@@ -22,12 +24,17 @@ LIPSYNC_MIN = 0.3  # 開口差小於這個就不動
 ALIGN = {}  # sfx/align.json：{台詞檔名: [[TTS 秒, 影片秒], ...]}（align_dtw.py 產生）；有就照錨點逐段變速，取代上面整句對齊
 
 
+ANCHOR = {}  # run/<段>/anchors.json：{台詞檔名: 起秒}（run_series.sh 產生）；H3 已照這個時間的 TTS 生嘴型，原速放回原位，不走上面兩種對齊
+
+
 def start_of(ln):
     h3 = LIPSYNC.get(ln["file"])
     return h3[0] if h3 and abs(h3[0] - ln["start"]) > LIPSYNC_MIN else ln["start"]
 
 
 def schedule(lines, seg_dur):
+    if lines and all(ln["file"] in ANCHOR for ln in lines):  # 錨點段：時間就是錨進 H3 的時間，原速
+        return [(ln, ANCHOR[ln["file"]], 1.0) for ln in lines]
     plan, prev_end = [], 0.0
     for i, ln in enumerate(lines):
         t = max(start_of(ln), prev_end + GAP if plan else start_of(ln))
@@ -115,6 +122,12 @@ def load_sync(cfg, d):
         for f in cfg.get("lipsync_manual", {}):
             ALIGN.pop(f, None)
         print(f"DTW 逐段對齊：{len(ALIGN)} 句")
+    for f in sorted((d / "run").glob("S*/anchors.json")):
+        ANCHOR.update(json.loads(f.read_text(encoding="utf-8")))
+    for f in ANCHOR:  # 錨點句不再套 H3 開口時段或 DTW
+        LIPSYNC.pop(f, None); ALIGN.pop(f, None)
+    if ANCHOR:
+        print(f"TTS 錨點（原速放回）：{len(ANCHOR)} 句")
 
 
 if __name__ == "__main__":
