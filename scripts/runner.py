@@ -648,7 +648,15 @@ def run_batch(
     exec_timeout: float,
     create_session_if_named: bool = False,
     transport: Any = COLAB,
+    skip_job: Callable[[str], bool] | None = None,
+    more_jobs: Callable[[], list[dict[str, Any]] | None] | None = None,
+    on_job_done: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
+    """skip_job(job_id)：每鏡開始前問一次，True 就略過（狀態 cancelled），用來在鏡與鏡之間停止整批或拿掉單鏡；
+    正在推論的那一鏡不會被打斷，結束時照常 stop()（還原服務）。
+    more_jobs()：manifest 的鏡頭跑完後再要下一批（同 manifest 的 job 格式，可阻塞等呼叫端備好）；
+    回傳空或 None 就收工。呼叫端可以邊準備邊生成，交班與常駐容器整段只開一次。
+    on_job_done(這一鏡的 progress 項目)：每鏡完成或失敗就回報（含 output、stages），不用等整批結束。"""
     transport.check()
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     jobs = resolve_jobs(manifest, output_dir)
@@ -706,8 +714,25 @@ def run_batch(
         progress["updated_at"] = now_iso()
         write_progress(progress_path, progress)
 
-        for index, job in enumerate(jobs):
+        index = 0
+        while True:
+            if index >= len(jobs):
+                extra = more_jobs() if more_jobs else None
+                if not extra:
+                    break
+                added = resolve_jobs({"jobs": extra}, output_dir)
+                jobs.extend(added)
+                progress["jobs"].extend({"id": job["id"], "title": job["title"], "status": "queued",
+                                         "output": str(job["output_path"])} for job in added)
+                continue
+            job = jobs[index]
             current = progress["jobs"][index]
+            index += 1
+            if skip_job and skip_job(job["id"]):
+                current.update({"status": "cancelled", "finished_at": now_iso()})
+                progress["updated_at"] = now_iso()
+                write_progress(progress_path, progress)
+                continue
             current.update({"status": "uploading", "started_at": now_iso()})
             progress["current_job"] = job["id"]
             progress["updated_at"] = now_iso()
@@ -807,6 +832,8 @@ def run_batch(
             results.append({"id": job["id"], "output": str(job["output_path"]), "status": "completed"})
             progress["updated_at"] = now_iso()
             write_progress(progress_path, progress)
+            if on_job_done:
+                on_job_done(current)
     except ColabTimeoutError as exc:
         batch_error = str(exc)
         if "current_job" in progress:
@@ -845,7 +872,7 @@ def run_batch(
     failed = sum(item["status"] == "failed" for item in progress["jobs"])
     cancelled = sum(item["status"] == "cancelled" for item in progress["jobs"])
     progress.update({
-        "status": "completed" if not batch_error and completed == len(jobs) else "partial" if completed else "failed",
+        "status": "completed" if not batch_error and completed == len(jobs) else "partial" if completed or (cancelled and not batch_error) else "failed",
         "completed_count": completed,
         "failed_count": failed,
         "cancelled_count": cancelled,

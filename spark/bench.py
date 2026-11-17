@@ -655,6 +655,7 @@ job_timeout_seconds = float(os.environ.get("H3_JOB_TIMEOUT_SECONDS", "7200"))
 assert math.isfinite(job_timeout_seconds) and job_timeout_seconds > 0, "H3_JOB_TIMEOUT_SECONDS 必須是正數。"
 deadline = time.monotonic() + job_timeout_seconds
 last_report = 0
+wait_start = time.monotonic()
 while time.monotonic() < deadline:
     if 'COMFY_PROCESS' in globals() and COMFY_PROCESS.poll() is not None:
         raise RuntimeError(f"ComfyUI 已退出；查看 {LOG_PATH}\n" + LOG_PATH.read_text()[-5000:])
@@ -669,7 +670,8 @@ while time.monotonic() < deadline:
         if run.get("status", {}).get("status_str") == "success":
             raise RuntimeError("任務已完成但沒有 MP4 輸出：" + json.dumps(outputs, ensure_ascii=False))
     if time.monotonic() - last_report >= 60:
-        print("仍在生成影片…")
+        elapsed = int(time.monotonic() - wait_start)
+        print(f"仍在生成影片…（已等 {elapsed // 60} 分 {elapsed % 60:02d} 秒）")
         last_report = time.monotonic()
     time.sleep(10)
 else:

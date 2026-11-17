@@ -73,6 +73,7 @@
 ## 9. H3 影片（Spark 離線）
 - **前置**：素材 tar 到 Spark `~/h3-bench/comic-video/<篇目>/`；`.sh` 是 LF
 - **做**：`setsid nohup bash pipeline.sh <篇目> > <篇目>/pipeline.log 2>&1 < /dev/null &`（重導只寫一次）；看 `pipeline.status`
+- **對嘴靠 TTS 錨點**（2026-11-17 起）：`run_series.sh` 把每句 TTS 原速錨在起秒那一幀送進 H3，H3 照我們的聲音生嘴型，`mux.py` 原速放回同一時間，不再跑 DTW。所以 `audio/lines.json` 的起秒和配音要在這步之前定案；改了配音或起秒，那段 H3 要重跑。`run_series.sh` 印出「講到 X 秒，超過段長」時，先回第 6 步挪時段或縮句。原理與實測見 notes「對嘴」第 4 點
 - 使用者要中途暫停就照 notes 的「中途暫停」做；續跑時已有的段會跳過
 - **完成**：`pipeline.status` 最後一行 `DONE`
 

@@ -29,6 +29,23 @@ def durations(cfg):
     return {sid: dur for sid, dur, _ in cfg["shots"]}
 
 
+ANCHOR_GAP = 0.15  # 前一句還沒講完，下一句順延到講完後再隔這麼久
+
+
+def anchor_plan(lines, seg_dur):
+    """TTS 音訊錨點的起秒（2026-11-17 起）：每句原速放在分鏡起秒，前句沒講完就順延。
+    run_series.sh 照這個時間把 TTS 錨進 H3（H3 照我們的聲音生嘴型），mux.py／subs.py 用同一個時間放回 TTS，三者一致。
+    回傳 [(行, 起秒)]；講到段尾之後的句子會印警告（要在 lines.json 改起秒或縮短台詞）。"""
+    plan, prev_end = [], None
+    for ln in lines:
+        t = ln["start"] if prev_end is None else max(ln["start"], prev_end + ANCHOR_GAP)
+        prev_end = t + ln["audio_sec"]
+        if prev_end > seg_dur:
+            print(f"警告：{ln['file']} 講到 {prev_end:.2f}s，超過段長 {seg_dur}s", file=sys.stderr)
+        plan.append((ln, round(t, 3)))
+    return plan
+
+
 # 本地 LLM（分鏡、首幀 prompt、擴寫、外觀、對嘴檢查共用）。預設 8006＝Spark vLLM qwen3.8-nvfp4（2026-11-04 起取代 8002）；
 # 環境變數 LLM_PORT=8002 改回 llama.cpp。8006 平常可能停著（pipeline.sh 跑 H3 前會停掉它），第一次呼叫時自動 docker start。
 LLM_PORT = os.environ.get("LLM_PORT", os.environ.get("SB_PORT", "8006"))
