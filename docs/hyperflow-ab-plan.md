@@ -72,7 +72,7 @@
 
 結論：速度只快 17%，沒達到 30% 的門檻；盲選 A 贏 4 比 2。**不改預設**，`H3_DIFFUSION=hyperflow` 保留給需要省時或省記憶體的時候。
 影片宣稱快 2.5 倍，是 16G 顯卡跑原版塞不進顯存時比出來的；Spark 是統一記憶體，31B 本來就沒有那個瓶頸。
-測試腳本和輸出在 Spark 的 `~/h3-bench/staging/`（`ab.sh`、`ab/results.txt`、`ab/blind/`）。
+測試腳本和輸出原放在 Spark 的 `~/h3-bench/staging/`，2026-11-18 已清除。
 
 ## 需要使用者同意的步驟
 1. 下載 FL2VA int8 模型（16.0 GB）到 Spark。

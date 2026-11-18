@@ -398,6 +398,7 @@ non_diegetic_music: 1–3 句英文，樂器、速度、節奏、力度；不寫
 | 生首幀時 TTS 還開著，立繪一張 436 秒（關掉後 169 秒） | 記憶體被搶 | `qwen_frame.py` 開跑前自動關 TTS |
 | 「101」TTS 唸成一百零一 | 數字讀法 | config `pronounce` 加 `101→一零一`（字幕保留 101） |
 | 獨立段畫風不一致（部分偏 3D） | t2va 段落沒有共用參考 | 尚未解決：可改為每段都用 Qwen-Image 首幀 |
+| HyperFlow 14B（社群壓縮版）宣稱快 2.5 倍，在 Spark 上只快 17%（190–200 秒 vs 31B＋Flex 230–240 秒，12 秒草稿），盲選 31B 贏 4:2（2026-11-18，owl01v2 S01–S03） | 2.5 倍是 16G 顯卡跑 31B 原版塞不進顯存時比出來的；Spark 是 121G 統一記憶體，31B 本來就沒有這個瓶頸。另外 14B 改過模型結構，31B 用的 Flex／Turbo／換人 LoRA 都不能用 | 預設維持 31B＋Flex。`H3_DIFFUSION=hyperflow` 留著需要時用，只支援 FL2VA（首幀生影片），不能搭換人。詳見 [hyperflow-ab-plan.md](hyperflow-ab-plan.md) |
 
 ## 時間參考（本例）
 
