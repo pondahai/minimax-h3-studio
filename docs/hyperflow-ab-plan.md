@@ -1,6 +1,6 @@
 # HyperFlow H3 Flash（14B）vs 現行 31B：A/B 測試大綱
 
-狀態：大綱草稿，等使用者確認後才下載模型、改 `spark/bench.py`。
+狀態：2026-11-18 已測完草稿 A/B，結論是不改預設；使用者決定暫不再測（動作／多角色鏡頭、正式解析度、Ref2VA 版都先不做）。
 
 ## 授權（2026-11-18 讀過 LICENSE／NOTICE）
 - HyperFlow 是 MiniMax H3 的 Model Derivative（衍生模型），沿用同一份 **MiniMax H3 Community License**，和我們現在用的 31B 是同一份授權，沒有多出新條款。
