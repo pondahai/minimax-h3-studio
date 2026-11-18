@@ -153,6 +153,22 @@ if CHARACTER_SWAP:
     SWAP_LORA_REPO = "akatz-ai/MiniMax-H3-Character-Swap-LoRA"
     SWAP_LORA = "h3_character_swap_v1.5.safetensors"
     model_files.append((SWAP_LORA_REPO, SWAP_LORA, "loras"))
+# 主模型（H3_DIFFUSION）：h3（預設）＝31B＋Flex/Turbo LoRA；hyperflow＝Video Rebirth HyperFlow H3 Flash 14B int8（A/B 測試中，
+# 見 docs/hyperflow-ab-plan.md）。14B 不掛 LoRA，用 HyperFlowLoader＋HyperFlowSigmas（4/6/8 步，H3_HF_STEPS）＋euler、CFG 1。
+# 需要 custom_nodes/ComfyUI-HyperFlow-Flash，權重手動放進 models/diffusion_models（VideoRebirthAI/hyperflow-h3-flash）。
+DIFFUSION_CHOICE = os.environ.get("H3_DIFFUSION", "h3").strip().lower()
+assert DIFFUSION_CHOICE in {"h3", "hyperflow"}, "H3_DIFFUSION 請使用 h3 或 hyperflow。"
+HYPERFLOW = DIFFUSION_CHOICE == "hyperflow"
+HF_STEPS = int(os.environ.get("H3_HF_STEPS", "6"))
+if HYPERFLOW:
+    assert INFERENCE_MODE != "reference", "HyperFlow 目前只下載了 FL2VA 版。"
+    assert not CHARACTER_SWAP, "換人 LoRA 只支援 31B，不能搭 HyperFlow。"
+    assert HF_STEPS in {4, 6, 8}, "H3_HF_STEPS 請使用 4、6 或 8。"
+    DIFFUSION = "minimax_h3_fl2va_hyperflow_flash_14b-int8_convrot.safetensors"
+    FLEX = False
+    model_files = [f for f in model_files if f[2] not in {"diffusion_models", "loras"}]
+    assert (COMFY / "models" / "diffusion_models" / DIFFUSION).is_file(), f"找不到 HyperFlow 權重：{DIFFUSION}"
+    print("主模型：HyperFlow H3 Flash 14B，", HF_STEPS, "步")
 # 鎖定模型版本（HF commit）：避免上游用同檔名覆蓋成不同權重。PIN_UPSTREAM=False 時抓最新版。
 HF_REVISIONS = {
     "Comfy-Org/MiniMax-H3": "e5eb578a89295337b8ff433a035929ce0279e0b6",
@@ -502,6 +518,9 @@ graph = {
     "4": {"class_type": "VAELoader", "inputs": {"vae_name": VIDEO_VAE}},
     "5": {"class_type": "VAELoader", "inputs": {"vae_name": AUDIO_VAE}},
 }
+if HYPERFLOW:
+    graph["1"] = {"class_type": "HyperFlowLoader", "inputs": {"unet_name": DIFFUSION}}
+    del graph["2"]
 
 if INFERENCE_MODE == "reference":
     picture_inputs = {
@@ -571,7 +590,7 @@ else:
 # 時間軸錨點（Add Guide for MiniMax H3）：H3_GUIDES = [{"image": 路徑?, "audio": 路徑?, "frame": 幀}]
 # 兩種模式都可用：例如 Ref2VA 以圖錨定第 0 幀當首幀，或把一段音訊固定在某幀開始。
 CONDITIONING = ["7", 0]
-MODEL = ["2", 0]
+MODEL = ["1", 0] if HYPERFLOW else ["2", 0]
 if SWAP_LORA:
     graph["6b"] = {"class_type": "LoraLoaderModelOnly", "inputs": {"model": MODEL, "lora_name": SWAP_LORA, "strength_model": 1.0}}
     MODEL = ["6b", 0]
@@ -604,7 +623,8 @@ graph.update({
     "8": {"class_type": "BasicGuider", "inputs": {"model": MODEL, "conditioning": CONDITIONING}},
     "9": {"class_type": "RandomNoise", "inputs": {"noise_seed": SEED}},
     "10": {"class_type": "KSamplerSelect", "inputs": {"sampler_name": "lcm" if FLEX else SAMPLER_NAME}},
-    "11": ({"class_type": "ManualSigmas", "inputs": {"sigmas": FLEX_SIGMAS}} if FLEX else
+    "11": ({"class_type": "HyperFlowSigmas", "inputs": {"model": ["1", 0], "steps": HF_STEPS}} if HYPERFLOW else
+           {"class_type": "ManualSigmas", "inputs": {"sigmas": FLEX_SIGMAS}} if FLEX else
            {"class_type": "BasicScheduler", "inputs": {"model": MODEL, "scheduler": SCHEDULER_NAME, "steps": STEPS, "denoise": DENOISE}}),
     "12": {"class_type": "SamplerCustomAdvanced", "inputs": {
         "noise": ["9", 0], "guider": ["8", 0], "sampler": ["10", 0],
