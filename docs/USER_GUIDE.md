@@ -491,3 +491,5 @@ H3 的提示詞要用英文，並用 `<Picture 1>`、`<Video 1>` 等標籤指出
 網路上已有同樣回報：google-colab-cli [#220](https://github.com/googlecolab/google-colab-cli/issues/220)（WebSocket 短暫斷線後 CLI 不再追蹤執行，#221 修正）、[#147](https://github.com/googlecolab/google-colab-cli/issues/147)（runtime proxy token 約 1 小時過期後 kernel 失效、VM 照樣計費；換新 kernel 即恢復）、[#184](https://github.com/googlecolab/google-colab-cli/pull/184)（`--timeout` 行為）。11-19 用的是 0.7.4，新版 0.8.0 可能已含修正，待更新後驗證。
 
 **colab-cli 升級紀錄（2026-11-19）**：0.7.4 長時間批次頻繁 `Connection was lost`（見上游 #220／#147），owl01b2 批次跑完後升到 0.8.0（`python -m pip install --upgrade google-colab-cli`；`colab update` 只會提示、不會升級）。CPU session 冒煙測試通過：new、exec（含 `--env`）、upload、download、restart-kernel、stop 都正常；長時間 GPU 批次的斷線是否改善，下次整批實跑再確認。新機器照 requirements／SETUP 安裝會拿到最新版，不用改安裝腳本；已裝 0.7.4 的機器 `pip install -r` 不會自動升級，要手動 `--upgrade`。確認 0.8.0 解決斷線後，再把 requirements 下限改成 `>=0.8.0`。
+
+**0.8.0 實跑結果（2026-11-19 晚，漫畫工作流 owl01b3）**：A100 開機後 35 分鐘內 `colab exec` 仍斷線 5 次，時間點和 #147 的 token 過期（約 1 小時）不同；0.8.0 沒解決這種斷線，requirements 下限維持不改。靠「斷線就 restart-kernel 重試」能撐過，每次多 2～4 分鐘。另外 78 MB 的檔案 `colab upload` 一次會失敗（41 MB 可以），大檔要拆塊上傳。
