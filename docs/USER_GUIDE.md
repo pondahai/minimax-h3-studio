@@ -409,11 +409,12 @@ H3 的提示詞要用英文寫，並遵守標籤格式。Studio 提供三種輔�
 | 換人，7 秒 | 411 秒 | — |
 | 換人，9 秒 | 561 秒 | 約 13 分鐘 |
 | 換人，15 秒 | **超過 26 分鐘，被自動中止** | — |
+| FL2VA 草稿 672×384，7 秒＋2 個音訊錨點（2026-11-19，漫畫工作流 `spark/bench.py`） | **50 秒** | 5 分 25 秒（含開機、下載模型），0.34 CU |
 
 - 每次開 Colab 的準備時間約 3 分鐘：安裝約 30 秒、下載模型約 2 分鐘、啟動 ComfyUI 約 25 秒。
 - 推論時間不是跟秒數成正比，而是隨長度大約**平方**成長。**換人超過 10 秒時，請改用長片分段換人。**
 - 單次執行上限 25～26 分鐘，超過就會自動中止並釋放 Colab，避免浪費 CU。中止前用掉的時間仍然會扣 CU。
-- CU 參考：Ref2VA 12 秒約 1.1 CU。實測換人 3 次成功加 1 次超時，合計約 6.2 CU。
+- CU 參考：Ref2VA 12 秒約 1.1 CU。2026-11-19 `colab usage` 顯示 A100 high-mem 費率 8.88 CU／小時（10-22 為 6.77）；當天 H100、G4 連續 1.5 小時都排不到（`Service Unavailable`，不扣 CU）。實測換人 3 次成功加 1 次超時，合計約 6.2 CU。
 - 換算成台幣：A100 約 NT$0.37／分鐘，換人 9 秒約 NT$5。完整估算見 [成本估算](COST_ESTIMATE.md)。
 
 ---
@@ -482,3 +483,11 @@ A100 滿載時，Colab 會直接拒絕（503），而且沒有排隊機制。被
 
 **Q：寫了中文提示詞，結果和想的完全不一樣？**
 H3 的提示詞要用英文，並用 `<Picture 1>`、`<Video 1>` 等標籤指出素材，只有台詞能用中文。中文構想請先用「LLM 擴寫提示詞」轉成完整的英文提示詞。要換人的話，也記得勾選「換人模式」，並把秒數設成和原片差不多。
+
+### Colab 執行到一半「Connection was lost」或卡住不動（2026-11-19，漫畫工作流實測）
+
+`colab exec` 跑長時間工作會斷線（`Connection was lost`），本機 `colab.exe` 有時卡住不返回，A100 照樣計費；檔案 API（upload／download／ls）不受影響。做法：在 Colab 用背景子程序跑推論，本機每 15 秒 `colab download` 一個完成標記檔；每個 colab 呼叫加逾時；短 exec 失敗就 `colab restart-kernel` 再試（重啟後恢復）。另外 `colab new` 排不到 GPU 時仍回 0，要用 `colab sessions` 確認；Git Bash 下 colab.exe 只吃相對路徑（`C:/…` 會卡、`/c/…` 找不到）。參考 comic-to-animation-workflow `projects/comic-video/colab_series.sh`。`scripts/runner.py` 目前用一次 `colab exec` 跑整本 notebook，遇到這種斷線會觸發卡死保護或被當成失敗；之後可考慮改成背景執行＋檔案輪詢。
+
+網路上已有同樣回報：google-colab-cli [#220](https://github.com/googlecolab/google-colab-cli/issues/220)（WebSocket 短暫斷線後 CLI 不再追蹤執行，#221 修正）、[#147](https://github.com/googlecolab/google-colab-cli/issues/147)（runtime proxy token 約 1 小時過期後 kernel 失效、VM 照樣計費；換新 kernel 即恢復）、[#184](https://github.com/googlecolab/google-colab-cli/pull/184)（`--timeout` 行為）。11-19 用的是 0.7.4，新版 0.8.0 可能已含修正，待更新後驗證。
+
+**colab-cli 升級紀錄（2026-11-19）**：0.7.4 長時間批次頻繁 `Connection was lost`（見上游 #220／#147），owl01b2 批次跑完後升到 0.8.0（`python -m pip install --upgrade google-colab-cli`；`colab update` 只會提示、不會升級）。CPU session 冒煙測試通過：new、exec（含 `--env`）、upload、download、restart-kernel、stop 都正常；長時間 GPU 批次的斷線是否改善，下次整批實跑再確認。新機器照 requirements／SETUP 安裝會拿到最新版，不用改安裝腳本；已裝 0.7.4 的機器 `pip install -r` 不會自動升級，要手動 `--upgrade`。確認 0.8.0 解決斷線後，再把 requirements 下限改成 `>=0.8.0`。
