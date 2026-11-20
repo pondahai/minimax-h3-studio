@@ -493,3 +493,7 @@ H3 的提示詞要用英文，並用 `<Picture 1>`、`<Video 1>` 等標籤指出
 **colab-cli 升級紀錄（2026-11-19）**：0.7.4 長時間批次頻繁 `Connection was lost`（見上游 #220／#147），owl01b2 批次跑完後升到 0.8.0（`python -m pip install --upgrade google-colab-cli`；`colab update` 只會提示、不會升級）。CPU session 冒煙測試通過：new、exec（含 `--env`）、upload、download、restart-kernel、stop 都正常；長時間 GPU 批次的斷線是否改善，下次整批實跑再確認。新機器照 requirements／SETUP 安裝會拿到最新版，不用改安裝腳本；已裝 0.7.4 的機器 `pip install -r` 不會自動升級，要手動 `--upgrade`。確認 0.8.0 解決斷線後，再把 requirements 下限改成 `>=0.8.0`。
 
 **0.8.0 實跑結果（2026-11-19 晚，漫畫工作流 owl01b3）**：A100 開機後 35 分鐘內 `colab exec` 仍斷線 5 次，時間點和 #147 的 token 過期（約 1 小時）不同；0.8.0 沒解決這種斷線，requirements 下限維持不改。靠「斷線就 restart-kernel 重試」能撐過，每次多 2～4 分鐘。另外 78 MB 的檔案 `colab upload` 一次會失敗（41 MB 可以），大檔要拆塊上傳。
+
+### 多段影片接起來後越播越不對嘴、拖動進度又對上
+
+**接段後越播越不對嘴、拖動又對上（2026-11-19～20，漫畫工作流 owl01b2／owl01b3）**：用 concat demuxer `-c copy` 接多段 H3 成品時，(1) 畫面：每段起點 0.02 秒，接縫留下間隔與重複時間戳；(2) 音訊（主因）：每段 AAC 的前置延遲、尾端不足一個封包，接起來靠拉長封包時間補洞，實際樣本比畫面短（49 段累積 2.4 秒）。ffmpeg 解碼照時間戳補靜音所以檢查都對，瀏覽器類播放器（Claude Code 內建）和手機連續播放樣本 → 聲音越來越早。修法：接段時音訊 `aresample=async=1:first_pts=0` 重新編碼、畫面 `setpts=N/24/TB` 重新編碼；檢查：音訊封包數 ×1024／48000 要等於畫面長度。用 concat「濾鏡」（重新編碼）接段的不受影響。 本專案 `app.py` 的長片接段用 concat 濾鏡，目前不受影響；之後若改成 `-c copy` 接段要注意。
