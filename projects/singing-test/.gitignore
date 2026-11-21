@@ -2,6 +2,7 @@ audio/
 frames/
 outputs/
 outputs_accomp_ab/
+outputs_matte_2angle/
 *.mp4
 *.wav
 *.png
