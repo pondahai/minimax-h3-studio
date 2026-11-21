@@ -1,0 +1,7 @@
+audio/
+frames/
+outputs/
+outputs_accomp_ab/
+*.mp4
+*.wav
+*.png

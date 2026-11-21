@@ -1,0 +1,7 @@
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Photorealistic live acoustic studio performance film. The young Taiwanese female indie folk singer in <Picture 1> remains seated on the wooden stool in the warm cozy café, preserving her exact face, dark brown medium-length hair, cream knit sweater, natural acoustic guitar, vintage condenser microphone positioned below and slightly aside from her mouth, and the warm tungsten bokeh lights behind her. From 00:00.000 to 00:00.470, she gently strums the acoustic guitar and takes a soft breath as she prepares to sing. From 00:00.470 to 00:04.550, she sings expressively and melodically with clear, natural lip, tongue, and jaw articulation synchronized to every sung syllable, gently swaying her upper body and strumming the guitar as she sings: <d>[Chinese] 感受停在我髮端的指尖，</d>. From 00:04.550 to 00:10.120, she leans slightly closer with heartfelt emotion, briefly softening her eyes on sustained notes while singing clearly and melodically: <d>[Chinese] 如何瞬間凍結時間。</d>. From 00:10.120 to 00:10.833, she holds a tender expression and lets the last note gently fade out. The camera performs a very slow, steady push-in at medium close-up scale so her mouth and facial expressions remain sharp and unobstructed throughout.
+
+overall_soundscape: Clean, intimate studio close-mic female Mandarin solo singing vocal synchronized precisely to her lip movements. No crowd chatter, no spoken dialogue.
+
+non_diegetic_music: N/A
