@@ -3,6 +3,7 @@ frames/
 outputs/
 outputs_accomp_ab/
 outputs_matte_2angle/
+outputs_onetake_ab/
 *.mp4
 *.wav
 *.png
